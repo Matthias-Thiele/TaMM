@@ -1,0 +1,8 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}(c) 2023 by Matthias Thiele
+${licensePrefix}GNU General Public License v3.0
+<#if licenseLast??>
+${licenseLast}
+</#if>

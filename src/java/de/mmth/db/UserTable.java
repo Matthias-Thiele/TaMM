@@ -1,7 +1,8 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * (c) 2023 by Matthias Thiele
+ * GNU General Public License v3.0
  */
+
 package de.mmth.db;
 
 import de.mmth.TammError;
