@@ -24,5 +24,6 @@ hs_err_pid*
 replay_pid*
 
 # ignore lib and build directories
-/lib
-/build
+lib/
+build/
+
