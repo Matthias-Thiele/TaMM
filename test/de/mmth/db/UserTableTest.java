@@ -42,6 +42,7 @@ public class UserTableTest {
   public void testWriteReadUser() throws TammError {
     System.out.println("writeReadUser");
     UserTable instance = new UserTable(con, "testusers");
+    // admin user with id=1 automatically created
     
     UserData user = new UserData();
     user.name = "Test1";
@@ -80,13 +81,13 @@ public class UserTableTest {
     
     UserData user5 = new UserData();
     user5.name = "Test2";
-    user5.administratorId = 1;
+    user5.administratorId = 2;
     instance.writeUser(user5);
     
     List<UserData> users1 = instance.listUsers(-1);
-    assertEquals("Two users expected.", users1.size(), 2);
+    assertEquals("Three users expected.", users1.size(), 3);
     
-    List<UserData> users2 = instance.listUsers(1);
+    List<UserData> users2 = instance.listUsers(2);
     assertEquals("One user expected.", users2.size(), 1);
     assertEquals("User Test2 expected.", users2.get(0).name, user5.name);
     

@@ -41,6 +41,18 @@ public class UserTable extends DBTable {
    */
   public UserTable(DBConnect conn, String tableName) {
     super(conn, tableName, TABLE_CONFIG);
+    if (isNewTable) {
+      UserData admin = new UserData();
+      admin.name = "admin";
+      admin.pwd = "";
+      admin.isMainAdmin = true;
+      admin.supervisorId = 1;
+      try {
+        writeUser(admin);
+      } catch (TammError ex) {
+        logger.warn("Cannot create admin user.", ex);
+      }
+    }
   }
   
   /**
@@ -98,7 +110,7 @@ public class UserTable extends DBTable {
     if (user.id == -1) {
       cmd = "INSERT INTO " + tableName + " (" + insertNames + ") values " + paramPlaceholders;
     } else {
-      cmd = "UPDATE " + tableName + " SET " + updateNames;
+      cmd = "UPDATE " + tableName + " SET " + updateNames + " WHERE id = " + user.id;
     }
     logger.debug("SQL: " + cmd);
     

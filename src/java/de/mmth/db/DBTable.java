@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class DBTable {
   private static final Logger logger = LogManager.getLogger(DBTable.class);
-  private boolean isNewTable = false;
+  protected boolean isNewTable = false;
   protected String tableName;
   
   protected String insertNames;
