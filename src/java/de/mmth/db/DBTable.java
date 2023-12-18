@@ -51,7 +51,6 @@ public class DBTable {
     try {
       try (java.sql.PreparedStatement tableInfo = conn.getConnection().prepareStatement(checkCmd)) {
         var result = tableInfo.executeQuery();
-        System.out.println(result);
         if (!result.next()) {
           // table does not exist, create it now
           try (java.sql.PreparedStatement createStmt = conn.getConnection().prepareStatement(createCmd)) {

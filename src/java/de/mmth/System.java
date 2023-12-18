@@ -85,7 +85,7 @@ public class System extends HttpServlet {
    */
   @Override
   public String getServletInfo() {
-    return "Short description";
+    return "Task Management and Monitoring";
   }// </editor-fold>
 
 }

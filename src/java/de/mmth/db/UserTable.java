@@ -7,7 +7,10 @@ package de.mmth.db;
 
 import de.mmth.TammError;
 import de.mmth.data.UserData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +30,7 @@ public class UserTable extends DBTable {
     mail V 100
     flags I
     supervisor I
+    administrator I
     """;
   
   /**
@@ -48,7 +52,7 @@ public class UserTable extends DBTable {
    * @throws TammError 
    */
   public UserData readUser(int byId, String byNameOrMail) throws TammError {
-    UserData result = new UserData();
+    UserData result = null;
     var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE ";
     if (byNameOrMail != null) {
       cmd += " name = ? or mail = ?";
@@ -72,12 +76,7 @@ public class UserTable extends DBTable {
           throw new TammError("User not found.");
         }
         
-        result.id = userRows.getInt(1);
-        result.name = userRows.getString(2);
-        result.pwd = userRows.getString(3);
-        result.mail = userRows.getString(4);
-        result.setFlags(userRows.getInt(5));
-        result.supervisorId = userRows.getInt(6);
+        result = getData(userRows);
       }
     } catch (SQLException ex) {
       logger.warn("Error writing user data.", ex);
@@ -111,6 +110,7 @@ public class UserTable extends DBTable {
         stmt.setString(col++, user.mail);
         stmt.setInt(col++, user.getFlags());
         stmt.setInt(col++, user.supervisorId);
+        stmt.setInt(col++, user.administratorId);
 
         stmt.execute();
       }
@@ -118,5 +118,62 @@ public class UserTable extends DBTable {
       logger.warn("Error writing user data.", ex);
       throw new TammError("Error writing user data.");
     }
+  }
+  
+  /**
+   * Lists all users of an admininstrator oder subadmin.
+   * 
+   * @param administratorId
+   * @return
+   * @throws TammError 
+   */
+  public List<UserData> listUsers(int administratorId) throws TammError {
+    List<UserData> result = new ArrayList<>();
+    
+    var cmd = "SELECT " + this.selectNames + " FROM " + tableName;
+    if (administratorId != -1) {
+      cmd += " WHERE administrator = ?";
+    }
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        if (administratorId != -1) {
+          stmt.setInt(1, administratorId);
+        }
+        
+        var userRows = stmt.executeQuery();
+        while (userRows.next()) {
+          var user = getData(userRows);
+          logger.debug("User found: " + user.name);
+          result.add(user);
+        }
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error reading user list.", ex);
+      throw new TammError("Error reading user list.");
+    }
+    return result;
+  }
+  
+  /**
+   * Copies the ResultSet user data into an UserData object.
+   * 
+   * @param userRows
+   * @return
+   * @throws SQLException 
+   */
+  private UserData getData(ResultSet userRows) throws SQLException {
+    UserData result = new UserData();
+    
+    result.id = userRows.getInt(1);
+    result.name = userRows.getString(2);
+    result.pwd = userRows.getString(3);
+    result.mail = userRows.getString(4);
+    result.setFlags(userRows.getInt(5));
+    result.supervisorId = userRows.getInt(6);
+    result.administratorId = userRows.getInt(7);
+    
+    return result;
   }
 }

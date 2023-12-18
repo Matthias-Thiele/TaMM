@@ -23,6 +23,7 @@ public class UserData {
   public boolean isSubAdmin;
   
   public int supervisorId;
+  public int administratorId;
   
   /**
    * Split the integer flag set into booleans.
