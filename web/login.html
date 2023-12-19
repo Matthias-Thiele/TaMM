@@ -10,47 +10,7 @@ Task Management and Monitoring
         <title>TaMM</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-            body {
-                font-family: Tahoma;
-            }
-            
-            .loginbox {
-                margin-left: 20pt;
-                margin-top: 20pt;
-                border: 1px silver solid;
-                width: 310pt;
-                border-radius: 5pt;
-                box-shadow: 5px 3px 3px gray;
-            }
-            
-            .header {
-                font-size: 14pt;
-                background-color: #f0f0f0;
-                padding: 5px;
-            }
-            
-            
-            label {
-                width: 120pt;
-                margin: 5pt;
-                display: inline-block;
-            }
-            
-            button {
-                position: relative;
-                margin: 5pt;
-                left: 228pt;
-            }
-            
-            .statusbar {
-                background-color: #f0f0f0;
-                color: maroon;
-                font-size: 12pt;
-                padding: 5pt;
-                height: 16pt;
-            }
-        </style>
+        <link rel="stylesheet" href="tamm.css">
         <script>
             function doLogin() {
                 var loginData = {};
@@ -79,7 +39,7 @@ Task Management and Monitoring
         </script>
     </head>
     <body>
-        <div class="loginbox">
+        <div class="dialogbox">
             <div class="header">TaMM - Task Management & Monitoring</div>
             <div><label>Anwendername</label><input type="text" id="name"></div>
             <div><label>Passwort</label><input type="text" id="pwd"></div>

@@ -1,0 +1,49 @@
+/*
+(c) 2023 by Matthias Thiele
+GNU General Public License v3.0
+*/
+/* 
+    Created on : 19.12.2023, 20:21:03
+    Author     : matthias
+*/
+
+body {
+    font-family: Tahoma;
+}
+
+.dialogbox {
+    margin-left: 20pt;
+    margin-top: 20pt;
+    border: 1px silver solid;
+    width: 310pt;
+    border-radius: 5pt;
+    box-shadow: 5px 3px 3px gray;
+}
+
+.header {
+    font-size: 14pt;
+    background-color: #f0f0f0;
+    padding: 5px;
+}
+
+
+label {
+    width: 120pt;
+    margin: 5pt;
+    display: inline-block;
+}
+
+button {
+    position: relative;
+    margin: 5pt;
+    left: 228pt;
+}
+
+.statusbar {
+    background-color: #f0f0f0;
+    color: maroon;
+    font-size: 12pt;
+    padding: 5pt;
+    height: 16pt;
+}
+
