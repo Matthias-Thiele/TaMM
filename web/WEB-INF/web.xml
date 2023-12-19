@@ -2,11 +2,11 @@
 <web-app version="4.0" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd">
     <servlet>
         <servlet-name>System</servlet-name>
-        <servlet-class>de.mmth.System</servlet-class>
+        <servlet-class>de.mmth.tamm.System</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>System</servlet-name>
-        <url-pattern>/system</url-pattern>
+        <url-pattern>/system/*</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

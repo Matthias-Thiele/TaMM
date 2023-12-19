@@ -2,7 +2,7 @@
  * (c) 2023 by Matthias Thiele
  * GNU General Public License v3.0
  */
-package de.mmth.db;
+package de.mmth.tamm.db;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!--
+TaMM
+Task Management and Monitoring
+
+(c) 2023 Matthias Thiele
+-->
+<html>
+    <head>
+        <title>TaMM</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                font-family: Tahoma;
+            }
+            
+            .loginbox {
+                margin-left: 20pt;
+                margin-top: 20pt;
+                border: 1px silver solid;
+                width: 310pt;
+                border-radius: 5pt;
+                box-shadow: 5px 3px 3px gray;
+            }
+            
+            .header {
+                font-size: 14pt;
+                background-color: #f0f0f0;
+                padding: 5px;
+            }
+            
+            
+            label {
+                width: 120pt;
+                margin: 5pt;
+                display: inline-block;
+            }
+            
+            button {
+                position: relative;
+                margin: 5pt;
+                left: 228pt;
+            }
+            
+            .statusbar {
+                background-color: #f0f0f0;
+                color: maroon;
+                font-size: 12pt;
+                padding: 5pt;
+                height: 16pt;
+            }
+        </style>
+        <script>
+            function doLogin() {
+                var loginData = {};
+                loginData.name = document.getElementById("name").value;
+                loginData.pwd = document.getElementById("pwd").value;
+                console.log(loginData);
+                
+                var request = new XMLHttpRequest();
+                request.open("POST", "system/login");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(loginData));
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        if (response.result === "ok") {
+                          window.location = "index.html";
+                      } else {
+                          var status = document.getElementById("status");
+                          status.innerText = "Unbekannter Anwender oder falsches Passwort.";
+                      }
+                    }
+                };
+            }
+        </script>
+    </head>
+    <body>
+        <div class="loginbox">
+            <div class="header">TaMM - Task Management & Monitoring</div>
+            <div><label>Anwendername</label><input type="text" id="name"></div>
+            <div><label>Passwort</label><input type="text" id="pwd"></div>
+            <div><button onclick="doLogin();">Anmelden</button></div>
+            <div class="statusbar" id="status"></div>
+        </div>
+    </body>
+</html>

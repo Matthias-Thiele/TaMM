@@ -3,10 +3,10 @@
  * GNU General Public License v3.0
  */
 
-package de.mmth.db;
+package de.mmth.tamm.db;
 
-import de.mmth.TammError;
-import de.mmth.data.UserData;
+import de.mmth.tamm.TammError;
+import de.mmth.tamm.data.UserData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;

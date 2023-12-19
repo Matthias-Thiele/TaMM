@@ -3,7 +3,7 @@
  * GNU General Public License v3.0
  */
 
-package de.mmth;
+package de.mmth.tamm;
 
 /**
  * Application error.

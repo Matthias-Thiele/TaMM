@@ -3,7 +3,7 @@
  * GNU General Public License v3.0
  */
 
-package de.mmth.db;
+package de.mmth.tamm.db;
 
 import java.sql.DriverManager;
 import java.sql.Connection;

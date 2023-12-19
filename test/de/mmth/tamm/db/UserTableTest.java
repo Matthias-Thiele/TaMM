@@ -3,10 +3,10 @@
  * GNU General Public License v3.0
  */
 
-package de.mmth.db;
+package de.mmth.tamm.db;
 
-import de.mmth.TammError;
-import de.mmth.data.UserData;
+import de.mmth.tamm.TammError;
+import de.mmth.tamm.data.UserData;
 import java.util.List;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

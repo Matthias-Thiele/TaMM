@@ -3,7 +3,7 @@
  * GNU General Public License v3.0
  */
 
-package de.mmth.data;
+package de.mmth.tamm.data;
 
 /**
  * Data object for the user data table.

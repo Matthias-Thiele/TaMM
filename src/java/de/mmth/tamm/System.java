@@ -3,14 +3,18 @@
  * GNU General Public License v3.0
  */
 
-package de.mmth;
+package de.mmth.tamm;
 
+import de.mmth.tamm.data.SessionData;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.io.InputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 public class System extends HttpServlet {
   
   private static final Logger logger = LogManager.getLogger(System.class);
+  private final PostProcessor postProcessor = new PostProcessor();
   
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -75,7 +80,23 @@ public class System extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
-    processRequest(request, response);
+    try (InputStream content = request.getInputStream()) {
+      HttpSession session = request.getSession();
+      SessionData sd = (SessionData) session.getAttribute("TAMM");
+      if (sd == null) {
+        sd = new SessionData();
+        session.setAttribute("TAMM", sd);
+      }
+      
+      try {
+        String requestUri = request.getRequestURI();
+        ServletOutputStream out = response.getOutputStream();
+        postProcessor.process(sd, requestUri, content, out);
+        out.flush();
+      } catch(Exception ex) {
+        // dont leak internal exceptions to browser
+      }
+    }
   }
 
   /**
