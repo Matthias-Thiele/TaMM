@@ -9,6 +9,7 @@ import de.mmth.tamm.data.SessionData;
 import com.google.gson.Gson;
 import de.mmth.tamm.data.AdminData;
 import de.mmth.tamm.data.JsonResult;
+import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -93,7 +94,7 @@ public class PostProcessor {
     JsonResult result = new JsonResult();
     try {
     var user = application.users.readUser(-1, loginData.name);
-    if (user.pwd.equals(loginData.pwd)) {
+    if (ServletUtils.comparePassword(user.pwd, loginData.pwd)) {
       result.result = "ok";
       result.nextPage = "index.html";
       session.loginTime = new Date();

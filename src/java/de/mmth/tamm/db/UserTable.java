@@ -7,6 +7,7 @@ package de.mmth.tamm.db;
 
 import de.mmth.tamm.TammError;
 import de.mmth.tamm.data.UserData;
+import de.mmth.tamm.utils.ServletUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class UserTable extends DBTable {
     if (isNewTable) {
       UserData admin = new UserData();
       admin.name = "admin";
-      admin.pwd = "";
+      admin.pwd = "tamm279";
       admin.isMainAdmin = true;
       admin.supervisorId = 1;
       try {
@@ -118,7 +119,7 @@ public class UserTable extends DBTable {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
         var col = 1;
         stmt.setString(col++, user.name);
-        stmt.setString(col++, user.pwd);
+        stmt.setString(col++, ServletUtils.encodePassword(user.pwd));
         stmt.setString(col++, user.mail);
         stmt.setInt(col++, user.getFlags());
         stmt.setInt(col++, user.supervisorId);
