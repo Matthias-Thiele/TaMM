@@ -5,7 +5,8 @@
 package de.mmth.tamm.data;
 
 /**
- *
+ * Data object as POST result.
+ * 
  * @author matthias
  */
 public class JsonResult {

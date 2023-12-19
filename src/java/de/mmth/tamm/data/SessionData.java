@@ -7,7 +7,8 @@ package de.mmth.tamm.data;
 import java.util.Date;
 
 /**
- *
+ * Session data.
+ * 
  * @author matthias
  */
 public class SessionData {

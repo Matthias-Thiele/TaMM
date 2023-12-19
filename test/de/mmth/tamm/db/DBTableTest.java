@@ -26,7 +26,7 @@ public class DBTableTest {
   
   @AfterClass
   public static void tearDownClass() {
-    con.dropDB("test");
+    con.dropDB();
     con.close();
   }
 

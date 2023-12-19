@@ -79,11 +79,9 @@ public class DBConnect {
    * 
    * Be careful, all data and all tables will be lost!
    * 
-   * @param dbName schema name/ database name
-   * 
    * @return true if successful deleted
    */
-  public boolean dropDB(String dbName) {
+  public boolean dropDB() {
     String dropCmd = "DROP SCHEMA " + dbName + " CASCADE";
     try {
       try (java.sql.PreparedStatement dropSchema = conn.prepareStatement(dropCmd)) {

@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Date;
 
 /**
  *
@@ -55,7 +56,7 @@ public class PostProcessor {
     try (Reader reader = new InputStreamReader(sourceData)) {
       switch (uriParts[3]) {
         case "login":
-          processLogin(reader, resultData);
+          processLogin(reader, resultData, session);
           break;
           
         case "initdata":
@@ -87,7 +88,7 @@ public class PostProcessor {
    * @param resultData
    * @throws IOException 
    */
-  private void processLogin(Reader reader, OutputStream resultData) throws IOException, TammError {
+  private void processLogin(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     LoginData loginData = new Gson().fromJson(reader, LoginData.class);
     JsonResult result = new JsonResult();
     try {
@@ -95,6 +96,7 @@ public class PostProcessor {
     if (user.pwd.equals(loginData.pwd)) {
       result.result = "ok";
       result.nextPage = "index.html";
+      session.loginTime = new Date();
     } else {
       result.result = "error";
       result.nextPage = "";

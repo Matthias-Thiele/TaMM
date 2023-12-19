@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.InputStream;
-import java.util.Date;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -65,7 +64,6 @@ public class System extends HttpServlet {
         sd = new SessionData();
         session.setAttribute("TAMM", sd);
         sd.clientIp = ServletUtils.getClientIp(request);
-        sd.loginTime = new Date();
         logger.info("New session from address " + sd.clientIp);
       }
       

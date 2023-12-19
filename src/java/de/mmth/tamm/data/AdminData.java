@@ -5,7 +5,8 @@
 package de.mmth.tamm.data;
 
 /**
- *
+ * Data object for the global system configuration.
+ * 
  * @author matthias
  */
 public class AdminData {

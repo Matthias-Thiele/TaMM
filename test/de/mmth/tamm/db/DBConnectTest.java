@@ -21,7 +21,7 @@ public class DBConnectTest {
   public void testDatabaseCreation() {
     DBConnect con = new DBConnect("jdbc:postgresql://localhost:5432/postgres", "test", "postgres", "postgres");
     assertTrue("Error creating/ connecting database", con.isValid());
-    assertTrue("Error dropping database", con.dropDB("test"));
+    assertTrue("Error dropping database", con.dropDB());
     assertNotNull("No JDBC handle available", con.getConnection());
     con.close();
   }

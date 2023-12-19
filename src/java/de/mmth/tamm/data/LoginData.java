@@ -7,7 +7,8 @@
 package de.mmth.tamm.data;
 
 /**
- *
+ * Data object from the login dialog.
+ * 
  * @author matthias
  */
 public class LoginData {

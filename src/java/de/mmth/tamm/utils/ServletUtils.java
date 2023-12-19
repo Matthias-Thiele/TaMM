@@ -12,6 +12,12 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class ServletUtils {
   
+/**
+ * Extract the client IP address.
+ * 
+ * @param request
+ * @return 
+ */
 public static String getClientIp(HttpServletRequest request) {
   String remoteAddr = "";
 

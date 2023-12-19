@@ -14,7 +14,6 @@ import java.util.prefs.Preferences;
  * @author matthias
  */
 public class ApplicationData {
-  private static final String DB_SCHEMA = "dbschema";
   private static final String DB_URL = "dburl";
   private static final String DB_NAME = "dbname";
   private static final String DB_PASSWORD = "dbpassword";
