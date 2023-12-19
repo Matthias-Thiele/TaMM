@@ -6,8 +6,8 @@
 package de.mmth.tamm;
 
 import de.mmth.tamm.data.SessionData;
+import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.InputStream;
+import java.util.Date;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,36 +26,14 @@ import org.apache.logging.log4j.Logger;
 public class System extends HttpServlet {
   
   private static final Logger logger = LogManager.getLogger(System.class);
-  private final PostProcessor postProcessor = new PostProcessor();
+  private final ApplicationData application = new ApplicationData();
+  private final PostProcessor postProcessor = new PostProcessor(application);
   
-  /**
-   * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-   *
-   * @param request servlet request
-   * @param response servlet response
-   * @throws ServletException if a servlet-specific error occurs
-   * @throws IOException if an I/O error occurs
-   */
-  protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
-    logger.info("processRequest");
-    
-    response.setContentType("text/html;charset=UTF-8");
-    try (PrintWriter out = response.getWriter()) {
-      /* TODO output your page here. You may use following sample code. */
-      out.println("<!DOCTYPE html>");
-      out.println("<html>");
-      out.println("<head>");
-      out.println("<title>Servlet System</title>");      
-      out.println("</head>");
-      out.println("<body>");
-      out.println("<h1>Servlet System at " + request.getContextPath() + "</h1>");
-      out.println("</body>");
-      out.println("</html>");
-    }
+  @Override
+  public void init() {
+    application.setSchema("tamm");
   }
-
-  // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+  
   /**
    * Handles the HTTP <code>GET</code> method.
    *
@@ -66,7 +45,6 @@ public class System extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
-    processRequest(request, response);
   }
 
   /**
@@ -86,6 +64,9 @@ public class System extends HttpServlet {
       if (sd == null) {
         sd = new SessionData();
         session.setAttribute("TAMM", sd);
+        sd.clientIp = ServletUtils.getClientIp(request);
+        sd.loginTime = new Date();
+        logger.info("New session from address " + sd.clientIp);
       }
       
       try {
@@ -93,8 +74,9 @@ public class System extends HttpServlet {
         ServletOutputStream out = response.getOutputStream();
         postProcessor.process(sd, requestUri, content, out);
         out.flush();
-      } catch(Exception ex) {
+      } catch(Throwable ex) {
         // dont leak internal exceptions to browser
+        logger.warn("Unexpected error in post processing.", ex);
       }
     }
   }
@@ -107,6 +89,6 @@ public class System extends HttpServlet {
   @Override
   public String getServletInfo() {
     return "Task Management and Monitoring";
-  }// </editor-fold>
+  }
 
 }

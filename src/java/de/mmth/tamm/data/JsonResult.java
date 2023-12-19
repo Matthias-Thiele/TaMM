@@ -4,13 +4,12 @@
  */
 package de.mmth.tamm.data;
 
-import java.util.Date;
-
 /**
  *
  * @author matthias
  */
-public class SessionData {
-  public String clientIp;
-  public Date loginTime;
+public class JsonResult {
+  public String result;
+  public String message;
+  public String nextPage;
 }

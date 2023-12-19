@@ -56,6 +56,8 @@ Task Management and Monitoring
                 var loginData = {};
                 loginData.name = document.getElementById("name").value;
                 loginData.pwd = document.getElementById("pwd").value;
+                var status = document.getElementById("status");
+                status.innerText = "Warte auf Serverantwort...";
                 console.log(loginData);
                 
                 var request = new XMLHttpRequest();
@@ -66,11 +68,11 @@ Task Management and Monitoring
                     if (this.readyState === 4 && this.status === 200) {
                         var response = JSON.parse(this.responseText);
                         if (response.result === "ok") {
-                          window.location = "index.html";
-                      } else {
+                          window.location = response.nextPage;
+                        } else {
                           var status = document.getElementById("status");
-                          status.innerText = "Unbekannter Anwender oder falsches Passwort.";
-                      }
+                          status.innerText = response.message;
+                        }
                     }
                 };
             }

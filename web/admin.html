@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!--
+(c) 2023 by Matthias Thiele
+GNU General Public License v3.0
+-->
+<html>
+    <head>
+        <title>System Administration</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script>
+            function doSave() {
+                var data = {};
+                data.dburl = document.getElementById("dburl").value;
+                data.name = document.getElementById("name").value;
+                data.password = document.getElementById("password").value;
+                console.log(data);
+                
+                var request = new XMLHttpRequest();
+                request.open("POST", "system/initdata");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(data));
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        if (response.result === "ok") {
+                          window.location = response.nextPage;
+                        } else {
+                          var status = document.getElementById("status");
+                          status.innerText = "Unbekannter Fehler beim Speichern.";
+                        }
+                    }
+                };
+            }
+        </script>
+    </head>
+    <body>
+        <div>System Administration</div>
+        <div><label>Database URL</label><input type="text" id="dburl"></div>
+        <div><label>DB Admin Name</label><input type="text" id="name"></div>
+        <div><label>DB Password</label><input type="text" id="password"></div>
+        <div><button onclick="doSave();">Speichern</button></div>
+    </body>
+</html>
