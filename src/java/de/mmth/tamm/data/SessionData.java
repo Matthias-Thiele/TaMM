@@ -14,4 +14,5 @@ import java.util.Date;
 public class SessionData {
   public String clientIp;
   public Date loginTime;
+  public UserData user;
 }

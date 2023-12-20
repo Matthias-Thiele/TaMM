@@ -26,6 +26,12 @@ public class ApplicationData {
   public DBConnect db;
   public UserTable users;
   
+  /**
+   * Reads the database access information from the registry
+   * and tries to connect.
+   * 
+   * @return 
+   */
   public boolean checkInit() {
     if (db != null && db.isValid()) {
       return true;
@@ -48,6 +54,13 @@ public class ApplicationData {
     return db != null;
   }
   
+  /**
+   * Stores the database access information into the registry.
+   * 
+   * TODO: encrypt password.
+   * 
+   * @param data 
+   */
   public void setAdminData(AdminData data) {
     dbUrl = data.dburl;
     dbAdmin = data.name;

@@ -35,7 +35,12 @@ public class DBConnect {
     isValid = false;
     try {
       logger.info("Start connecting to database " + dbName);
-      conn = DriverManager.getConnection(url, userName, password);
+      try {
+        conn = DriverManager.getConnection(url, userName, password);
+      } catch(SQLException ex2) {
+        // for some reason the first try always fails in Tomcat.
+        conn = DriverManager.getConnection(url, userName, password);        
+      }
       this.dbName = dbName;
       
       if (conn != null) {

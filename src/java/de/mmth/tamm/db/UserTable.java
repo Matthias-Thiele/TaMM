@@ -7,7 +7,6 @@ package de.mmth.tamm.db;
 
 import de.mmth.tamm.TammError;
 import de.mmth.tamm.data.UserData;
-import de.mmth.tamm.utils.ServletUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class UserTable extends DBTable {
       UserData admin = new UserData();
       admin.name = "admin";
       admin.pwd = "tamm279";
-      admin.isMainAdmin = true;
+      admin.mainAdmin = true;
       admin.supervisorId = 1;
       try {
         writeUser(admin);
@@ -119,7 +118,7 @@ public class UserTable extends DBTable {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
         var col = 1;
         stmt.setString(col++, user.name);
-        stmt.setString(col++, ServletUtils.encodePassword(user.pwd));
+        stmt.setString(col++, user.pwd);
         stmt.setString(col++, user.mail);
         stmt.setInt(col++, user.getFlags());
         stmt.setInt(col++, user.supervisorId);
@@ -137,22 +136,47 @@ public class UserTable extends DBTable {
    * Lists all users of an admininstrator oder subadmin.
    * 
    * @param administratorId
+   * @param filter
    * @return
    * @throws TammError 
    */
-  public List<UserData> listUsers(int administratorId) throws TammError {
+  public List<UserData> listUsers(int administratorId, String filter) throws TammError {
+    boolean hasId = administratorId != -1;
+    boolean hasFilter = filter != null && !filter.isBlank();
+    
     List<UserData> result = new ArrayList<>();
     
     var cmd = "SELECT " + this.selectNames + " FROM " + tableName;
-    if (administratorId != -1) {
-      cmd += " WHERE administrator = ?";
+    
+    if (hasId || hasFilter) {
+      cmd += " WHERE ";
     }
+    
+    if (hasId) {
+      cmd += "administrator = ? ";
+      if (hasFilter) {
+        cmd += "and ";
+      }
+    }
+    
+    if (hasFilter) {
+      cmd += "( name ILIKE ? or mail ILIKE ? ) ";
+    }
+    
+    cmd += " ORDER BY name";
+    
     logger.debug("SQL: " + cmd);
     
     try {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
-        if (administratorId != -1) {
-          stmt.setInt(1, administratorId);
+        int paramCol = 1;
+        if (hasId) {
+          stmt.setInt(paramCol++, administratorId);
+        }
+        
+        if (hasFilter) {
+          stmt.setString(paramCol++, filter);
+          stmt.setString(paramCol++, filter);
         }
         
         var userRows = stmt.executeQuery();

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!--
+(c) 2023 by Matthias Thiele
+GNU General Public License v3.0
+-->
+<html>
+    <head>
+        <title>User Administration</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="tamm.css">
+        <script>
+            var selectedUser;
+            
+            function doSave() {
+                selectedUser.name = getValue("name");
+                selectedUser.mail = getValue("mail");
+                selectedUser.id = getValue("userid");
+                selectedUser.mainAdmin = getValue("sysadmin");
+                selectedUser.subAdmin = getValue("subadmin");
+                console.log(selectedUser);
+                status.innerText = "Warte auf Server...";
+                
+                var request = new XMLHttpRequest();
+                request.open("POST", "system/saveuser");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(selectedUser));
+                request.overrideMimeType('text/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var status = document.getElementById("status");
+                        var response = JSON.parse(this.responseText);
+                        if (response.result === "ok") {
+                          status.innerText = "Anwenderdaten gespeichert."
+                          emptyUser = {};
+                          fillForm(emptyUser);
+                        } else {
+                            if (!response.message) {
+                                response.message = "Unbekannter Fehler beim Speichern.";
+                            }
+                            status.innerText = response.message;
+                        }
+                    }
+                };
+            }
+            
+            function filterUsers() {
+                var status = document.getElementById("status");
+                var data = {};
+                data.source = "userlist";
+                data.filterText = document.getElementById("filtervalue").value;
+                if (data.filterText.slice(-1) !== "%") {
+                    data.filterText = data.filterText + "%";
+                }
+                console.log("Search for" + data);
+                status.innerText = "Warte auf Server...";
+                
+                var request = new XMLHttpRequest();
+                request.open("POST", "system/filter");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(data));
+                request.overrideMimeType('text/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        if (response.result !== "error") {
+                          listUsers(response);
+                          status.innerText = "";
+                        } else {
+                          status.innerText = "Unbekannter Fehler beim Suchen.";
+                        }
+                    }
+                };
+            }
+            
+            function listUsers(userlist) {
+                var list = document.getElementById("userlist");
+                list.innerHTML = "";
+                userlist.forEach((user) => {
+                    var newItem = document.createElement("div");
+                    newItem.innerText = user.name;
+                    newItem.userData = user;
+                    newItem.className = "listitem";
+                    newItem.onclick = function() {fillForm(user);};
+                    list.appendChild(newItem);
+                });
+            }
+            
+            function addUser() {
+                var user = {};
+                user.id = -1;
+                fillForm(user);
+            }
+            
+            function fillForm(userData) {
+                selectedUser = userData;
+                var status = document.getElementById("status");
+                status.innerText = "";
+                setValue("userid", userData.id);
+                setValue("name", userData.name);
+                setValue("mail", userData.mail);
+                document.getElementById("sysadmin").checked = userData.mainAdmin;
+                document.getElementById("subadmin").checked = userData.subAdmin;
+                
+                document.getElementById("save").disabled = true;
+            }
+            
+            function setValue(elementName, value) {
+                if (!value) {
+                    value = "";
+                }
+                
+                document.getElementById(elementName).value = value;
+            }
+            
+            function getValue(elementName) {
+                var value;
+                var elem = document.getElementById(elementName);
+                if (elem.type === "checkbox") {
+                    value = elem.checked ? "true" : "false";
+                } else {
+                    value = elem.value;
+                    if (!value) {
+                        value = "";
+                    }
+                }
+                
+                return value;
+            }
+            
+            function changed() {
+                document.getElementById("save").disabled = false;
+            }
+        </script>
+    </head>
+    <body>
+        <div class="bodybox">
+            <div class="header">User Administration</div>
+            <div class="left-sidebar">
+                <div class="">
+                    <input id="filtervalue" size="12">
+                    <button onclick="filterUsers();">Suchen</button>
+                    <button onclick="addUser();">Neu</button>
+                    <div id="userlist" class="selectlist"></div>
+                </div>
+                <div class="">
+                    <div><label>Id</label><input type="text" id="userid" readonly></div>
+                    <div><label>Anwendername</label><input onchange="changed()" type="text" id="name"></div>
+                    <div><label>EMail</label><input onchange="changed()" type="text" id="mail"></div>
+                    <div><label for="sysadmin">Systemadministrator</label><input onchange="changed()" type="checkbox" id="sysadmin"></div>
+                    <div><label for="sysadmin">Anwenderverwaltung</label><input onchange="changed()" type="checkbox" id="subadmin"></div>
+                    <div><button id="save" disabled onclick="doSave();">Speichern</button></div>
+                </div>
+            </div>
+            <div class="statusbar" id="status"></div>
+        </div>
+    </body>
+</html>

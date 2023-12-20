@@ -46,9 +46,9 @@ public class UserTableTest {
     
     UserData user = new UserData();
     user.name = "Test1";
-    user.pwd = "asdf";
-    user.mail = "test1@test.de";
-    user.isMainAdmin = true;
+    user.pwd = "";
+    user.mail = "mtest1@test.de";
+    user.mainAdmin = true;
     user.supervisorId = 12345;
     user.administratorId = 9999;
     
@@ -56,10 +56,9 @@ public class UserTableTest {
     
     UserData user2 = instance.readUser(-1, "Test1");
     assertEquals("User name mismatch", user.name, user2.name);
-    assertEquals("Password mismatch", user.pwd, user2.pwd);
     assertEquals("EMail mismatch", user.mail, user2.mail);
-    assertEquals("Main Admin mismatch", user.isMainAdmin, user2.isMainAdmin);
-    assertEquals("Subadmin mismatch", user.isSubAdmin, user2.isSubAdmin);
+    assertEquals("Main Admin mismatch", user.mainAdmin, user2.mainAdmin);
+    assertEquals("Subadmin mismatch", user.subAdmin, user2.subAdmin);
     assertEquals("Supervisor mismatch", user.supervisorId, user2.supervisorId);
     assertEquals("Administrator mismatch", user.administratorId, user2.administratorId);
     
@@ -82,15 +81,21 @@ public class UserTableTest {
     UserData user5 = new UserData();
     user5.name = "Test2";
     user5.administratorId = 2;
+    user5.mail = "mtest2@test.de";
     instance.writeUser(user5);
     
-    List<UserData> users1 = instance.listUsers(-1);
+    List<UserData> users1 = instance.listUsers(-1, null);
     assertEquals("Three users expected.", users1.size(), 3);
     
-    List<UserData> users2 = instance.listUsers(2);
+    List<UserData> users2 = instance.listUsers(2, null);
     assertEquals("One user expected.", users2.size(), 1);
     assertEquals("User Test2 expected.", users2.get(0).name, user5.name);
-    
+
+    List<UserData> users3 = instance.listUsers(-1, "test%");
+    assertEquals("Two users expected.", users3.size(), 2);
+
+    List<UserData> users4 = instance.listUsers(2, "MTest%");
+    assertEquals("Only user test2 expected.", users4.size(), 1);
   }
 
 }

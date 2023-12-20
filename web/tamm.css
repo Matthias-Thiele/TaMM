@@ -28,15 +28,15 @@ body {
 
 
 label {
-    width: 120pt;
+    width: 130pt;
     margin: 5pt;
     display: inline-block;
 }
 
-button {
+.dialogbox button {
     position: relative;
     margin: 5pt;
-    left: 228pt;
+    left: 220pt;
 }
 
 .statusbar {
@@ -47,3 +47,49 @@ button {
     height: 16pt;
 }
 
+.selectlist {
+    margin-top: 10pt;
+    font-size: 10pt;
+}
+
+.listitem {
+    margin-top: 4pt;
+    background-color: #f8f8fc;
+    box-shadow: 2px 1px 1px gray;
+    padding: 3pt;
+}
+
+/* whole page, two column layout */
+.bodybox {
+    margin-left: 20pt;
+    margin-top: 20pt;
+    border: 1px silver solid;
+    width: 90%;
+    border-radius: 5pt;
+    box-shadow: 5px 3px 3px gray;
+}
+
+.left-sidebar {
+    display:flex;
+    flex-wrap:wrap;
+}
+
+/* columns */
+.left-sidebar > * {
+    width:100%;
+    padding:1rem;
+}
+
+/* tablet breakpoint */
+@media (min-width:768px) {
+    .left-sidebar > *:nth-child(1) {
+        width:calc(88% / 3);
+        max-width: 180pt;
+        order:-1;
+        border-right: 1px solid silver
+    }
+    
+    .left-sidebar > *:nth-child(2) {
+        width:calc(88% / 3 * 2);
+    }
+}

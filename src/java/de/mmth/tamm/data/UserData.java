@@ -19,8 +19,8 @@ public class UserData {
   public String pwd;
   public String mail;
   
-  public boolean isMainAdmin;
-  public boolean isSubAdmin;
+  public boolean mainAdmin;
+  public boolean subAdmin;
   
   public int supervisorId;
   public int administratorId;
@@ -32,11 +32,11 @@ public class UserData {
    */
   public int getFlags() {
     int flags = 0;
-    if (isMainAdmin) {
+    if (mainAdmin) {
       flags |= FG_ADMIN;
     }
     
-    if (isSubAdmin) {
+    if (subAdmin) {
       flags |= FG_SUBADMIN;
     }
     
@@ -50,7 +50,7 @@ public class UserData {
    * @param flags 
    */
   public void setFlags(int flags) {
-    isMainAdmin = (flags & FG_ADMIN) != 0;
-    isSubAdmin = (flags & FG_SUBADMIN) != 0;
+    mainAdmin = (flags & FG_ADMIN) != 0;
+    subAdmin = (flags & FG_SUBADMIN) != 0;
   }
 }

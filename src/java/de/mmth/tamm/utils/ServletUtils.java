@@ -4,8 +4,13 @@
  */
 package de.mmth.tamm.utils;
 
+import com.google.gson.Gson;
+import de.mmth.tamm.data.JsonResult;
 import jakarta.servlet.http.HttpServletRequest;
-import static java.lang.Math.random;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -111,4 +116,31 @@ public class ServletUtils {
     String encoded = salt + "Z" + hashPassword(salt, password);
     return encoded;
   }
+  
+  /**
+   * Create and populate a JSON result object and send it to the OutputStream.
+   * 
+   * @param resultData
+   * @param isOk
+   * @param nextPageOk
+   * @param nextPageError
+   * @param errorMsg
+   * @throws IOException 
+   */
+  public static void sendResult(OutputStream resultData, boolean isOk, String nextPageOk, String nextPageError, String errorMsg) throws IOException {
+    JsonResult result = new JsonResult();
+    result.message = errorMsg;
+    if (isOk) {
+      result.result = "ok";
+      result.nextPage = nextPageOk;
+    } else {
+      result.result = "error";
+      result.nextPage = nextPageError;
+    }
+    
+    try (Writer writer = new OutputStreamWriter(resultData)) {
+      new Gson().toJson(result, writer);
+    }
+  }
+  
 }

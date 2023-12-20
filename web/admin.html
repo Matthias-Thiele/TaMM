@@ -21,6 +21,7 @@ GNU General Public License v3.0
                 request.open("POST", "system/initdata");
                 request.setRequestHeader('Content-Type', 'application/json');
                 request.send(JSON.stringify(data));
+                request.overrideMimeType('text/json');
                 request.onreadystatechange = function() {
                     if (this.readyState === 4 && this.status === 200) {
                         var response = JSON.parse(this.responseText);
