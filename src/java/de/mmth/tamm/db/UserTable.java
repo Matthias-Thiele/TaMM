@@ -46,7 +46,9 @@ public class UserTable extends DBTable {
       admin.name = "admin";
       admin.pwd = "tamm279";
       admin.mainAdmin = true;
+      admin.subAdmin = true;
       admin.supervisorId = 1;
+      admin.administratorId = 1;
       try {
         writeUser(admin);
       } catch (TammError ex) {

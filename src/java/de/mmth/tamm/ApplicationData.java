@@ -7,6 +7,7 @@ package de.mmth.tamm;
 import de.mmth.tamm.data.AdminData;
 import de.mmth.tamm.db.DBConnect;
 import de.mmth.tamm.db.UserTable;
+import de.mmth.tamm.utils.RequestCache;
 import java.util.prefs.Preferences;
 
 /**
@@ -25,6 +26,8 @@ public class ApplicationData {
   
   public DBConnect db;
   public UserTable users;
+  public RequestCache requests;
+  public String tammUrl;
   
   /**
    * Reads the database access information from the registry
@@ -48,6 +51,7 @@ public class ApplicationData {
         db = con;
         
         users = new UserTable(db, "userlist");
+        requests = new RequestCache();
       }
     }
     

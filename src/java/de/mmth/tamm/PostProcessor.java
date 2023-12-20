@@ -21,13 +21,17 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Date;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author matthias
  */
 public class PostProcessor {
-
+  private static final Logger logger = LogManager.getLogger(PostProcessor.class);
+  private static final long PWD_REQUEST_VALID_MILLIS = 60000;
+  
   private final ApplicationData application;
   
   /**
@@ -53,6 +57,7 @@ public class PostProcessor {
     String[] uriParts = uri.split("/");
     String cmd = uriParts[3];
     if (!application.checkInit() && !cmd.equals("initdata")) {
+      logger.warn("Missing initialisation data, request aborted.");
       gotoErrorPage(resultData);
       return;
     }
@@ -73,6 +78,14 @@ public class PostProcessor {
           
         case "saveuser":
           processSaveUser(reader, resultData, session);
+          break;
+          
+        case "pwdreq":
+          processPasswordRequest(reader, resultData);
+          break;
+          
+        case "updatepwd":
+          processUpdatePassword(reader, resultData);
           break;
       }
     }
@@ -102,6 +115,7 @@ public class PostProcessor {
    */
   private void processLogin(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     LoginData loginData = new Gson().fromJson(reader, LoginData.class);
+    logger.debug("Process login request for user" + loginData.name);
     JsonResult result = new JsonResult();
     try {
     var user = application.users.readUser(-1, loginData.name);
@@ -135,6 +149,7 @@ public class PostProcessor {
    */
   private void processInitdata(Reader reader, OutputStream resultData) throws IOException {
     AdminData adminData = new Gson().fromJson(reader, AdminData.class);
+    logger.warn("Servlet Initdata written " + adminData.dburl);
     application.setAdminData(adminData);
     ServletUtils.sendResult(resultData, application.checkInit(), "index.html", "admin.html", "");
   }
@@ -155,6 +170,7 @@ public class PostProcessor {
     }
     
     FindData findData = new Gson().fromJson(reader, FindData.class);
+    logger.debug("Search userlist " + findData.filterText);
     int userId = session.user.id; 
     if (userId == 1) userId = -1; // TODO remove
     var searchResult = application.users.listUsers(userId, findData.filterText);
@@ -196,10 +212,12 @@ public class PostProcessor {
     String errorMsg = "";
     if (userData.id == -1) {
       // new user
+     logger.info("Insert user data for user" + userData.name);
       userData.pwd = PasswordUtils.encodePassword(Long.toHexString((long)(Math.random() * Long.MAX_VALUE)));
       application.users.writeUser(userData);
     } else {
       // update existing user
+      logger.info("Update user data for user" + userData.name);
       var checkUser = application.users.readUser(userData.id, null);
       if (checkUser.administratorId == 0) {
         checkUser.administratorId = checkUser.id;
@@ -207,6 +225,7 @@ public class PostProcessor {
       
       if (checkUser.administratorId != session.user.id) {
         errorMsg = "Es können nur eigene Anwender bearbeitet werden.";
+        logger.warn("Invalid user access from " + session.user.name + " to user " + userData.name);
       } else {
         checkUser.name = userData.name;
         checkUser.mail = userData.mail;
@@ -218,5 +237,59 @@ public class PostProcessor {
     
     ServletUtils.sendResult(resultData, errorMsg.isBlank(), "", "", errorMsg);
   }  
+  
+  /**
+   * Processes new password request.
+   * 
+   * @param reader
+   * @param resultData
+   * @throws IOException 
+   */
+  private void processPasswordRequest(Reader reader, OutputStream resultData) throws IOException {
+    UserData userData = new Gson().fromJson(reader, UserData.class);
+    logger.debug("Password request for user " + userData.name);
+    boolean found = false;
+    String message = "Unbekannter Anwender oder Mailadresse";
+    try {
+      var checkUser = application.users.readUser(-1, userData.name);
+      if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
+        String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS);
+        logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
+        message = "Anforderung per Mail verschickt";
+        found = true;
+      } else {
+        logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);
+      }
+    } catch(TammError ex) {
+      logger.debug("Invalid password request for " + userData.name);
+    }
+    
+    ServletUtils.sendResult(resultData, found, "", "", message);
+  }
+  
+  /**
+   * Checks and stores new password.
+   * 
+   * @param reader
+   * @param resultData
+   * @throws IOException
+   * @throws TammError 
+   */
+  private void processUpdatePassword(Reader reader, OutputStream resultData) throws IOException, TammError {
+    String message = "";
+    boolean found = false;
+    LoginData loginData = new Gson().fromJson(reader, LoginData.class);
+    UserData requestUser = application.requests.getUserItem(loginData.key);
+    if (requestUser != null) {
+      var updateUser = application.users.readUser(requestUser.id, null);
+      updateUser.pwd = PasswordUtils.encodePassword(loginData.pwd);
+      application.users.writeUser(updateUser);
+      found = true;
+    } else {
+      message = "Ungültiger oder abgelaufener Schlüssel";
+    }
+    
+    ServletUtils.sendResult(resultData, found, "login.html", "", message);
+  }
   
 }

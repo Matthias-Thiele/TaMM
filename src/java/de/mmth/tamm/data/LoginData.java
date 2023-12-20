@@ -14,4 +14,5 @@ package de.mmth.tamm.data;
 public class LoginData {
   public String name;
   public String pwd;
+  public String key;
 }

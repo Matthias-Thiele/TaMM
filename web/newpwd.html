@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!--
+(c) 2023 by Matthias Thiele
+GNU General Public License v3.0
+-->
+<html>
+    <head>
+        <title>Neues Passwort vergeben</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="tamm.css">
+        <script>
+            function sendPwd() {
+                var loginData = {};
+                loginData.name = document.getElementById("name").value;
+                loginData.pwd = document.getElementById("pwd1").value;
+                loginData.key = document.getElementById("key").value;
+                var status = document.getElementById("status");
+                status.innerText = "Warte auf Serverantwort...";
+                console.log(loginData);
+                
+                var request = new XMLHttpRequest();
+                request.open("POST", "system/updatepwd");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(loginData));
+                request.overrideMimeType('text/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        if (response.result === "ok") {
+                          window.location = response.nextPage;
+                        } else {
+                          var status = document.getElementById("status");
+                          status.innerText = response.message;
+                        }
+                    }
+                };
+            }
+            
+            function getUrlParam(name) {
+                var url_string = window.location;
+                var url = new URL(url_string);
+                var c = url.searchParams.get(name);
+                return c;
+            }
+            
+            function initKey() {
+                var key = getUrlParam("key");
+                var field = document.getElementById("key");
+                field.value = key;
+            }
+            
+            function comparePwd() {
+                var pw1 = document.getElementById("pwd1").value;
+                var pw2 = document.getElementById("pwd2").value;
+                
+                var status = document.getElementById("status");
+                var button = document.getElementById("send");
+                if (pw1 === pw2) {
+                    status.innerText = "";
+                    button.disabled = false;
+                } else {
+                    status.innerText = "Passwortwiederholung nicht identisch.";
+                    button.disabled = true;
+                }
+            }
+        </script>
+    </head>
+    <body onload="initKey();">
+        <div class="dialogbox">
+            <div class="header">TaMM - Neues Passwort vergeben</div>
+            <div><label>Anwendername</label><input type="text" id="name"></div>
+            <div><label>Passwort neu</label><input type="text" id="pwd1" onkeyup="comparePwd()"></div>
+            <div><label>Passwort neu</label><input type="text" id="pwd2" onkeyup="comparePwd()"></div>
+            <div><label>Request key</label><input type="text" id="key"></div>
+            
+            <div><button id="send" onclick="sendPwd();" disabled>Absenden</button></div>
+            <div class="statusbar" id="status"></div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!--
+(c) 2023 by Matthias Thiele
+GNU General Public License v3.0
+-->
+<html>
+    <head>
+        <title>Passwort anfordern</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="tamm.css">
+        <script>
+            function doSave() {
+                var status = document.getElementById("status");
+                var data = {};
+                data.name = document.getElementById("name").value;
+                data.mail = document.getElementById("mail").value;
+                console.log(data);
+                
+                var request = new XMLHttpRequest();
+                status.innerText = "Warte auf Server...";
+                document.getElementById("send").disabled = true;
+                
+                request.open("POST", "system/pwdreq");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(data));
+                request.overrideMimeType('text/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        status.innerText = response.message;
+                        
+                        if (response.result !== "ok") {
+                            document.getElementById("send").disabled = false;
+                        }
+                    }
+                };
+            }
+        </script>
+    </head>
+    <body>
+        <div class="dialogbox">
+            <div class="header">Passwort anfordern</div>
+            <div class="message">
+                <h4>Über diesen Dialog können Sie ein neues Passwort anfordern.</h4>
+                Der Name und die registrierte Mailadresse müssen korrekt eingetragen
+                werden. Sie erhalten dann per EMail einen Link zur Eingabe eines
+                neuen Passworts.
+            </div>
+            <div><label>Anwendername</label><input type="text" id="name"></div>
+            <div><label>Mailadresse</label><input type="text" id="mail"></div>
+            <div><button id="send" onclick="doSave();">Anfordern</button></div>
+            <div class="statusbar" id="status"></div>
+        </div>
+    </body>
+</html>

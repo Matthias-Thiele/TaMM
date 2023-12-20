@@ -57,6 +57,14 @@ public class System extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
+    if (application.tammUrl == null) {
+      String url = request.getRequestURL().toString();
+      int tammPos = url.indexOf("/TaMM/");
+      if (tammPos > 0) {
+        application.tammUrl = url.substring(0, tammPos + 6);
+      }
+    }
+    
     try (InputStream content = request.getInputStream()) {
       HttpSession session = request.getSession();
       SessionData sd = (SessionData) session.getAttribute("TAMM");
