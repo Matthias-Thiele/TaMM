@@ -11,6 +11,7 @@ import de.mmth.tamm.data.AdminData;
 import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.UserData;
+import de.mmth.tamm.utils.PasswordUtils;
 import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,7 +105,7 @@ public class PostProcessor {
     JsonResult result = new JsonResult();
     try {
     var user = application.users.readUser(-1, loginData.name);
-    if (ServletUtils.comparePassword(user.pwd, loginData.pwd)) {
+    if (PasswordUtils.comparePassword(user.pwd, loginData.pwd)) {
       result.result = "ok";
       result.nextPage = "index.html";
       session.loginTime = new Date();
@@ -195,7 +196,7 @@ public class PostProcessor {
     String errorMsg = "";
     if (userData.id == -1) {
       // new user
-      userData.pwd = ServletUtils.encodePassword(Long.toHexString((long)(Math.random() * Long.MAX_VALUE)));
+      userData.pwd = PasswordUtils.encodePassword(Long.toHexString((long)(Math.random() * Long.MAX_VALUE)));
       application.users.writeUser(userData);
     } else {
       // update existing user

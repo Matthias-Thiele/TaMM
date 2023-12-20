@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  *
  * @author matthias
  */
-public class ServletUtilsTest {
+public class PasswordUtilsTest {
   
   /**
    * Test of bytesToHex method, of class ServletUtils.
@@ -21,7 +21,7 @@ public class ServletUtilsTest {
     System.out.println("bytesToHex");
     byte[] data = {(byte)0x12, (byte)0xef};
     String expResult = "12ef";
-    String result = ServletUtils.bytesToHex(data);
+    String result = PasswordUtils.bytesToHex(data);
     assertEquals(expResult, result);
   }
 
@@ -34,7 +34,7 @@ public class ServletUtilsTest {
     String password = "some password";
     String salt = "1234567890";
     String expResult = "0c2d5de14f29c244480bade9436b582888e2b9a69c2293c6ebbad901754de802";
-    String result = ServletUtils.hashPassword(salt, password);
+    String result = PasswordUtils.hashPassword(salt, password);
     assertEquals(expResult, result);
   }
 
@@ -47,7 +47,7 @@ public class ServletUtilsTest {
     String storedPassword = "1234567890Z0c2d5de14f29c244480bade9436b582888e2b9a69c2293c6ebbad901754de802";
     String queryPassword = "some password";
     boolean expResult = true;
-    boolean result = ServletUtils.comparePassword(storedPassword, queryPassword);
+    boolean result = PasswordUtils.comparePassword(storedPassword, queryPassword);
     assertEquals(expResult, result);
   }
 
