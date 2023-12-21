@@ -10,6 +10,8 @@
         <title>TODO supply a title</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="tamm.css">
+        <link rel="stylesheet" href="menu.css">
         <script>
             var sessionData;
             
@@ -51,7 +53,24 @@
         </script>
     </head>
     <body onload="loadSessionData();">
-        <div>TODO write content</div>
-        <button onclick="logout();">logout</button>
+        <div class="hamburger-menu">
+            <input id="menu__toggle" type="checkbox" />
+            <label class="menu__btn" for="menu__toggle">
+                <span></span>
+            </label>
+
+            <ul class="menu__box">
+                <li><a class="menu__item" href="index.html">Home</a></li>
+                <li><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
+                <li><a class="menu__item" href="about.html">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();">Logout</a></li>
+            </ul>
+
+        </div>
+        
+        <div class="bodybox">
+            <div class="header">TODO write content</div>
+            <button onclick="logout();">logout</button>
+        </div>
     </body>
 </html>
