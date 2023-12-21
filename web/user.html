@@ -11,6 +11,25 @@ GNU General Public License v3.0
         <link rel="stylesheet" href="tamm.css">
         <script>
             var selectedUser;
+            var sessionData;
+            
+            function loadSessionData() {
+                var request = new XMLHttpRequest();
+                request.open("GET", "system/session");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send();
+                request.overrideMimeType('application/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        if (response.result === "error") {
+                            window.location = response.nextPage + "?next=user.html";
+                        } else {
+                            sessionData = response.data;
+                        }
+                    }
+                };
+            }
             
             function doSave() {
                 selectedUser.name = getValue("name");
@@ -133,7 +152,7 @@ GNU General Public License v3.0
             }
         </script>
     </head>
-    <body>
+    <body onload="loadSessionData();">
         <div class="bodybox">
             <div class="header">User Administration</div>
             <div class="left-sidebar">

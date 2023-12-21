@@ -6,7 +6,9 @@ package de.mmth.tamm.utils;
 
 import com.google.gson.Gson;
 import de.mmth.tamm.data.JsonResult;
+import de.mmth.tamm.data.SessionData;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -50,9 +52,11 @@ public class ServletUtils {
    * @param errorMsg
    * @throws IOException 
    */
-  public static void sendResult(OutputStream resultData, boolean isOk, String nextPageOk, String nextPageError, String errorMsg) throws IOException {
+  public static void sendResult(OutputStream resultData, boolean isOk, String nextPageOk, String nextPageError, String errorMsg, Object data) throws IOException {
     JsonResult result = new JsonResult();
     result.message = errorMsg;
+    result.data = data;
+    
     if (isOk) {
       result.result = "ok";
       result.nextPage = nextPageOk;
@@ -65,5 +69,44 @@ public class ServletUtils {
       new Gson().toJson(result, writer);
     }
   }
+  
+  /**
+   * Returns the session data object.
+   * 
+   * When the session is new, a new session data
+   * object will be created and populated with
+   * initial data.
+   * 
+   * @param request
+   * @return 
+   */
+  public static SessionData prepareSession(HttpServletRequest request) {
+    HttpSession session = request.getSession();
+    SessionData sd = (SessionData) session.getAttribute("TAMM");
+    if (sd == null) {
+      sd = new SessionData();
+      session.setAttribute("TAMM", sd);
+      sd.clientIp = ServletUtils.getClientIp(request);
+      logger.info("New session from address " + sd.clientIp);
+    }
+    
+    return sd;
+  }
+
+  /**
+   * Send result with error marker and link to error page.
+   * 
+   * @param resultData
+   * @throws IOException 
+   */
+  public static void gotoErrorPage(OutputStream resultData) throws IOException {
+    JsonResult result = new JsonResult();
+    result.result = "ok";
+    result.nextPage = "error.html";
+    try (Writer writer = new OutputStreamWriter(resultData)) {
+      new Gson().toJson(result, writer);
+    }
+  }
+  
   
 }

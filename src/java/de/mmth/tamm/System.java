@@ -27,6 +27,7 @@ public class System extends HttpServlet {
   private static final Logger logger = LogManager.getLogger(System.class);
   private final ApplicationData application = new ApplicationData();
   private final PostProcessor postProcessor = new PostProcessor(application);
+  private final GetProcessor getProcessor = new GetProcessor(application);
   
   @Override
   public void init() {
@@ -44,6 +45,19 @@ public class System extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
+    try (InputStream content = request.getInputStream()) {
+      SessionData sd = ServletUtils.prepareSession(request);
+      
+      try {
+        String requestUri = request.getRequestURI();
+        ServletOutputStream out = response.getOutputStream();
+        getProcessor.process(sd, requestUri, content, out);
+        out.flush();
+      } catch(Throwable ex) {
+        // dont leak internal exceptions to browser
+        logger.warn("Unexpected error in get processing.", ex);
+      }
+    }
   }
 
   /**
@@ -66,14 +80,7 @@ public class System extends HttpServlet {
     }
     
     try (InputStream content = request.getInputStream()) {
-      HttpSession session = request.getSession();
-      SessionData sd = (SessionData) session.getAttribute("TAMM");
-      if (sd == null) {
-        sd = new SessionData();
-        session.setAttribute("TAMM", sd);
-        sd.clientIp = ServletUtils.getClientIp(request);
-        logger.info("New session from address " + sd.clientIp);
-      }
+      SessionData sd = ServletUtils.prepareSession(request);
       
       try {
         String requestUri = request.getRequestURI();

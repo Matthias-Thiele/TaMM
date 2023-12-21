@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class PostProcessor {
   private static final Logger logger = LogManager.getLogger(PostProcessor.class);
-  private static final long PWD_REQUEST_VALID_MILLIS = 60000;
+  private static final long PWD_REQUEST_VALID_MILLIS = 3600000;
   
   private final ApplicationData application;
   
@@ -58,7 +58,7 @@ public class PostProcessor {
     String cmd = uriParts[3];
     if (!application.checkInit() && !cmd.equals("initdata")) {
       logger.warn("Missing initialisation data, request aborted.");
-      gotoErrorPage(resultData);
+      ServletUtils.gotoErrorPage(resultData);
       return;
     }
     
@@ -69,7 +69,7 @@ public class PostProcessor {
           break;
           
         case "initdata":
-          processInitdata(reader, resultData);
+          processInitdata(reader, resultData, session);
           break;
           
         case "filter":
@@ -92,21 +92,6 @@ public class PostProcessor {
   }
   
   /**
-   * Send result with error marker and link to error page.
-   * 
-   * @param resultData
-   * @throws IOException 
-   */
-  private void gotoErrorPage(OutputStream resultData) throws IOException {
-    JsonResult result = new JsonResult();
-    result.result = "ok";
-    result.nextPage = "error.html";
-    try (Writer writer = new OutputStreamWriter(resultData)) {
-      new Gson().toJson(result, writer);
-    }
-  }
-  
-  /**
    * Validates user and password.
    * 
    * @param reader
@@ -124,6 +109,7 @@ public class PostProcessor {
       result.nextPage = "index.html";
       session.loginTime = new Date();
       session.user = user;
+      session.user.pwd = ""; // do not leak password.
     } else {
       result.result = "error";
       result.nextPage = "";
@@ -147,11 +133,20 @@ public class PostProcessor {
    * @param resultData
    * @throws IOException 
    */
-  private void processInitdata(Reader reader, OutputStream resultData) throws IOException {
+  private void processInitdata(Reader reader, OutputStream resultData, SessionData session) throws IOException {
     AdminData adminData = new Gson().fromJson(reader, AdminData.class);
-    logger.warn("Servlet Initdata written " + adminData.dburl);
-    application.setAdminData(adminData);
-    ServletUtils.sendResult(resultData, application.checkInit(), "index.html", "admin.html", "");
+    boolean isMainAdmin = (session.user != null) && session.user.mainAdmin;
+    boolean ok;
+    if (application.db.isValid() && !isMainAdmin) {
+      logger.warn("Invalid application data write attempt ignored from " + session.clientIp);
+      ok = false;
+    } else {
+      logger.warn("Servlet Initdata written " + adminData.dburl);
+      application.setAdminData(adminData);
+      ok = application.checkInit();
+    }
+    
+    ServletUtils.sendResult(resultData, ok, "index.html", "admin.html", "", null);
   }
   
   /**
@@ -194,7 +189,7 @@ public class PostProcessor {
    */
   private void processSaveUser(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     if (session.user == null) {
-      ServletUtils.sendResult(resultData, false, "", "", "Sie sind noch nicht angemeldet.");
+      ServletUtils.sendResult(resultData, false, "", "", "Sie sind noch nicht angemeldet.", null);
       return;
     }
     
@@ -235,7 +230,7 @@ public class PostProcessor {
       }
     }
     
-    ServletUtils.sendResult(resultData, errorMsg.isBlank(), "", "", errorMsg);
+    ServletUtils.sendResult(resultData, errorMsg.isBlank(), "", "", errorMsg, null);
   }  
   
   /**
@@ -264,7 +259,7 @@ public class PostProcessor {
       logger.debug("Invalid password request for " + userData.name);
     }
     
-    ServletUtils.sendResult(resultData, found, "", "", message);
+    ServletUtils.sendResult(resultData, found, "", "", message, null);
   }
   
   /**
@@ -289,7 +284,7 @@ public class PostProcessor {
       message = "Ungültiger oder abgelaufener Schlüssel";
     }
     
-    ServletUtils.sendResult(resultData, found, "login.html", "", message);
+    ServletUtils.sendResult(resultData, found, "login.html", "", message, null);
   }
   
 }

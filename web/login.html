@@ -29,13 +29,25 @@ Task Management and Monitoring
                     if (this.readyState === 4 && this.status === 200) {
                         var response = JSON.parse(this.responseText);
                         if (response.result === "ok") {
-                          window.location = response.nextPage;
+                            var dest = getUrlParam("next");
+                            if (dest) {
+                                response.nextPage = dest;
+                            }
+                            
+                            window.location = response.nextPage;
                         } else {
                           var status = document.getElementById("status");
                           status.innerText = response.message;
                         }
                     }
                 };
+            }
+            
+            function getUrlParam(name) {
+                var url_string = window.location;
+                var url = new URL(url_string);
+                var c = url.searchParams.get(name);
+                return c;
             }
         </script>
     </head>

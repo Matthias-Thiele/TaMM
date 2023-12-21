@@ -13,4 +13,5 @@ public class JsonResult {
   public String result;
   public String message;
   public String nextPage;
+  public Object data;
 }
