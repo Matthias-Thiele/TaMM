@@ -4,8 +4,6 @@
  */
 package de.mmth.tamm.data;
 
-import java.util.Date;
-
 /**
  * Session data.
  * 
@@ -13,6 +11,6 @@ import java.util.Date;
  */
 public class SessionData {
   public String clientIp;
-  public Date loginTime;
+  public String loginTime;
   public UserData user;
 }

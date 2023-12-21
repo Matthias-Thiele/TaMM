@@ -51,6 +51,7 @@ public class UserTableTest {
     user.mainAdmin = true;
     user.supervisorId = 12345;
     user.administratorId = 9999;
+    user.lastLogin = "20231231112233";
     
     instance.writeUser(user);
     
@@ -61,9 +62,13 @@ public class UserTableTest {
     assertEquals("Subadmin mismatch", user.subAdmin, user2.subAdmin);
     assertEquals("Supervisor mismatch", user.supervisorId, user2.supervisorId);
     assertEquals("Administrator mismatch", user.administratorId, user2.administratorId);
+    assertEquals("Last login date mismatch", user.lastLogin, user2.lastLogin);
     
+    String newLoginDate = "2024010122334";
+    instance.updateLoginDate(user2.id, newLoginDate);
     UserData user3 = instance.readUser(user2.id, null);
     assertEquals("User name mismatch", user3.name, user2.name);
+    assertEquals("Last login date mismatch", newLoginDate, user3.lastLogin);
     
     user3.name = "Test1 name changed";
     instance.writeUser(user3);

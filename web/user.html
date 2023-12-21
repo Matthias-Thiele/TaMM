@@ -38,6 +38,8 @@ GNU General Public License v3.0
                 selectedUser.id = getValue("userid");
                 selectedUser.mainAdmin = getValue("sysadmin");
                 selectedUser.subAdmin = getValue("subadmin");
+                selectedUser.lastLogin = getValue("lastlogin");
+                
                 console.log(selectedUser);
                 status.innerText = "Warte auf Server...";
                 
@@ -121,6 +123,7 @@ GNU General Public License v3.0
                 setValue("mail", userData.mail);
                 document.getElementById("sysadmin").checked = userData.mainAdmin;
                 document.getElementById("subadmin").checked = userData.subAdmin;
+                setValue("lastlogin", userData.lastLogin);
                 
                 document.getElementById("save").disabled = true;
             }
@@ -184,6 +187,7 @@ GNU General Public License v3.0
                     <div><label>EMail</label><input onchange="changed()" type="text" id="mail"></div>
                     <div><label for="sysadmin">Systemadministrator</label><input onchange="changed()" type="checkbox" id="sysadmin"></div>
                     <div><label for="sysadmin">Anwenderverwaltung</label><input onchange="changed()" type="checkbox" id="subadmin"></div>
+                    <div><label for="lastlogin">Letzte Anmeldung</label><input id="lastlogin" readonly></div>
                     <div><button id="save" disabled onclick="doSave();">Speichern</button></div>
                 </div>
             </div>

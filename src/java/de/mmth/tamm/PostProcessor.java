@@ -11,6 +11,7 @@ import de.mmth.tamm.data.AdminData;
 import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.UserData;
+import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.PasswordUtils;
 import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
@@ -20,7 +21,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Date;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -107,9 +107,10 @@ public class PostProcessor {
     if (PasswordUtils.comparePassword(user.pwd, loginData.pwd)) {
       result.result = "ok";
       result.nextPage = "index.html";
-      session.loginTime = new Date();
+      session.loginTime = DateUtils.format(null); 
       session.user = user;
       session.user.pwd = ""; // do not leak password.
+      application.users.updateLoginDate(user.id, session.loginTime);
     } else {
       result.result = "error";
       result.nextPage = "";

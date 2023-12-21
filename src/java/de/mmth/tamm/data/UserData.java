@@ -18,6 +18,7 @@ public class UserData {
   public String name;
   public String pwd;
   public String mail;
+  public String lastLogin;
   
   public boolean mainAdmin;
   public boolean subAdmin;

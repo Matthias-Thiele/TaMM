@@ -31,6 +31,7 @@ public class UserTable extends DBTable {
     flags I
     supervisor I
     administrator I
+    lastlogin V 20
     """;
   
   /**
@@ -125,12 +126,40 @@ public class UserTable extends DBTable {
         stmt.setInt(col++, user.getFlags());
         stmt.setInt(col++, user.supervisorId);
         stmt.setInt(col++, user.administratorId);
+        stmt.setString(col++, user.lastLogin);
 
         stmt.execute();
       }
     } catch (SQLException ex) {
       logger.warn("Error writing user data.", ex);
       throw new TammError("Error writing user data.");
+    }
+  }
+  
+  /**
+   * Update last login date of the given user.
+   * 
+   * Create a new User with user.id == -1
+   * 
+   * @param userId
+   * @param loginDate
+   * @throws TammError 
+   */
+  public void updateLoginDate(int userId, String loginDate) throws TammError {
+    String cmd;
+    cmd = "UPDATE " + tableName + " SET lastlogin = ? WHERE id = " + userId;
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        var col = 1;
+        stmt.setString(col++, loginDate);
+
+        stmt.execute();
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error updating login date.", ex);
+      throw new TammError("Error updating login date.");
     }
   }
   
@@ -212,6 +241,7 @@ public class UserTable extends DBTable {
     result.setFlags(userRows.getInt(5));
     result.supervisorId = userRows.getInt(6);
     result.administratorId = userRows.getInt(7);
+    result.lastLogin = userRows.getString(8);
     
     return result;
   }
