@@ -87,7 +87,7 @@ public class GetProcessor {
    */
   private void processLogout(OutputStream resultData, SessionData session) throws IOException, TammError {
     session.user = null;
-    ServletUtils.sendResult(resultData, true, "", "login.html", "", session);
+    ServletUtils.sendResult(resultData, true, "login.html", "", "", session);
   }
   
 }

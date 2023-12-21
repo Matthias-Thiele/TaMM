@@ -12,6 +12,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
         <link rel="stylesheet" href="menu.css">
+        <script src="common.js"></script> 
         <script>
             var sessionData;
             
@@ -33,23 +34,6 @@
                 };
             }
             
-            function logout() {
-                var request = new XMLHttpRequest();
-                request.open("GET", "system/logout");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send();
-                request.overrideMimeType('application/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var response = JSON.parse(this.responseText);
-                        if (response.result === "ok") {
-                            window.location = response.nextPage + "?next=index.html";
-                        } else {
-                            // logout failed? why?
-                        }
-                    }
-                };
-            }
         </script>
     </head>
     <body onload="loadSessionData();">
@@ -70,7 +54,7 @@
         
         <div class="bodybox">
             <div class="header">TODO write content</div>
-            <button onclick="logout();">logout</button>
+            <button onclick="logout('index.html');">logout</button>
         </div>
     </body>
 </html>
