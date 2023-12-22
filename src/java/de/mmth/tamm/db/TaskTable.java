@@ -8,6 +8,8 @@ import de.mmth.tamm.TammError;
 import de.mmth.tamm.data.TaskData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,7 +54,7 @@ public class TaskTable extends DBTable {
       cmd = "INSERT INTO " + tableName + " (" + insertNames + ") values " + paramPlaceholders;
       task.lId = System.nanoTime();
     } else {
-      cmd = "UPDATE " + tableName + " SET " + updateNames + " WHERE id = " + task.lId;
+      cmd = "UPDATE " + tableName + " SET " + updateNames + " WHERE lid = " + task.lId;
     }
     logger.debug("SQL: " + cmd);
     
@@ -110,6 +112,68 @@ public class TaskTable extends DBTable {
     return result;
   }
 
+  /**
+   * Returns a list of tasks of the given user matching the filter.
+   * 
+   * The filter matches the name part of the task.
+   * 
+   * @param ownerId optional, -1: all tasks of all users
+   * @param filter optional null: no filter
+   * @return
+   * @throws TammError 
+   */
+  public List<TaskData> listTasks(int ownerId, String filter) throws TammError {
+    boolean hasId = ownerId != -1;
+    boolean hasFilter = filter != null;
+    
+    List<TaskData> result = new ArrayList<>();
+    
+    var cmd = "SELECT " + this.selectNames + " FROM " + tableName;
+    
+    if (hasId || hasFilter) {
+      cmd += " WHERE ";
+    }
+    
+    if (hasId) {
+      cmd += "owner = ? ";
+      if (hasFilter) {
+        cmd += "and ";
+      }
+    }
+    
+    if (hasFilter) {
+      cmd += "( name ILIKE ? ) ";
+    }
+    
+    cmd += " ORDER BY nextduedate, createdate";
+    
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        int paramCol = 1;
+        if (hasId) {
+          stmt.setInt(paramCol++, ownerId);
+        }
+        
+        if (hasFilter) {
+          stmt.setString(paramCol++, filter);
+        }
+        
+        var taskRows = stmt.executeQuery();
+        while (taskRows.next()) {
+          var task = getData(taskRows);
+          logger.debug("Task found: " + task.name);
+          result.add(task);
+        }
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error reading task list.", ex);
+      throw new TammError("Error reading task list.");
+    }
+    return result;
+  }
+  
   /**
    * Copies the ResultSet user data into an TaskData object.
    * 

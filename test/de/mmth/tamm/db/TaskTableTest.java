@@ -83,6 +83,12 @@ public class TaskTableTest {
       // as expected
     }
     
+    // Test update
+    task2.name = "changed to test2";
+    instance.writeTask(task2);
+    
+    TaskData task3 = instance.readTask(task2.lId);
+    assertEquals("Task name mismatch", task2.name, task3.name);
   }
 
 }

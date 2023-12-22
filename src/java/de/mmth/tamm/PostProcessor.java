@@ -33,6 +33,7 @@ public class PostProcessor {
   
   private final ApplicationData application;
   private final UserProcessor userProcessor;
+  private final TaskProcessor taskProcessor;
   
   /**
    * Constructor with global application data.
@@ -42,6 +43,7 @@ public class PostProcessor {
   public PostProcessor(ApplicationData application) {
     this.application = application;
     this.userProcessor = new UserProcessor(application);
+    this.taskProcessor = new TaskProcessor(application);
   }
   
   /**
@@ -73,7 +75,7 @@ public class PostProcessor {
           processInitdata(reader, resultData, session);
           break;
           
-        case "filter":
+        case "filteruser":
           userProcessor.processFilter(reader, resultData, session);
           break;
           
@@ -87,6 +89,14 @@ public class PostProcessor {
           
         case "updatepwd":
           processUpdatePassword(reader, resultData);
+          break;
+          
+        case "savetask":
+          taskProcessor.processSaveTask(reader, resultData, session);
+          break;
+          
+        case "filtertask":
+          taskProcessor.processFilter(reader, resultData, session);
           break;
       }
     }

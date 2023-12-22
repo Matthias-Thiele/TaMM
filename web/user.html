@@ -79,7 +79,7 @@ GNU General Public License v3.0
                 status.innerText = "Warte auf Server...";
                 
                 var request = new XMLHttpRequest();
-                request.open("POST", "system/filter");
+                request.open("POST", "system/filteruser");
                 request.setRequestHeader('Content-Type', 'application/json');
                 request.send(JSON.stringify(data));
                 request.overrideMimeType('text/json');
@@ -127,21 +127,6 @@ GNU General Public License v3.0
                 setValue("lastlogin", userData.lastLogin);
                 
                 document.getElementById("save").disabled = true;
-            }
-            
-            function getValue(elementName) {
-                var value;
-                var elem = document.getElementById(elementName);
-                if (elem.type === "checkbox") {
-                    value = elem.checked ? "true" : "false";
-                } else {
-                    value = elem.value;
-                    if (!value) {
-                        value = "";
-                    }
-                }
-                
-                return value;
             }
             
             function changed() {

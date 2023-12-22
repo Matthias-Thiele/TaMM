@@ -17,6 +17,10 @@
             var sessionData;
             var selectedTask;
             
+            /**
+             * Load user information and other session data.
+             * @returns {undefined}
+             */
             function loadSessionData() {
                 var request = new XMLHttpRequest();
                 request.open("GET", "system/session");
@@ -35,28 +39,128 @@
                 };
             }
             
+            /**
+             * Creates a new empty task item and displays it in the form area.
+             * @returns {undefined}
+             */
             function addTask() {
                 var task = {};
-                task.lid = -1;
+                task.lid = "-1";
                 fillForm(task);
             }
 
+            /**
+             * Displays the given task item in the form area.
+             * @param {type} taskData
+             * @returns {undefined}
+             */
             function fillForm(taskData) {
                 selectedTask = taskData;
                 var status = document.getElementById("status");
                 status.innerText = "";
                 
-                setValue("userid", userData.id);
-                setValue("name", userData.name);
-                setValue("mail", userData.mail);
-                document.getElementById("sysadmin").checked = userData.mainAdmin;
-                document.getElementById("subadmin").checked = userData.subAdmin;
-                setValue("lastlogin", userData.lastLogin);
+                setValue("tasklid", taskData.lId);
+                setValue("name", taskData.name);
+                setValue("description", taskData.description);
                 
                 document.getElementById("save").disabled = true;
             }
             
+            /**
+             * Fills the current task item with the data from the
+             * form area and sends it to the server.
+             * @returns {undefined}
+             */
+            function doSave() {
+                selectedTask.lId = getValue("tasklid");
+                if (selectedTask.lId === "") {
+                    selectedTask.lId = "-1";
+                }
+                selectedTask.name = getValue("name");
+                selectedTask.description = getValue("description");
+                console.log(selectedTask);
+                status.innerText = "Warte auf Server...";
+                
+                var request = new XMLHttpRequest();
+                request.open("POST", "system/savetask");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(selectedTask));
+                request.overrideMimeType('text/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var status = document.getElementById("status");
+                        var response = JSON.parse(this.responseText);
+                        if (response.result === "ok") {
+                          status.innerText = "Aufgabe gespeichert."
+                          emptyTask = {};
+                          fillForm(emptyTask);
+                        } else {
+                            if (!response.message) {
+                                response.message = "Unbekannter Fehler beim Speichern.";
+                            }
+                            status.innerText = response.message;
+                        }
+                    }
+                };
+            }
     
+            /**
+             * Reads the filter input and requests a task list
+             * from the server.
+             * @returns {undefined}
+             */
+            function filterTasks() {
+                var status = document.getElementById("status");
+                var data = {};
+                data.source = "tasklist";
+                data.filterText = "%" + document.getElementById("filtervalue").value + "%";
+                console.log("Search for" + data);
+                status.innerText = "Warte auf Server...";
+                
+                var request = new XMLHttpRequest();
+                request.open("POST", "system/filtertask");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(data));
+                request.overrideMimeType('text/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        if (response.result !== "error") {
+                          listTasks(response);
+                          status.innerText = "";
+                        } else {
+                          status.innerText = "Unbekannter Fehler beim Suchen.";
+                        }
+                    }
+                };
+            }
+            
+            /**
+             * Populates the tasklist with the selection of the
+             * returned task items.
+             * @param {type} tasklist
+             * @returns {undefined}
+             */
+            function listTasks(tasklist) {
+                var list = document.getElementById("tasklist");
+                list.innerHTML = "";
+                tasklist.forEach((task) => {
+                    var newItem = document.createElement("div");
+                    newItem.innerText = task.name;
+                    newItem.userData = task;
+                    newItem.className = "listitem";
+                    newItem.onclick = function() {fillForm(task);};
+                    list.appendChild(newItem);
+                });
+            }
+            
+            /**
+             * Save button enabled after changig an input element.
+             * @returns {undefined}
+             */
+            function changed() {
+                document.getElementById("save").disabled = false;
+            }
         </script>
     </head>
     <body onload="loadSessionData();">
@@ -86,8 +190,8 @@
                 </div>
                 <div class="">
                     <div><label>Id</label><input type="text" id="tasklid" readonly></div>
-                    <div><label>Bezeichnung</label><input onchange="changed()" type="text" id="name"></div>
-                    <div><label>Beschreibung</label><input onchange="changed()" type="text" id="description"></div>
+                    <div><label>Bezeichnung</label><input onchange="changed()" size="30" type="text" id="name"></div>
+                    <div><label>Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
                     <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
                     <div><button id="save" disabled onclick="doSave();">Speichern</button></div>
                 </div>

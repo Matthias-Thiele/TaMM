@@ -43,3 +43,24 @@ function setValue(elementName, value) {
     document.getElementById(elementName).value = value;
 }
 
+/**
+ * Reads the value of a named element.
+ * 
+ * @param {type} elementName
+ * @returns {String|.document@call;getElementById.value}
+ */
+function getValue(elementName) {
+    var value;
+    var elem = document.getElementById(elementName);
+    if (elem.type === "checkbox") {
+        value = elem.checked ? "true" : "false";
+    } else {
+        value = elem.value;
+        if (!value) {
+            value = "";
+        }
+    }
+
+    return value;
+}
+            

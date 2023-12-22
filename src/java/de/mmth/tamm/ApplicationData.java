@@ -6,6 +6,7 @@ package de.mmth.tamm;
 
 import de.mmth.tamm.data.AdminData;
 import de.mmth.tamm.db.DBConnect;
+import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.utils.RequestCache;
 import java.util.prefs.Preferences;
@@ -26,6 +27,8 @@ public class ApplicationData {
   
   public DBConnect db;
   public UserTable users;
+  public TaskTable tasks;
+  
   public RequestCache requests;
   public String tammUrl;
   
@@ -51,6 +54,7 @@ public class ApplicationData {
         db = con;
         
         users = new UserTable(db, "userlist");
+        tasks = new TaskTable(db, "tasklist");
         requests = new RequestCache();
       }
     }
