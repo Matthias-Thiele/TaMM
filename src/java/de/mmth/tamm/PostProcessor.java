@@ -8,7 +8,6 @@ import de.mmth.tamm.data.LoginData;
 import de.mmth.tamm.data.SessionData;
 import com.google.gson.Gson;
 import de.mmth.tamm.data.AdminData;
-import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.DateUtils;
@@ -33,6 +32,7 @@ public class PostProcessor {
   private static final long PWD_REQUEST_VALID_MILLIS = 3600000;
   
   private final ApplicationData application;
+  private final UserProcessor userProcessor;
   
   /**
    * Constructor with global application data.
@@ -41,6 +41,7 @@ public class PostProcessor {
    */
   public PostProcessor(ApplicationData application) {
     this.application = application;
+    this.userProcessor = new UserProcessor(application);
   }
   
   /**
@@ -73,11 +74,11 @@ public class PostProcessor {
           break;
           
         case "filter":
-          processFilter(reader, resultData, session);
+          userProcessor.processFilter(reader, resultData, session);
           break;
           
         case "saveuser":
-          processSaveUser(reader, resultData, session);
+          userProcessor.processSaveUser(reader, resultData, session);
           break;
           
         case "pwdreq":
@@ -150,89 +151,6 @@ public class PostProcessor {
     ServletUtils.sendResult(resultData, ok, "index.html", "admin.html", "", null);
   }
   
-  /**
-   * Processes a filter request from the web page.
-   * 
-   * returns a list of found entries.
-   * @param reader
-   * @param resultData
-   * @param session
-   * @throws IOException
-   * @throws TammError 
-   */
-  private void processFilter(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
-    if (session.user == null) {
-      throw new TammError("Missing login.");
-    }
-    
-    FindData findData = new Gson().fromJson(reader, FindData.class);
-    logger.debug("Search userlist " + findData.filterText);
-    int userId = session.user.id; 
-    if (userId == 1) userId = -1; // TODO remove
-    var searchResult = application.users.listUsers(userId, findData.filterText);
-    for (UserData user: searchResult) {
-      user.pwd = ""; // do not leak user passwords to the outside.
-    }
-    
-    try (Writer writer = new OutputStreamWriter(resultData)) {
-      new Gson().toJson(searchResult, writer);
-    }
-  }
-  
-  /**
-   * Insert or update given user data.
-   * 
-   * @param reader
-   * @param resultData
-   * @param session
-   * @throws IOException
-   * @throws TammError 
-   */
-  private void processSaveUser(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
-    if (session.user == null) {
-      ServletUtils.sendResult(resultData, false, "", "", "Sie sind noch nicht angemeldet.", null);
-      return;
-    }
-    
-    UserData userData = new Gson().fromJson(reader, UserData.class);
-    if (!session.user.mainAdmin) {
-      userData.mainAdmin = false;
-    }
-    
-    if (!session.user.subAdmin && !session.user.mainAdmin) {
-      userData.subAdmin = false;
-    }
-    
-    userData.administratorId = session.user.id;
-    
-    String errorMsg = "";
-    if (userData.id == -1) {
-      // new user
-     logger.info("Insert user data for user" + userData.name);
-      userData.pwd = PasswordUtils.encodePassword(Long.toHexString((long)(Math.random() * Long.MAX_VALUE)));
-      application.users.writeUser(userData);
-    } else {
-      // update existing user
-      logger.info("Update user data for user" + userData.name);
-      var checkUser = application.users.readUser(userData.id, null);
-      if (checkUser.administratorId == 0) {
-        checkUser.administratorId = checkUser.id;
-      }
-      
-      if (checkUser.administratorId != session.user.id) {
-        errorMsg = "Es können nur eigene Anwender bearbeitet werden.";
-        logger.warn("Invalid user access from " + session.user.name + " to user " + userData.name);
-      } else {
-        checkUser.name = userData.name;
-        checkUser.mail = userData.mail;
-        checkUser.mainAdmin = userData.mainAdmin;
-        checkUser.subAdmin = userData.subAdmin;
-        application.users.writeUser(checkUser);
-      }
-    }
-    
-    ServletUtils.sendResult(resultData, errorMsg.isBlank(), "", "", errorMsg, null);
-  }  
   
   /**
    * Processes new password request.
