@@ -36,6 +36,16 @@ public class UserTableTest {
   }
 
   /**
+   * Test if the number of columns has been changed
+   * without changing the unit tests.
+   */
+  @Test
+  public void testCheckColumns() {
+    String[] cols = UserTable.TABLE_CONFIG.split("\\R");
+    assertEquals("Number of columns changed", 8, cols.length);
+  }
+  
+  /**
    * Test of readUser and writeUser methods, of class UserTable.
    */
   @Test

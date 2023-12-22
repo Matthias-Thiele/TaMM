@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 public class UserTable extends DBTable {
   private static final Logger logger = LogManager.getLogger(UserTable.class);
   
-  private static final String TABLE_CONFIG = 
+  protected static final String TABLE_CONFIG = 
     """
     id I G
     name V 100
