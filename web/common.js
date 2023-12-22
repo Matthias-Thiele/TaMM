@@ -3,7 +3,9 @@
  * GNU General Public License v3.0
  */
 
-
+/*
+ * Send the logout command to the server and switch to the login page.
+ */
 function logout(next) {
     var request = new XMLHttpRequest();
     request.open("GET", "system/logout");
@@ -22,3 +24,22 @@ function logout(next) {
         }
     };
 }
+
+/**
+ * Set the value property of a named element.
+ * 
+ * If the value is null or undefined then
+ * insert an empty string.
+ * 
+ * @param {type} elementName
+ * @param {type} value
+ * @returns {undefined}
+ */
+function setValue(elementName, value) {
+    if ((value === null) || (value === undefined)) {
+        value = "";
+    }
+
+    document.getElementById(elementName).value = value;
+}
+

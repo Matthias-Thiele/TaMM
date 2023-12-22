@@ -7,7 +7,7 @@
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>TaMM Aufgaben</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
@@ -15,6 +15,7 @@
         <script src="common.js"></script> 
         <script>
             var sessionData;
+            var selectedTask;
             
             function loadSessionData() {
                 var request = new XMLHttpRequest();
@@ -34,6 +35,28 @@
                 };
             }
             
+            function addTask() {
+                var task = {};
+                task.lid = -1;
+                fillForm(task);
+            }
+
+            function fillForm(taskData) {
+                selectedTask = taskData;
+                var status = document.getElementById("status");
+                status.innerText = "";
+                
+                setValue("userid", userData.id);
+                setValue("name", userData.name);
+                setValue("mail", userData.mail);
+                document.getElementById("sysadmin").checked = userData.mainAdmin;
+                document.getElementById("subadmin").checked = userData.subAdmin;
+                setValue("lastlogin", userData.lastLogin);
+                
+                document.getElementById("save").disabled = true;
+            }
+            
+    
         </script>
     </head>
     <body onload="loadSessionData();">
@@ -53,8 +76,23 @@
         </div>
         
         <div class="bodybox">
-            <div class="header">TODO write content</div>
-            <button onclick="logout('index.html');">logout</button>
+            <div class="header">TaMM Aufgaben</div>
+            <div class="left-sidebar">
+                <div class="">
+                    <input id="filtervalue" size="12">
+                    <button onclick="filterTasks();">Suchen</button>
+                    <button onclick="addTask();">Neu</button>
+                    <div id="tasklist" class="selectlist"></div>
+                </div>
+                <div class="">
+                    <div><label>Id</label><input type="text" id="tasklid" readonly></div>
+                    <div><label>Bezeichnung</label><input onchange="changed()" type="text" id="name"></div>
+                    <div><label>Beschreibung</label><input onchange="changed()" type="text" id="description"></div>
+                    <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
+                    <div><button id="save" disabled onclick="doSave();">Speichern</button></div>
+                </div>
+            </div>
+            <div class="statusbar" id="status"></div>
         </div>
     </body>
 </html>
