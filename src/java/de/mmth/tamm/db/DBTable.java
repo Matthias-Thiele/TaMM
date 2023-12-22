@@ -173,6 +173,10 @@ public class DBTable {
       case "V":
         sqlType = "VARCHAR(" + value + ")";
         break;
+        
+      case "L":
+        sqlType = "BIGINT";
+        break;
     }
     
     String cmd = "ALTER TABLE " + tableName + " ADD COLUMN " + name + " " + sqlType;
