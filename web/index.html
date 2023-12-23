@@ -23,6 +23,8 @@
              * @returns {undefined}
              */
             function loadSessionData() {
+                initForm("save");
+                
                 var request = new XMLHttpRequest();
                 request.open("GET", "system/session");
                 request.setRequestHeader('Content-Type', 'application/json');

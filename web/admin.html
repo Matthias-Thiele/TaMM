@@ -11,6 +11,8 @@ GNU General Public License v3.0
         <link rel="stylesheet" href="tamm.css">
         <link rel="shortcut icon" href="favicon.ico"/> 
         <script>
+            initForm("save");
+            
             function doSave() {
                 var data = {};
                 data.dburl = document.getElementById("dburl").value;
@@ -43,7 +45,7 @@ GNU General Public License v3.0
             <div><label>Database URL</label><input type="text" id="dburl"></div>
             <div><label>DB Admin Name</label><input type="text" id="name"></div>
             <div><label>DB Password</label><input type="text" id="password"></div>
-            <div><button onclick="doSave();">Speichern</button></div>
+            <div><button id="save" onclick="doSave();">Speichern</button></div>
         </div>
     </body>
 </html>

@@ -26,6 +26,23 @@ function logout(next) {
 }
 
 /**
+ * Initializes global behaviour.
+ * @param {type} saveButtonId
+ * @returns {undefined}
+ */
+function initForm(saveButtonId) {
+    if (saveButtonId) {
+        document.addEventListener("keypress", function (event) {
+            if (event.keyCode === 13) {
+                if (!document.getElementById(saveButtonId).disabled) {
+                    doSave();
+                }
+            }
+         });
+    }
+}
+
+/**
  * Set the value property of a named element.
  * 
  * If the value is null or undefined then
