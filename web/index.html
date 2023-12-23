@@ -34,7 +34,6 @@
                             window.location = response.nextPage + "?next=index.html";
                         } else {
                             sessionData = response.data;
-                            //createUserlist();
                             userlist = new Userlist(sessionData.userNames);
                             userlist.createOptionList("userlist");
                         }
@@ -219,9 +218,9 @@
                     <div id="tasklist" class="selectlist"></div>
                 </div>
                 <div class="">
-                    <div><label>Id</label><input type="text" id="tasklid" readonly></div>
-                    <div><label>Bezeichnung</label><input onchange="changed()" size="30" type="text" id="name"></div>
-                    <div><label>Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
+                    <div><label for="tasklid">Id</label><input type="text" id="tasklid" readonly></div>
+                    <div><label for="name">Bezeichnung</label><input onchange="changed()" size="30" type="text" id="name"></div>
+                    <div><label for="description">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
                     <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
                     <div><label for="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed()"></div>
                     <div><button id="save" disabled onclick="doSave();">Speichern</button></div>

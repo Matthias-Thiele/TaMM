@@ -14,6 +14,7 @@ GNU General Public License v3.0
         <script>
             var selectedUser;
             var sessionData;
+            var userNames;
             
             function loadSessionData() {
                 var request = new XMLHttpRequest();
@@ -28,6 +29,8 @@ GNU General Public License v3.0
                             window.location = response.nextPage + "?next=user.html";
                         } else {
                             sessionData = response.data;
+                            userNames = new Userlist(sessionData.userNames);
+                            userNames.createOptionList("usernames");
                         }
                     }
                 };
@@ -37,6 +40,7 @@ GNU General Public License v3.0
                 selectedUser.name = getValue("name");
                 selectedUser.mail = getValue("mail");
                 selectedUser.id = getValue("userid");
+                selectedUser.supervisorId = userNames.idFromName(getValue("supervisor"));
                 selectedUser.mainAdmin = getValue("sysadmin");
                 selectedUser.subAdmin = getValue("subadmin");
                 selectedUser.lastLogin = getValue("lastlogin");
@@ -122,6 +126,8 @@ GNU General Public License v3.0
                 setValue("userid", userData.id);
                 setValue("name", userData.name);
                 setValue("mail", userData.mail);
+                setValue("supervisor", userNames.nameFromId(userData.supervisorId));
+                setValue("administrator", userNames.nameFromId(userData.administratorId));
                 document.getElementById("sysadmin").checked = userData.mainAdmin;
                 document.getElementById("subadmin").checked = userData.subAdmin;
                 setValue("lastlogin", userData.lastLogin);
@@ -160,16 +166,20 @@ GNU General Public License v3.0
                     <div id="userlist" class="selectlist"></div>
                 </div>
                 <div class="">
-                    <div><label>Id</label><input type="text" id="userid" readonly></div>
-                    <div><label>Anwendername</label><input onchange="changed()" type="text" id="name"></div>
-                    <div><label>EMail</label><input onchange="changed()" type="text" id="mail"></div>
+                    <div><label for="name">Anwendername</label><input onchange="changed()" type="text" id="name"></div>
+                    <div><label for="mail">EMail</label><input onchange="changed()" type="text" id="mail"></div>
+                    <div><label for="supervisor">Vorgesetzter</label><input id="supervisor" list="usernames" onchange="changed()"></div>
                     <div><label for="sysadmin">Systemadministrator</label><input onchange="changed()" type="checkbox" id="sysadmin"></div>
                     <div><label for="sysadmin">Anwenderverwaltung</label><input onchange="changed()" type="checkbox" id="subadmin"></div>
+                    <hr>
                     <div><label for="lastlogin">Letzte Anmeldung</label><input id="lastlogin" readonly></div>
+                    <div><label for="administrator">Administrator</label><input id="administrator" list="usernames" onchange="changed()" readonly></div>
+                    <div><label for="userid">Id</label><input type="text" id="userid" readonly></div>
                     <div><button id="save" disabled onclick="doSave();">Speichern</button></div>
                 </div>
             </div>
             <div class="statusbar" id="status"></div>
         </div>
+        <datalist id="usernames"></datalist>
     </body>
 </html>
