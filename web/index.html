@@ -12,6 +12,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
         <link rel="stylesheet" href="menu.css">
+        <link rel="shortcut icon" href="favicon.ico"/> 
         <script src="common.js"></script> 
         <script>
             var sessionData;
@@ -151,9 +152,9 @@
                 list.innerHTML = "";
                 tasklist.forEach((task) => {
                     var newItem = document.createElement("div");
+                    newItem.className = "listitem";
                     newItem.innerText = task.name;
                     newItem.userData = task;
-                    newItem.className = "listitem";
                     newItem.onclick = function() {fillForm(task);};
                     list.appendChild(newItem);
                 });
