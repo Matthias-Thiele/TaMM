@@ -6,6 +6,7 @@
 package de.mmth.tamm.db;
 
 import de.mmth.tamm.TammError;
+import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.UserData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -220,6 +221,35 @@ public class UserTable extends DBTable {
     } catch (SQLException ex) {
       logger.warn("Error reading user list.", ex);
       throw new TammError("Error reading user list.");
+    }
+    return result;
+  }
+  
+  /**
+   * Lists all usersnames.
+   * 
+   * @return
+   * @throws TammError 
+   */
+  public List<KeyValue> listUserNames() throws TammError {
+    List<KeyValue> result = new ArrayList<>();
+    
+    var cmd = "SELECT id, name FROM " + tableName + " ORDER BY name";
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        var userRows = stmt.executeQuery();
+        while (userRows.next()) {
+          int id = userRows.getInt(1);
+          String name = userRows.getString(2);
+          logger.debug("User found: " + name);
+          result.add(new KeyValue(id, name));
+        }
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error reading user/id list.", ex);
+      throw new TammError("Error reading user/id list.");
     }
     return result;
   }

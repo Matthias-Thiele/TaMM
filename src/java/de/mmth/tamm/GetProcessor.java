@@ -71,6 +71,7 @@ public class GetProcessor {
    */
   private void processSession(OutputStream resultData, SessionData session) throws IOException, TammError {
     boolean isOk = session.user != null;
+    session.userNames = application.userNames;
     ServletUtils.sendResult(resultData, isOk, "", "login.html", "", session);
   }
   

@@ -5,17 +5,22 @@
 package de.mmth.tamm;
 
 import de.mmth.tamm.data.AdminData;
+import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.db.DBConnect;
 import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.utils.RequestCache;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *
  * @author matthias
  */
 public class ApplicationData {
+  private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(ApplicationData.class);
   private static final String DB_URL = "dburl";
   private static final String DB_NAME = "dbname";
   private static final String DB_PASSWORD = "dbpassword";
@@ -31,6 +36,7 @@ public class ApplicationData {
   
   public RequestCache requests;
   public String tammUrl;
+  public List<KeyValue> userNames;
   
   /**
    * Reads the database access information from the registry
@@ -54,6 +60,12 @@ public class ApplicationData {
         db = con;
         
         users = new UserTable(db, "userlist");
+        try {
+          userNames = users.listUserNames();
+        } catch (TammError ex) {
+          logger.warn("Cannot read usernames list.");
+          userNames = new ArrayList<KeyValue>();
+        }
         tasks = new TaskTable(db, "tasklist");
         requests = new RequestCache();
       }

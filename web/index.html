@@ -16,7 +16,7 @@
         <script>
             var sessionData;
             var selectedTask;
-            
+            var userlist;
             /**
              * Load user information and other session data.
              * @returns {undefined}
@@ -34,10 +34,14 @@
                             window.location = response.nextPage + "?next=index.html";
                         } else {
                             sessionData = response.data;
+                            //createUserlist();
+                            userlist = new Userlist(sessionData.userNames);
+                            userlist.createOptionList("userlist");
                         }
                     }
                 };
             }
+            
             
             /**
              * Creates a new empty task item and displays it in the form area.
@@ -62,6 +66,7 @@
                 setValue("tasklid", taskData.lId);
                 setValue("name", taskData.name);
                 setValue("description", taskData.description);
+                setValue("owner", userlist.nameFromId(taskData.owner));
                 
                 document.getElementById("save").disabled = true;
             }
@@ -78,6 +83,7 @@
                 }
                 selectedTask.name = getValue("name");
                 selectedTask.description = getValue("description");
+                selectedTask.owner = userlist.idFromName(getValue("owner"));
                 console.log(selectedTask);
                 status.innerText = "Warte auf Server...";
                 
@@ -161,6 +167,30 @@
             function changed() {
                 document.getElementById("save").disabled = false;
             }
+            
+            function filter(source) {
+                var input = document.getElementById(source);
+                var filterText = input.value.toLowerCase();
+                var ul = document.getElementById("sel" + source);
+                ul.innerHTML = "";
+                sessionData.userNames.forEach((idName) => {
+                    if (idName.value.toLowerCase().includes(filterText)) {
+                        var li = document.createElement("li");
+                        li.data = idName;
+                        var txt = document.createTextNode(idName.value);
+                        li.appendChild(txt);
+                        li.onclick = function() {selected(input,ul, li);};
+                        ul.appendChild(li);
+                    }
+                });
+            }
+            
+            function selected(toInput, ul, li) {
+                var data = li.data;
+                toInput.value = data.value;
+                toInput.tammid = data.key;
+                ul.innerHTML = "";
+            }
         </script>
     </head>
     <body onload="loadSessionData();">
@@ -193,10 +223,12 @@
                     <div><label>Bezeichnung</label><input onchange="changed()" size="30" type="text" id="name"></div>
                     <div><label>Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
                     <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
+                    <div><label for="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed()"></div>
                     <div><button id="save" disabled onclick="doSave();">Speichern</button></div>
                 </div>
             </div>
             <div class="statusbar" id="status"></div>
         </div>
+        <datalist id="userlist"></datalist>
     </body>
 </html>

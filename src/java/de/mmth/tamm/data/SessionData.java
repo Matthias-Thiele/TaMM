@@ -4,6 +4,8 @@
  */
 package de.mmth.tamm.data;
 
+import java.util.List;
+
 /**
  * Session data.
  * 
@@ -13,4 +15,5 @@ public class SessionData {
   public String clientIp;
   public String loginTime;
   public UserData user;
+  public List<KeyValue> userNames;
 }
