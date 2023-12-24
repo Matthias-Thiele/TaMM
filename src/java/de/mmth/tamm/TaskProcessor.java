@@ -45,7 +45,7 @@ public class TaskProcessor {
     }
     
     TaskData taskData = gson.fromJson(reader, TaskData.class);
-    taskData.lastChanged = DateUtils.format(null);
+    taskData.lastChanged = DateUtils.formatZ(null);
     if (taskData.createDate == null) {
       taskData.createDate = taskData.lastChanged;
       taskData.creator = session.user.id;

@@ -118,7 +118,7 @@ public class PostProcessor {
     if (PasswordUtils.comparePassword(user.pwd, loginData.pwd)) {
       result.result = "ok";
       result.nextPage = "index.html";
-      session.loginTime = DateUtils.format(null); 
+      session.loginTime = DateUtils.formatZ(null); 
       session.user = user;
       session.user.pwd = ""; // do not leak password.
       application.users.updateLoginDate(user.id, session.loginTime);

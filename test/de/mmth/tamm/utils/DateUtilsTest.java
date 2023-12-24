@@ -4,9 +4,8 @@
  */
 package de.mmth.tamm.utils;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -23,8 +22,25 @@ public class DateUtilsTest {
   public void testFormat() {
     System.out.println("format");
     ZonedDateTime date = ZonedDateTime.now();
-    String result = DateUtils.format(date);
+    String result = DateUtils.formatZ(date);
     assertEquals(19, result.length());
+    
+    LocalDate ldate = LocalDate.now();
+    result = DateUtils.formatL(ldate);
+    assertEquals(10, result.length());
+  }
+
+  /**
+   * Test of fromIso method, of class DateUtils.
+   */
+  @Test
+  public void testFromIso() {
+    System.out.println("fromIso");
+    String isoDate = "2024-12-31";
+    LocalDate result = DateUtils.fromIso(isoDate);
+    assertEquals(2024, result.getYear());
+    assertEquals(12, result.getMonthValue());
+    assertEquals(31, result.getDayOfMonth());
   }
   
 }

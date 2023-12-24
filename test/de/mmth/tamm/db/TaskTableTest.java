@@ -39,7 +39,7 @@ public class TaskTableTest {
   @Test
   public void testCheckColumns() {
     String[] cols = TaskTable.TABLE_CONFIG.split("\\R");
-    assertEquals("Number of columns changed", 9, cols.length);
+    assertEquals("Number of columns changed", 10, cols.length);
   }
 
   /**
@@ -52,13 +52,14 @@ public class TaskTableTest {
     task.lId = -1;
     task.name = "First test task";
     task.description = "This is the description of the new task.";
-    task.createDate = DateUtils.format(null);
-    task.lastChanged = DateUtils.format(DateUtils.now().plusMinutes(2));
+    task.createDate = DateUtils.formatZ(null);
+    task.lastChanged = DateUtils.formatZ(DateUtils.now().plusMinutes(2));
     task.creator = 123;
     ZonedDateTime dueDate = DateUtils.now().plusDays(1);
-    task.nextDueDate = DateUtils.format(dueDate);
-    task.startDate = DateUtils.format(DateUtils.now().plusDays(3));
+    task.nextDueDate = DateUtils.formatZ(dueDate);
+    task.startDate = DateUtils.formatZ(DateUtils.now().plusDays(3));
     task.owner = 456;
+    task.interval = "single|1|2024-01-02";
     
     TaskTable instance = new TaskTable(con, "testtasks");
     long result = instance.writeTask(task);
@@ -74,7 +75,8 @@ public class TaskTableTest {
     assertEquals("Task last changed date mismatch", task.lastChanged, task2.lastChanged);
     assertEquals("Task due date mismatch", task.nextDueDate, task2.nextDueDate);
     assertEquals("Task start date mismatch", task.startDate, task2.startDate);
-    assertEquals("Tast owner mismatch", task.owner, task2.owner);
+    assertEquals("Task owner mismatch", task.owner, task2.owner);
+    assertEquals("Task interval mismatch", task.interval, task2.interval);
     
     try {
       instance.readTask(12345);
