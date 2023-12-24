@@ -69,8 +69,38 @@
                 setValue("name", taskData.name);
                 setValue("description", taskData.description);
                 setValue("owner", userlist.nameFromId(taskData.owner));
+                fillInterval(taskData.interval);
                 
                 document.getElementById("save").disabled = true;
+            }
+            
+            /**
+             * Splits the given intervalData string into parts
+             * and fill the interval fields with the given values.
+             * 
+             * @param {type} intervalData
+             * @returns {undefined}
+             */
+            function fillInterval(intervalData) {
+                var intervalInitNeeded = true;
+                if (intervalData) {
+                    var intervalParts = intervalData.split("|");
+                    if (intervalParts.length === 3) {
+                        document.getElementById(intervalParts[0]).checked = true;
+                        setValue("divider", intervalParts[1]);
+                        var startDates = intervalParts[2].split(";");
+                        document.getElementById("datelist").innerHTML = "";
+                        startDates.forEach((startDate) => {addDateField(startDate);});
+                        intervalInitNeeded = false;
+                    }
+                }
+                
+                if (intervalInitNeeded) {
+                    document.getElementById("single").checked = true;
+                    document.getElementById("divider").value = 1;
+                    document.getElementById("datelist").innerHTML = "";
+                    addDateField();
+                }
             }
             
             /**
@@ -86,6 +116,7 @@
                 selectedTask.name = getValue("name");
                 selectedTask.description = getValue("description");
                 selectedTask.owner = userlist.idFromName(getValue("owner"));
+                selectedTask.interval = getInterval();
                 console.log(selectedTask);
                 status.innerText = "Warte auf Server...";
                 
@@ -170,30 +201,68 @@
                 document.getElementById("save").disabled = false;
             }
             
-            function filter(source) {
-                var input = document.getElementById(source);
-                var filterText = input.value.toLowerCase();
-                var ul = document.getElementById("sel" + source);
-                ul.innerHTML = "";
-                sessionData.userNames.forEach((idName) => {
-                    if (idName.value.toLowerCase().includes(filterText)) {
-                        var li = document.createElement("li");
-                        li.data = idName;
-                        var txt = document.createTextNode(idName.value);
-                        li.appendChild(txt);
-                        li.onclick = function() {selected(input,ul, li);};
-                        ul.appendChild(li);
-                    }
-                });
+            /**
+             * Adds a date field into the list of start dates.
+             * @param {type} initialValue
+             * @returns {undefined}
+             */
+            function addDateField(initialValue) {
+                var root = document.getElementById("datelist");
+                var dateField = document.createElement("input");
+                dateField.type = "date";
+                dateField.style = "margin-right: 5pt;";
+                dateField.name = "startdate";
+                dateField.onchange = function() {changed();};
+                if (initialValue) {
+                    dateField.value = initialValue;
+                }
+                root.appendChild(dateField);
             }
             
-            function selected(toInput, ul, li) {
-                var data = li.data;
-                toInput.value = data.value;
-                toInput.tammid = data.key;
-                ul.innerHTML = "";
+            /**
+             * Reads the values of the interval fields and build
+             * the interval string for storage.
+             * @returns {String}
+             */
+            function getInterval() {
+                var interval = document.querySelector('input[name="interval"]:checked').value;
+                var divider = document.getElementById("divider").value;
+                var dates = getValues("startdate", ";");
+                return interval + "|" + divider + "|" + dates;
             }
         </script>
+        <style>
+            input[type=radio] {
+            display: none;
+                & ~ label {
+                    cursor: pointer;
+                    background-color: #f8f8fc;
+                    border-radius: 3px;
+                    box-shadow: 2px 1px 1px gray;
+                    padding: 3pt;
+                    margin: 3pt;
+                    width: 80pt;
+                    text-align: center;
+                }
+            }
+            
+            input[type="radio"]:checked + label {
+                background-color: #e0e0ff;
+            }
+               
+            .datelist {
+                margin: 5pt;
+            }
+            
+            .flex-container {
+                display: flex;
+            }
+   
+            .flex-container > div {
+                margin: 10px;
+                padding: 8px;
+            }
+        </style>
     </head>
     <body onload="loadSessionData();">
         <div class="hamburger-menu">
@@ -226,6 +295,23 @@
                     <div><label for="description">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
                     <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
                     <div><label for="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed()"></div>
+                    <hr>
+                    Intervall<br>
+                    <div class="flex-container">
+                        <div>
+                            <input type="radio" name="interval" id="single" value="single" onchange="changed()" checked> <label for="single">Einmal</label><br>
+                            <input type="radio" name="interval" id="daily" value="daily" onchange="changed()"> <label for="daily">Täglich</label><br>
+                            <input type="radio" name="interval" id="weekly" value="weekly" onchange="changed()"> <label for="weekly">Wöchentlich</label><br>
+                            <input type="radio" name="interval" id="monthly" value="monthly" onchange="changed()"> <label for="monthly">Monatlich</label><br>
+                            <input type="radio" name="interval" id="yearly" value="yearly" onchange="changed()"> <label for="yearly">Jährlich</label><br>
+                        </div>
+                        <div>
+                            <div>Teiler <input type="number" id="divider" style="width: 40pt" value="1" min="1" max="9999" onchange="changed()">
+                                <button style="margin-left: 10pt;" id="dateadd" onclick="addDateField();">+ Startdatum hinzufügen</button>
+                            </div>
+                            <div id="datelist" class="datelist"><input name="startdate" type="date" style="margin-right: 5pt" onchange="changed()"></div>
+                        </div>
+                    </div>
                     <div><button id="save" disabled onclick="doSave();">Speichern</button></div>
                 </div>
             </div>

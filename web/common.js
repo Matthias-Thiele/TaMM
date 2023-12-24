@@ -82,6 +82,28 @@ function getValue(elementName) {
 }
 
 /**
+ * Get all values of the nodes with the given name
+ * and return them as one string with the given
+ * seperator.
+ * 
+ * @param {type} name
+ * @param {type} seperator
+ * @returns {String}
+ */
+function getValues(name, seperator) {
+    var result = [];
+    var inputs = document.getElementsByName(name);
+    inputs.forEach((input) => { 
+        if (input.value) {
+            result.push(input.value);
+        }
+    });
+
+    return result.sort().join(seperator);
+}
+
+
+/**
  * Helper function for user selection.
  * @param {type} users
  * @returns {Userlist}

@@ -31,6 +31,7 @@ public class TaskTable extends DBTable {
     owner I
     startdate V 20
     nextduedate V 20
+    interval V 2000
     """;
   
   public TaskTable(DBConnect conn, String tableName) {
@@ -70,6 +71,7 @@ public class TaskTable extends DBTable {
         stmt.setInt(col++, task.owner);
         stmt.setString(col++, task.startDate);
         stmt.setString(col++, task.nextDueDate);
+        stmt.setString(col++, task.interval);
 
         stmt.execute();
       }
@@ -194,6 +196,7 @@ public class TaskTable extends DBTable {
     result.owner = taskRows.getInt(col++);
     result.startDate = taskRows.getString(col++);
     result.nextDueDate = taskRows.getString(col++);
+    result.interval = taskRows.getString(col++);
     
     return result;
   }

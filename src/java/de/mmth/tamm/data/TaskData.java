@@ -18,4 +18,5 @@ public class TaskData {
   public int owner;
   public String startDate;
   public String nextDueDate;
+  public String interval;
 }
