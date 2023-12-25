@@ -105,4 +105,48 @@ public class IntervalTest {
     assertEquals("2024-02-01", nextDate);
   }
   
+  /**
+   * Test of nextDate method, of class Interval.
+   */
+  @Test
+  public void testNextWeeklyDate() {
+    System.out.println("nextDate WEEKLY");
+    String source = "weekly|2|2024-01-02;2024-01-03";
+    Interval instance = new Interval(source);
+    
+    /*for (int i = 1; i < 32; i++) {
+      String startDate = "2024-01-" + ((i < 10) ? "0" + i : i);
+      String nextDate = instance.nextDate(startDate);
+      System.out.println("Start: " + startDate + ", next: " + nextDate);
+    }*/
+    
+    String startDate = "2024-01-02";
+    String nextDate = instance.nextDate(startDate);
+    assertEquals("2024-01-03", nextDate);
+    
+    startDate = "2024-01-03";
+    nextDate = instance.nextDate(startDate);
+    assertEquals("2024-01-16", nextDate);
+    
+    startDate = "2024-01-15";
+    nextDate = instance.nextDate(startDate);
+    assertEquals("2024-01-16", nextDate);
+    
+    startDate = "2024-01-16";
+    nextDate = instance.nextDate(startDate);
+    assertEquals("2024-01-17", nextDate);
+    
+    startDate = "2024-01-17";
+    nextDate = instance.nextDate(startDate);
+    assertEquals("2024-01-30", nextDate);
+    
+    startDate = "2024-01-30";
+    nextDate = instance.nextDate(startDate);
+    assertEquals("2024-01-31", nextDate);
+    
+    startDate = "2024-01-31";
+    nextDate = instance.nextDate(startDate);
+    assertEquals("2024-02-13", nextDate);
+    
+  }  
 }

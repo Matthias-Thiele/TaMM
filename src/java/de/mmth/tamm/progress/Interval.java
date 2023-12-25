@@ -7,7 +7,6 @@ package de.mmth.tamm.progress;
 import de.mmth.tamm.utils.DateUtils;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
 
 /**
  * Serializes and calculates Interval dates.
@@ -40,7 +39,8 @@ public class Interval {
     
     return switch (repeat) {
       case SINGLE -> nextSingleDate(afterThisDate);
-      case DAILY -> nextDailyDate(afterThisDate);
+      case DAILY -> nextDailyDate(afterThisDate, divider, isoDates);
+      case WEEKLY -> nextDailyDate(afterThisDate, 7 * divider, isoDates);
       default -> null;
     };
   }
@@ -134,22 +134,22 @@ public class Interval {
     return null;
   }
   
-  private String nextDailyDate(String afterThisDate) {
+  private String nextDailyDate(String afterThisDate, int localDivider, String[] localIsoDates) {
     LocalDate dateAfter = DateUtils.fromIso(afterThisDate);
-    if (isoDates.length == 1) {
-      LocalDate nextDay = dateAfter.plusDays(divider);
+    if (localIsoDates.length == 1) {
+      LocalDate nextDay = dateAfter.plusDays(localDivider);
       return DateUtils.formatL(nextDay);
     } else {
       long daysAfter = dateAfter.getLong(ChronoField.EPOCH_DAY) + 1;
-      long nowModDivider = daysAfter % divider;
+      long nowModDivider = daysAfter % localDivider;
       long minDay = Long.MAX_VALUE;
-      for (String next: isoDates) {
+      for (String next: localIsoDates) {
         long isoDays = DateUtils.fromIso(next).getLong(ChronoField.EPOCH_DAY);
-        long isoModDivider = isoDays % divider;
+        long isoModDivider = isoDays % localDivider;
         long checkDay = daysAfter + isoModDivider - nowModDivider;
         
         if (checkDay < daysAfter) {
-          checkDay += divider;
+          checkDay += localDivider;
         }
         if (checkDay < minDay) {
           minDay = checkDay;
