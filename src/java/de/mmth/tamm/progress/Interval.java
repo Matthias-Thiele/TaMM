@@ -5,8 +5,11 @@
 package de.mmth.tamm.progress;
 
 import de.mmth.tamm.utils.DateUtils;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Serializes and calculates Interval dates.
@@ -17,9 +20,12 @@ import java.time.temporal.ChronoField;
  * @author matthias
  */
 public class Interval {
+  private static final Logger logger = LogManager.getLogger(Interval.class);
+  
   private Repeat repeat = Repeat.SINGLE;
   private int divider = 1;
   private String[] isoDates = new String[0];
+  private boolean valid = false;
   
   /**
    * Construct from string representation.
@@ -109,12 +115,34 @@ public class Interval {
    * @param data 
    */
   private void init(String data) {
-    var parts = data.split("\\|");
-    if (parts.length == 3) {
-      repeat = Repeat.fromLabel(parts[0]);
-      divider = Integer.parseInt(parts[1]);
-      isoDates = parts[2].split(";");
+    if (data != null) {
+      var parts = data.split("\\|");
+      if (parts.length == 3) {
+        repeat = Repeat.fromLabel(parts[0]);
+        try {
+          divider = Integer.parseInt(parts[1]);
+          isoDates = parts[2].split(";");
+          valid = (repeat != null) && (isoDates.length > 0);
+          for (var dt: isoDates) {
+            DateUtils.fromIso(dt);
+          }
+        } catch(NumberFormatException | DateTimeException ex2) {
+          valid = false;
+        }
+      }
     }
+    if (!valid) {
+      logger.info("Invalid interval ignored: " + data);
+    }
+  }
+  
+  /**
+   * A valid interval has been constructed.
+   * 
+   * @return 
+   */
+  public boolean isValid() {
+    return valid;
   }
   
   /**

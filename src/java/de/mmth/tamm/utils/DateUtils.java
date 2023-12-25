@@ -4,6 +4,7 @@
  */
 package de.mmth.tamm.utils;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -57,6 +58,10 @@ public class DateUtils {
   }
   
   public static LocalDate fromIso(String isoDate) {
+    if ((isoDate == null) || (isoDate.length() != 10)) {
+      throw new DateTimeException("Invalid ISO Date length.");
+    }
+    
     int year = Integer.parseInt(isoDate.substring(0, 4));
     int month = Integer.parseInt(isoDate.substring(5, 7));
     int day = Integer.parseInt(isoDate.substring(8, 10));

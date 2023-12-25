@@ -24,7 +24,7 @@ public enum Repeat {
       }
     }
     
-    return SINGLE;
+    return null;
   }
   
   private Repeat(String label) {

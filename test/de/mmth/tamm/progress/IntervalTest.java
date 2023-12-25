@@ -27,6 +27,35 @@ public class IntervalTest {
     }
   }
 
+  @Test
+  public void testIsValid() {
+    System.out.println("isValid");
+    var interval = new Interval("single|1|2024-01-01");
+    assertTrue("Interval was valid", interval.isValid());
+    
+    interval = new Interval("error|1|2024-01-01");
+    assertFalse("Invalid repeat not detected.", interval.isValid());
+    
+    interval = new Interval("daily|error|2024-01-01");
+    assertFalse("Invalid divider not detected.", interval.isValid());
+    
+    interval = new Interval("monthly|1|");
+    assertFalse("Missing start date not detected.", interval.isValid());
+    
+    interval = new Interval("monthly|1|text");
+    assertFalse("Invalid start date not detected.", interval.isValid());
+    
+    interval = new Interval("monthly|1|1234567890");
+    assertFalse("Invalid start date not detected.", interval.isValid());
+    
+    interval = new Interval("something else");
+    assertFalse("Not an interval - not detected.", interval.isValid());  
+    
+    interval = new Interval(null);
+    assertFalse("Should not raise an exception.", interval.isValid());
+    
+    
+  }
   /**
    * Test of getDivider method, of class Interval.
    */

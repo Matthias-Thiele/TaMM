@@ -52,6 +52,7 @@
                             sessionData = response.data;
                             userlist = new Userlist(sessionData.userNames);
                             userlist.createOptionList("userlist");
+                            setTimeout(filterTasks, 200);
                         }
                     }
                 };
@@ -205,6 +206,7 @@
                 var data = {};
                 data.source = "tasklist";
                 data.filterText = "%" + document.getElementById("filtervalue").value + "%";
+                data.userId = sessionData.user.id;
                 console.log("Search for" + data);
                 status.innerText = "Warte auf Server...";
                 

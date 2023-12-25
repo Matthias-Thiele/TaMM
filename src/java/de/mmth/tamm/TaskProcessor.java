@@ -73,8 +73,7 @@ public class TaskProcessor {
     
     FindData findData = gson.fromJson(reader, FindData.class);
     logger.debug("Search tasklist " + findData.filterText);
-    int userId = session.user.id; 
-    if (userId == 1) userId = -1; // TODO remove
+    int userId = findData.userId; 
     var searchResult = application.tasks.listTasks(userId, findData.filterText);
     
     try (Writer writer = new OutputStreamWriter(resultData)) {
@@ -103,6 +102,10 @@ public class TaskProcessor {
     }
     
     Interval interval = new Interval(taskData.interval);
+    if (!interval.isValid()) {
+      throw new TammError("Invalid interval.");
+    }
+    
     String next = interval.nextDate(DateUtils.toDay());
     taskData.nextDueDate = next;
     application.tasks.writeTask(taskData);

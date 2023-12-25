@@ -12,4 +12,5 @@ package de.mmth.tamm.data;
 public class FindData {
   public String source;
   public String filterText;
+  public int userId;
 }
