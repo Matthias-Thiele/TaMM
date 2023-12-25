@@ -13,6 +13,19 @@
         <link rel="stylesheet" href="tamm.css">
         <link rel="stylesheet" href="menu.css">
         <link rel="shortcut icon" href="favicon.ico"/> 
+        <style>
+            .taskname {
+                font-weight: bold;
+            }
+            
+            .duedate {
+                color: #202020;
+            }
+            
+            .escalated {
+                color: #c00040;
+            }
+        </style>
         <script src="common.js"></script> 
         <script>
             var sessionData;
@@ -62,6 +75,7 @@
              */
             function fillForm(taskData) {
                 selectedTask = taskData;
+                document.getElementById("advance").disabled = taskData.lId === "-1";
                 var status = document.getElementById("status");
                 status.innerText = "";
                 
@@ -69,6 +83,7 @@
                 setValue("name", taskData.name);
                 setValue("description", taskData.description);
                 setValue("owner", userlist.nameFromId(taskData.owner));
+                setValue("duedate", taskData.nextDueDate);
                 fillInterval(taskData.interval);
                 
                 document.getElementById("save").disabled = true;
@@ -104,6 +119,42 @@
             }
             
             /**
+             * Advances the selected task to the next event date
+             * after today.
+             * 
+             * @returns {undefined}
+             */
+            function doAdvance() {
+                var taskData = {};
+                taskData.lId = selectedTask.lId;
+                
+                console.log(taskData);
+                status.innerText = "Warte auf Server...";
+                
+                var request = new XMLHttpRequest();
+                request.open("POST", "system/advancetask");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(taskData));
+                request.overrideMimeType('text/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var status = document.getElementById("status");
+                        var response = JSON.parse(this.responseText);
+                        if (response.result === "ok") {
+                          status.innerText = "Aufgabe weitergeleitet: " + response.message;
+                          emptyTask = {};
+                          fillForm(emptyTask);
+                        } else {
+                            if (!response.message) {
+                                response.message = "Unbekannter Fehler beim Weiterleiten.";
+                            }
+                            status.innerText = response.message;
+                        }
+                    }
+                };
+            }
+            
+            /**
              * Fills the current task item with the data from the
              * form area and sends it to the server.
              * @returns {undefined}
@@ -117,6 +168,7 @@
                 selectedTask.description = getValue("description");
                 selectedTask.owner = userlist.idFromName(getValue("owner"));
                 selectedTask.interval = getInterval();
+                selectedTask.nextDueDate = getValue("duedate");
                 console.log(selectedTask);
                 status.innerText = "Warte auf Server...";
                 
@@ -183,10 +235,22 @@
             function listTasks(tasklist) {
                 var list = document.getElementById("tasklist");
                 list.innerHTML = "";
+                var td = toDay();
                 tasklist.forEach((task) => {
                     var newItem = document.createElement("div");
                     newItem.className = "listitem";
-                    newItem.innerText = task.name;
+                    var taskName = document.createElement("div");
+                    taskName.className = "taskname";
+                    taskName.innerText = task.name;
+                    var dueDate = document.createElement("div");
+                    dueDate.innerText = task.nextDueDate;
+                    dueDate.className = "duedate";
+                    if (task.nextDueDate < td) {
+                        dueDate.classList.add("escalated");
+                    }
+                    
+                    newItem.appendChild(taskName);
+                    newItem.appendChild(dueDate);
                     newItem.userData = task;
                     newItem.onclick = function() {fillForm(task);};
                     list.appendChild(newItem);
@@ -229,6 +293,10 @@
                 var divider = document.getElementById("divider").value;
                 var dates = getValues("startdate", ";");
                 return interval + "|" + divider + "|" + dates;
+            }
+            
+            function toDay() {
+                return new Date().toISOString().split('T')[0];
             }
         </script>
         <style>
@@ -295,6 +363,7 @@
                     <div><label for="description">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
                     <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
                     <div><label for="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed()"></div>
+                    <div><label for="duedate">Nächster Start</label><input id="duedate" type="date" onchange="changed()"></div>
                     <hr>
                     Intervall<br>
                     <div class="flex-container">
@@ -312,7 +381,7 @@
                             <div id="datelist" class="datelist"><input name="startdate" type="date" style="margin-right: 5pt" onchange="changed()"></div>
                         </div>
                     </div>
-                    <div><button id="save" disabled onclick="doSave();">Speichern</button></div>
+                    <div><button id="save" disabled onclick="doSave();" style="margin-right: 5pt;">Speichern</button><button id="advance" disabled onclick="doAdvance();">Erledigt</button></div>
                 </div>
             </div>
             <div class="statusbar" id="status"></div>

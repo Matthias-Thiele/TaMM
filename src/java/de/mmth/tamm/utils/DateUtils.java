@@ -52,6 +52,10 @@ public class DateUtils {
     return ZonedDateTime.now();
   }
   
+  public static String toDay() {
+    return formatL(LocalDate.now());
+  }
+  
   public static LocalDate fromIso(String isoDate) {
     int year = Integer.parseInt(isoDate.substring(0, 4));
     int month = Integer.parseInt(isoDate.substring(5, 7));

@@ -98,6 +98,9 @@ public class PostProcessor {
         case "filtertask":
           taskProcessor.processFilter(reader, resultData, session);
           break;
+          
+        case "advancetask":
+          taskProcessor.processAdvance(reader, resultData, session);
       }
     }
   }

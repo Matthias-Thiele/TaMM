@@ -46,12 +46,14 @@ public class System extends HttpServlet {
           throws ServletException, IOException {
     try (InputStream content = request.getInputStream()) {
       SessionData sd = ServletUtils.prepareSession(request);
+      ServletOutputStream out = response.getOutputStream();
       
       try {
         String requestUri = request.getRequestURI();
-        ServletOutputStream out = response.getOutputStream();
         getProcessor.process(sd, requestUri, content, out);
         out.flush();
+      } catch(TammError te) {
+        ServletUtils.sendResult(out, false, "", "", te.getMessage(), null);
       } catch(Throwable ex) {
         // dont leak internal exceptions to browser
         logger.warn("Unexpected error in get processing.", ex);
@@ -80,12 +82,14 @@ public class System extends HttpServlet {
     
     try (InputStream content = request.getInputStream()) {
       SessionData sd = ServletUtils.prepareSession(request);
+      ServletOutputStream out = response.getOutputStream();
       
       try {
         String requestUri = request.getRequestURI();
-        ServletOutputStream out = response.getOutputStream();
         postProcessor.process(sd, requestUri, content, out);
         out.flush();
+      } catch(TammError te) {
+        ServletUtils.sendResult(out, false, "", "", te.getMessage(), null);
       } catch(Throwable ex) {
         // dont leak internal exceptions to browser
         logger.warn("Unexpected error in post processing.", ex);

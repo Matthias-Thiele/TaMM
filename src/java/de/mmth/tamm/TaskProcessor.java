@@ -11,6 +11,7 @@ import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.data.TaskData;
 import de.mmth.tamm.data.UserData;
+import de.mmth.tamm.progress.Interval;
 import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
@@ -79,6 +80,35 @@ public class TaskProcessor {
     try (Writer writer = new OutputStreamWriter(resultData)) {
       gson.toJson(searchResult, writer);
     }
+  }
+
+  /**
+   * Advance selected task to next date after today.
+   * 
+   * @param reader
+   * @param resultData
+   * @param session
+   * @throws TammError
+   * @throws IOException 
+   */
+  void processAdvance(Reader reader, OutputStream resultData, SessionData session) throws TammError, IOException {
+    if (session.user == null) {
+      throw new TammError("Missing login.");
+    }
+    
+    TaskData advanceTask = gson.fromJson(reader, TaskData.class);
+    TaskData taskData = application.tasks.readTask(advanceTask.lId);
+    if ((taskData.owner != session.user.id) && !session.user.mainAdmin) {
+      throw new TammError("Not your task.");
+    }
+    
+    Interval interval = new Interval(taskData.interval);
+    String next = interval.nextDate(DateUtils.toDay());
+    taskData.nextDueDate = next;
+    application.tasks.writeTask(taskData);
+    
+    ServletUtils.sendResult(resultData, true, "", "", next, null);
+    
   }
   
 }
