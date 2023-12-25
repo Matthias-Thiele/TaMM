@@ -41,6 +41,7 @@ public class Interval {
       case SINGLE -> nextSingleDate(afterThisDate);
       case DAILY -> nextDailyDate(afterThisDate, divider, isoDates);
       case WEEKLY -> nextDailyDate(afterThisDate, 7 * divider, isoDates);
+      case YEARLY -> nextYearlyDate(afterThisDate);
       default -> null;
     };
   }
@@ -134,6 +135,17 @@ public class Interval {
     return null;
   }
   
+  /**
+   * Find the next activation date after the given date.
+   * 
+   * The weekly date is calculated the same way as
+   * daily dates, just the difference is multiplied by 7.
+   * 
+   * @param afterThisDate
+   * @param localDivider
+   * @param localIsoDates
+   * @return 
+   */
   private String nextDailyDate(String afterThisDate, int localDivider, String[] localIsoDates) {
     LocalDate dateAfter = DateUtils.fromIso(afterThisDate);
     if (localIsoDates.length == 1) {
@@ -157,6 +169,44 @@ public class Interval {
       }
       LocalDate nextDay = LocalDate.ofEpochDay(minDay);
       return DateUtils.formatL(nextDay);
+    }
+  }
+  
+  /**
+   * Find the next yearly activation after the given date.
+   * 
+   * @param afterThisDate
+   * @return 
+   */
+  private String nextYearlyDate(String afterThisDate) {
+    if (isoDates.length == 1) {
+      String startYear = isoDates[0].substring(0, 4);
+      String nextYear = Integer.toString(Integer.parseInt(afterThisDate.substring(0, 4)) + 1);
+      if (nextYear.compareTo(startYear) < 0) {
+        nextYear = startYear;
+      }
+      
+      return nextYear + isoDates[0].substring(4);
+    } else {
+      String nextDate = "Z";
+      for (var iso: isoDates) {
+        int startYear = Integer.parseInt(iso.substring(0, 4));
+        String isoDatePart = iso.substring(4);
+        for(int y = 0; y < 100; y++) {
+          String checkDate = Integer.toString(startYear) + isoDatePart;
+          if (checkDate.compareTo(afterThisDate) > 0) {
+            if (checkDate.compareTo(nextDate) < 0) {
+              nextDate = checkDate;
+            }
+            
+            break;
+          }
+          
+          startYear += divider;
+        }
+      }
+      
+      return nextDate;
     }
   }
 }
