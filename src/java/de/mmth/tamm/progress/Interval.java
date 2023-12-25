@@ -41,6 +41,7 @@ public class Interval {
       case SINGLE -> nextSingleDate(afterThisDate);
       case DAILY -> nextDailyDate(afterThisDate, divider, isoDates);
       case WEEKLY -> nextDailyDate(afterThisDate, 7 * divider, isoDates);
+      case MONTHLY -> nextMonthlyDate(afterThisDate);
       case YEARLY -> nextYearlyDate(afterThisDate);
       default -> null;
     };
@@ -170,6 +171,42 @@ public class Interval {
       LocalDate nextDay = LocalDate.ofEpochDay(minDay);
       return DateUtils.formatL(nextDay);
     }
+  }
+  
+  /**
+   * Find the next monthly activation after the given date.
+   * 
+   * @param afterThisDate
+   * @return 
+   */
+  private String nextMonthlyDate(String afterThisDate) {
+    String nextDate = "Z";
+    for (var iso: isoDates) {
+      String checkMonth = iso.substring(5, 7);
+      String checkYear = iso.substring(0, 4);
+      String checkDay = iso.substring(8, 10);
+
+      for (var retry = 0; retry < 100; retry++) {
+        String nextCheck = checkYear + "-" + checkMonth + "-" + checkDay;
+        if (nextCheck.compareTo(afterThisDate) > 0) {
+          if (nextCheck.compareTo(nextDate) < 0) {
+            nextDate = nextCheck;
+          }
+
+          break;
+        }
+
+        int nextMonth = Integer.parseInt(checkMonth) + divider;
+        while (nextMonth > 12) {
+          nextMonth -= 12;
+          checkYear = Integer.toString(Integer.parseInt(checkYear) + 1);
+        }
+        
+        checkMonth = (nextMonth < 10) ? "0" + nextMonth : Integer.toString(nextMonth);
+      }
+    }
+
+    return nextDate;
   }
   
   /**

@@ -154,6 +154,43 @@ public class IntervalTest {
    * Test of nextDate method, of class Interval.
    */
   @Test
+  public void testNextMonthlyDate() {
+    System.out.println("nextDate MONTHLY");
+    String source = "monthly|13|2024-01-02;2024-01-03";
+    Interval instance = new Interval(source);
+    
+    String startDate2 = "2024-01-01";
+    for (int i = 1; i < 10; i++) {
+      String nextDate = instance.nextDate(startDate2);
+      System.out.println("Start: " + startDate2 + ", next: " + nextDate);
+      startDate2 = nextDate;
+    }
+    
+    String startDate = "2024-01-01";
+    String nextDate = instance.nextDate(startDate);
+    assertEquals("2024-01-02", nextDate);
+    
+    startDate = "2024-01-02";
+    nextDate = instance.nextDate(startDate);
+    assertEquals("2024-01-03", nextDate);
+    
+    startDate = "2024-01-03";
+    nextDate = instance.nextDate(startDate);
+    assertEquals("2025-02-02", nextDate);
+    
+    startDate = "2025-02-02";
+    nextDate = instance.nextDate(startDate);
+    assertEquals("2025-02-03", nextDate);
+    
+    startDate = "2025-02-03";
+    nextDate = instance.nextDate(startDate);
+    assertEquals("2026-03-02", nextDate);
+  }
+  
+  /**
+   * Test of nextDate method, of class Interval.
+   */
+  @Test
   public void testNextYearlyDate() {
     System.out.println("nextDate YEARLY");
     String source = "yearly|2|2024-01-02;2024-01-03";
