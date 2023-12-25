@@ -159,12 +159,12 @@ public class IntervalTest {
     String source = "monthly|13|2024-01-02;2024-01-03";
     Interval instance = new Interval(source);
     
-    String startDate2 = "2024-01-01";
+    /*String startDate2 = "2024-01-01";
     for (int i = 1; i < 10; i++) {
       String nextDate = instance.nextDate(startDate2);
       System.out.println("Start: " + startDate2 + ", next: " + nextDate);
       startDate2 = nextDate;
-    }
+    }*/
     
     String startDate = "2024-01-01";
     String nextDate = instance.nextDate(startDate);

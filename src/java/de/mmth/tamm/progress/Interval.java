@@ -216,34 +216,24 @@ public class Interval {
    * @return 
    */
   private String nextYearlyDate(String afterThisDate) {
-    if (isoDates.length == 1) {
-      String startYear = isoDates[0].substring(0, 4);
-      String nextYear = Integer.toString(Integer.parseInt(afterThisDate.substring(0, 4)) + 1);
-      if (nextYear.compareTo(startYear) < 0) {
-        nextYear = startYear;
-      }
-      
-      return nextYear + isoDates[0].substring(4);
-    } else {
-      String nextDate = "Z";
-      for (var iso: isoDates) {
-        int startYear = Integer.parseInt(iso.substring(0, 4));
-        String isoDatePart = iso.substring(4);
-        for(int y = 0; y < 100; y++) {
-          String checkDate = Integer.toString(startYear) + isoDatePart;
-          if (checkDate.compareTo(afterThisDate) > 0) {
-            if (checkDate.compareTo(nextDate) < 0) {
-              nextDate = checkDate;
-            }
-            
-            break;
+    String nextDate = "Z";
+    for (var iso: isoDates) {
+      int startYear = Integer.parseInt(iso.substring(0, 4));
+      String isoDatePart = iso.substring(4);
+      for(int y = 0; y < 100; y++) {
+        String checkDate = Integer.toString(startYear) + isoDatePart;
+        if (checkDate.compareTo(afterThisDate) > 0) {
+          if (checkDate.compareTo(nextDate) < 0) {
+            nextDate = checkDate;
           }
-          
-          startYear += divider;
+
+          break;
         }
+
+        startYear += divider;
       }
-      
-      return nextDate;
     }
+
+    return nextDate;
   }
 }
