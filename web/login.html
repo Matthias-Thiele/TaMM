@@ -48,6 +48,9 @@ Task Management and Monitoring
                 var url_string = window.location;
                 var url = new URL(url_string);
                 var c = url.searchParams.get(name);
+                if (!c || (c === "undefined")) {
+                    c="";
+                }
                 return c;
             }
         </script>
