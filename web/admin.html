@@ -10,6 +10,42 @@ GNU General Public License v3.0
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
         <link rel="shortcut icon" href="favicon.ico"/> 
+        <style>
+            .admin-sidebar {
+                display:flex;
+                flex-wrap:wrap;
+            }
+
+            /* columns */
+            .admin-sidebar > * {
+                width:100%;
+                padding:1rem;
+            }
+
+            /* tablet breakpoint */
+            @media (min-width:768px) {
+                .admin-sidebar > *:nth-child(1) {
+                    width:calc(88% / 3);
+                    max-width: 180pt;
+                    order:-1;
+                    border-right: 1px solid silver
+                }
+
+                .admin-sidebar > *:nth-child(2) {
+                    width:calc(88% / 3);
+                    max-width: 180pt;
+                    order:-1;
+                    border-right: 1px solid silver
+                }
+
+                .admin-sidebar > *:nth-child(3) {
+                    width:calc(88% / 3);
+                    order:-1;
+                    border-right: 1px solid silver
+                }
+            }
+            
+        </style>
         <script>
             initForm("save");
             
@@ -40,12 +76,26 @@ GNU General Public License v3.0
         </script>
     </head>
     <body>
-        <div class="dialogbox">
+        <div class="bodybox">
             <div class="header">System Administration</div>
-            <div><label>Database URL</label><input type="text" id="dburl"></div>
-            <div><label>DB Admin Name</label><input type="text" id="name"></div>
-            <div><label>DB Password</label><input type="text" id="password"></div>
-            <div><button id="save" onclick="doSave();">Speichern</button></div>
+            <div class="admin-sidebar">
+                <div>
+                    <div>Datenbankverbindung</div>
+                    <div><label>Database URL</label><input type="text" id="dburl"></div>
+                    <div><label>DB Admin Name</label><input type="text" id="name"></div>
+                    <div><label>DB Password</label><input type="text" id="password"></div>
+                    <div></div>
+                </div>
+                <div>
+                    <div>Mailserver</div>
+                </div>
+                <div>
+                    <div>Mandanten</div>
+                </div>
+            </div>
+            <div class="statusbar" id="status">
+                <button id="save" onclick="doSave();">Speichern</button>
+            </div>
         </div>
     </body>
 </html>

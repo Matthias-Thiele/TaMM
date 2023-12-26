@@ -95,8 +95,8 @@ public class UserTable extends DBTable {
         result = getData(userRows);
       }
     } catch (SQLException ex) {
-      logger.warn("Error writing user data.", ex);
-      throw new TammError("Error writing user data.");
+      logger.warn("Error reading user data.", ex);
+      throw new TammError("Error reading user data.");
     }
     return result;
   }
