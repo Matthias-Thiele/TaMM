@@ -57,6 +57,10 @@ public class GetProcessor {
       case "logout":
         processLogout(resultData, session);
         break;
+        
+      case "clientlist":
+        processClientList(resultData, session);
+        break;
     }
   }
   
@@ -87,6 +91,10 @@ public class GetProcessor {
   private void processLogout(OutputStream resultData, SessionData session) throws IOException, TammError {
     session.user = null;
     ServletUtils.sendResult(resultData, true, "login.html", "", "", session);
+  }
+  
+  private void processClientList(OutputStream resultData, SessionData session) throws IOException, TammError {
+    ServletUtils.sendResult(resultData, true, "", "", "", application.clientNames);
   }
   
 }

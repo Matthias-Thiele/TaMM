@@ -8,6 +8,7 @@ import de.mmth.tamm.data.LoginData;
 import de.mmth.tamm.data.SessionData;
 import com.google.gson.Gson;
 import de.mmth.tamm.data.AdminData;
+import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.DateUtils;
@@ -101,8 +102,21 @@ public class PostProcessor {
           
         case "advancetask":
           taskProcessor.processAdvance(reader, resultData, session);
+          break;
+          
+        case "saveclient":
+          processSaveClient(reader, resultData, session);
+          break;
       }
     }
+  }
+  
+  private void processSaveClient(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
+    ClientData clientData = new Gson().fromJson(reader, ClientData.class);
+    logger.debug("Process login request for user" + clientData.name);
+    application.clients.writeClient(clientData);
+    application.refreshClientNames();
+    ServletUtils.sendResult(resultData, true, "", "", "", null);
   }
   
   /**

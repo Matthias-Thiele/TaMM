@@ -46,9 +46,39 @@ GNU General Public License v3.0
             }
             
         </style>
+        
+        <script src="common.js"></script> 
         <script>
-            initForm("save");
+            var clientlist;
+            var selectedClient = {};
             
+            /**
+             * Load user information and other session data.
+             * @returns {undefined}
+             */
+            function loadAdminData() {
+                initForm("save");
+                status = document.getElementById("status");
+                status.innerText = "Wait for server...";
+                
+                var request = new XMLHttpRequest();
+                request.open("GET", "system/clientlist");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send();
+                request.overrideMimeType('application/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        if (response.result === "error") {
+                            status.innerText = response.message;
+                        } else {
+                            clientlist = response.data;
+                            createClientList(clientlist);
+                        }
+                    }
+                };
+            }
+
             function doSave() {
                 var data = {};
                 data.dburl = document.getElementById("dburl").value;
@@ -65,7 +95,7 @@ GNU General Public License v3.0
                     if (this.readyState === 4 && this.status === 200) {
                         var response = JSON.parse(this.responseText);
                         if (response.result === "ok") {
-                          window.location = response.nextPage;
+                          createOptionList("clientnames", result.data);
                         } else {
                           var status = document.getElementById("status");
                           status.innerText = "Unbekannter Fehler beim Speichern.";
@@ -73,9 +103,85 @@ GNU General Public License v3.0
                     }
                 };
             }
+            
+            function createClientList(clientlist) {
+                var list = document.getElementById("clientlist");
+                list.innerHTML = "";
+                for(var clientName in clientlist) {
+                    var clientInfo = clientlist[clientName];
+                    var client = document.createElement("button");
+                    var text = document.createTextNode(clientInfo.name)
+                    client.appendChild(text);
+                    client.key = clientInfo;
+                    client.onclick = function() { fillClient(window.event.srcElement.key); };
+                    client.style = "margin: 3pt;";
+                    list.appendChild(client);
+                };
+            };
+            
+            function changed() {
+                document.getElementById("saveclient").disabled = false;
+            }
+            
+            function selectClient() {
+                selectedClient = this.source.key;
+            }
+            
+            function createClient() {
+                selectedClient = {};
+                selectedClient.id = -1;
+                selectedClient.maxDocMB = 100;
+                selectedClient.maxUser = 20;
+                fillClient();
+            }
+            
+            function fillClient(client) {
+                if (client) {
+                    selectedClient = client;
+                }
+                
+                setValue("clientid", selectedClient.id);
+                setValue("clientname", selectedClient.name);
+                setValue("clienthost", selectedClient.hostName);
+                setValue("clientmaxmb", selectedClient.maxDocMB);
+                setValue("clientmaxuser", selectedClient.maxUser);
+            }
+            
+            function saveClient() {
+                selectedClient.name = getValue("clientname");
+                selectedClient.hostName = getValue("clienthost");
+                selectedClient.maxDocMB = getValue("clientmaxmb");
+                selectedClient.maxUser = getValue("clientmaxuser");
+                
+                status = document.getElementById("status");
+                status.innerText = "Wait for server...";
+                
+                var request = new XMLHttpRequest();
+                request.open("POST", "system/saveclient");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(selectedClient));
+                request.overrideMimeType('text/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var status = document.getElementById("status");
+                        var response = JSON.parse(this.responseText);
+                        if (response.result === "ok") {
+                          status.innerText = "Mandant gespeichert."
+                          emptyUser = {};
+                          fillClient(emptyUser);
+                          loadAdminData();
+                        } else {
+                            if (!response.message) {
+                                response.message = "Unbekannter Fehler beim Speichern.";
+                            }
+                            status.innerText = response.message;
+                        }
+                    }
+                };
+            }
         </script>
     </head>
-    <body>
+    <body onload="loadAdminData()">
         <div class="bodybox">
             <div class="header">System Administration</div>
             <div class="admin-sidebar">
@@ -84,18 +190,31 @@ GNU General Public License v3.0
                     <div><label>Database URL</label><input type="text" id="dburl"></div>
                     <div><label>DB Admin Name</label><input type="text" id="name"></div>
                     <div><label>DB Password</label><input type="text" id="password"></div>
-                    <div></div>
+                    <div><button id="save" onclick="doSave();">Speichern</button></div>
                 </div>
                 <div>
                     <div>Mailserver</div>
                 </div>
                 <div>
-                    <div>Mandanten</div>
+                    <div>Mandanten<button style="margin-left: 10pt;" onclick="createClient();">Neu</button></div>
+                    <div>
+                        
+                        <div id="clientlist"></div>
+                        <hr>
+                            <div><label for="clientid">Id</label><input type="text" id="clientid" readonly></div>
+                            <div><label for="clientname">Mandantenname</label><input type="text" id="clientname"></div>
+                            <div><label for="clienthost">Hostname</label><input type="text" id="clienthost"></div>
+                            <div><label for="clientmaxmb">Id</label><input type="number" id="clientmaxmb"></div>
+                            <div><label for="clientmaxuser">Id</label><input type="number" id="clientmaxuser"></div>
+                            <button onclick="saveClient();">Mandant speichern</button>
+                    </div>
                 </div>
             </div>
-            <div class="statusbar" id="status">
-                <button id="save" onclick="doSave();">Speichern</button>
+            <div class="statusbar" id="statusbar">
+                
+                <span id="status"></span>
             </div>
         </div>
+        <datalist id="clientnames"></datalist>
     </body>
 </html>

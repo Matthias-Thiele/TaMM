@@ -5,13 +5,17 @@
 package de.mmth.tamm;
 
 import de.mmth.tamm.data.AdminData;
+import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.KeyValue;
+import de.mmth.tamm.db.ClientTable;
 import de.mmth.tamm.db.DBConnect;
 import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.utils.RequestCache;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.prefs.Preferences;
 import org.apache.logging.log4j.LogManager;
 
@@ -33,10 +37,12 @@ public class ApplicationData {
   public DBConnect db;
   public UserTable users;
   public TaskTable tasks;
+  public ClientTable clients;
   
   public RequestCache requests;
   public String tammUrl;
   public List<KeyValue> userNames;
+  public Map<String, ClientData> clientNames;
   
   /**
    * Reads the database access information from the registry
@@ -64,14 +70,31 @@ public class ApplicationData {
           userNames = users.listUserNames();
         } catch (TammError ex) {
           logger.warn("Cannot read usernames list.");
-          userNames = new ArrayList<KeyValue>();
+          userNames = new ArrayList<>();
         }
         tasks = new TaskTable(db, "tasklist");
+        clients = new ClientTable(db, "clientlist");
+        refreshClientNames();
         requests = new RequestCache();
       }
     }
     
     return db != null;
+  }
+  
+  public void refreshClientNames() {
+    try {
+      var clientList = clients.listClients();
+      var localClientNames = new HashMap<String, ClientData>(clientList.size());
+      for (var c: clientList) {
+        localClientNames.put(c.hostName, c);
+      }
+      
+      clientNames = localClientNames;
+    } catch(TammError ex) {
+      logger.warn("Cannot read client list.");
+    }
+    
   }
   
   /**
