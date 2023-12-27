@@ -27,3 +27,4 @@ replay_pid*
 lib/
 build/
 
+/dist/

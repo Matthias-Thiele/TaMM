@@ -182,21 +182,29 @@ public class UserTable extends DBTable {
    * @throws TammError 
    */
   public List<UserData> listUsers(int clientId, int administratorId, String filter) throws TammError {
-    boolean hasId = administratorId != -1;
+    boolean hasClientId = clientId > 0;
+    boolean hasId = administratorId > 0;
     boolean hasFilter = filter != null && !filter.isBlank();
     
     List<UserData> result = new ArrayList<>();
     
-    var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE clientid = ? ";
+    var cmd = "SELECT " + this.selectNames + " FROM " + tableName;
     
-    if (hasId || hasFilter) {
-      cmd += " AND ";
+    if (hasClientId || hasId || hasFilter) {
+      cmd += " WHERE ";
+    }
+    
+    if (hasClientId) {
+      cmd += "clientid = ? ";
+      if (hasId || hasFilter) {
+        cmd += " AND ";
+      }
     }
     
     if (hasId) {
       cmd += "administrator = ? ";
       if (hasFilter) {
-        cmd += "and ";
+        cmd += "AND ";
       }
     }
     
@@ -211,7 +219,9 @@ public class UserTable extends DBTable {
     try {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
         int paramCol = 1;
-        stmt.setInt(paramCol++, clientId);
+        if (hasClientId) {
+          stmt.setInt(paramCol++, clientId);
+        }
         
         if (hasId) {
           stmt.setInt(paramCol++, administratorId);

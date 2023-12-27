@@ -18,4 +18,8 @@ public class SessionData {
   public List<KeyValue> userNames;
   public ClientData client;
   public String clientName;
+
+  // only for system admins, null otherwise  
+  public List<KeyValue> clientList;
+
 }

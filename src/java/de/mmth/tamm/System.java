@@ -59,7 +59,7 @@ public class System extends HttpServlet {
           return;
         }
 
-        if (!ServletUtils.checkClientId(request, sd, application.clientNames)) {
+        if (!ServletUtils.checkClientId(request, sd, application)) {
           throw new TammError("Invalid client access.");
         }
 
@@ -107,7 +107,7 @@ public class System extends HttpServlet {
           return;
         }
 
-        if (!ServletUtils.checkClientId(request, sd, application.clientNames)) {
+        if (!ServletUtils.checkClientId(request, sd, application)) {
           throw new TammError("Invalid client access.");
         }
 

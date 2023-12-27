@@ -16,6 +16,7 @@ GNU General Public License v3.0
             var selectedUser;
             var sessionData;
             var userNames;
+            var clientNames;
             
             function loadSessionData() {
                 initForm("save");
@@ -34,6 +35,10 @@ GNU General Public License v3.0
                             sessionData = response.data;
                             userNames = new Userlist(sessionData.userNames);
                             userNames.createOptionList("usernames");
+                            clientNames = new Userlist(sessionData.clientList);
+                            clientNames.createOptionList("clientnames");
+                            var clientInput = document.getElementById("client");
+                            clientInput.disabled = !sessionData.user.mainAdmin;
                         }
                     }
                 };
@@ -47,6 +52,11 @@ GNU General Public License v3.0
                 selectedUser.mainAdmin = getValue("sysadmin");
                 selectedUser.subAdmin = getValue("subadmin");
                 selectedUser.lastLogin = getValue("lastlogin");
+                if (sessionData.user.mainAdmin) {
+                    selectedUser.clientId = clientNames.idFromName(getValue("client"));
+                } else {
+                    selectedUser.clientId = sessionData.client.id;
+                }
                 
                 console.log(selectedUser);
                 status.innerText = "Warte auf Server...";
@@ -131,6 +141,11 @@ GNU General Public License v3.0
                 setValue("mail", userData.mail);
                 setValue("supervisor", userNames.nameFromId(userData.supervisorId));
                 setValue("administrator", userNames.nameFromId(userData.administratorId));
+                if (sessionData.user.mainAdmin) {
+                    setValue("client", clientNames.nameFromId(userData.clientId));
+                } else {
+                    setValue("client", sessionData.client.name);
+                }
                 document.getElementById("sysadmin").checked = userData.mainAdmin;
                 document.getElementById("subadmin").checked = userData.subAdmin;
                 setValue("lastlogin", userData.lastLogin);
@@ -178,11 +193,13 @@ GNU General Public License v3.0
                     <div><label for="lastlogin">Letzte Anmeldung</label><input id="lastlogin" readonly></div>
                     <div><label for="administrator">Administrator</label><input id="administrator" list="usernames" onchange="changed()" readonly></div>
                     <div><label for="userid">Id</label><input type="text" id="userid" readonly></div>
+                    <div><label for="client">Mandant</label><input type="text" id="client" list="clientnames" onchange="changed()"></div>
                     <div><button id="save" disabled onclick="doSave();">Speichern</button></div>
                 </div>
             </div>
             <div class="statusbar" id="status"></div>
         </div>
         <datalist id="usernames"></datalist>
+        <datalist id="clientnames"></datalist>
     </body>
 </html>

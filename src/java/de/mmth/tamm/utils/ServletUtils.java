@@ -5,8 +5,10 @@
 package de.mmth.tamm.utils;
 
 import com.google.gson.Gson;
+import de.mmth.tamm.ApplicationData;
 import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.JsonResult;
+import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.SessionData;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 
@@ -43,7 +46,8 @@ public class ServletUtils {
     return remoteAddr;
   }
 
-  public static boolean checkClientId(HttpServletRequest request, SessionData session, Map<String, ClientData> clients) {
+  public static boolean checkClientId(HttpServletRequest request, SessionData session, ApplicationData application) {
+    Map<String, ClientData> clients = application.clientNames;
     String hostName = request.getHeader("host");
     boolean result;
     
@@ -68,6 +72,13 @@ public class ServletUtils {
       
       if (!result) {
         logger.warn("Invalid client access " + ((client == null) ? "null" : client.name) + " of " + session.clientName);
+      }
+    }
+    
+    if ((session.user != null) && session.user.mainAdmin) {
+      session.clientList = new ArrayList<KeyValue>(application.clientList.size()); 
+      for (var client: application.clientList) {
+        session.clientList.add(new KeyValue(client.id, client.name));
       }
     }
     

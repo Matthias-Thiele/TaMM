@@ -50,7 +50,8 @@ public class UserProcessor {
     logger.debug("Search userlist " + findData.filterText);
     int userId = session.user.id; 
     if (userId == 1) userId = -1; // TODO remove
-    var searchResult = application.users.listUsers(session.client.id, userId, findData.filterText);
+    int clientId = (session.user.mainAdmin) ? -1 : session.client.id;
+    var searchResult = application.users.listUsers(clientId, userId, findData.filterText);
     for (UserData user: searchResult) {
       user.pwd = ""; // do not leak user passwords to the outside.
     }
@@ -85,7 +86,9 @@ public class UserProcessor {
     }
     
     userData.administratorId = session.user.id;
-    userData.clientId = session.client.id;
+    if (!session.user.mainAdmin || userData.clientId == 0) {
+      userData.clientId = session.client.id;
+    }
     
     String errorMsg = "";
     if (userData.id == -1) {
@@ -109,6 +112,9 @@ public class UserProcessor {
         checkUser.mail = userData.mail;
         checkUser.mainAdmin = userData.mainAdmin;
         checkUser.subAdmin = userData.subAdmin;
+        if (session.user.mainAdmin) {
+          checkUser.clientId = userData.clientId;
+        }
         application.users.writeUser(checkUser);
       }
     }
