@@ -45,19 +45,30 @@ public class ServletUtils {
 
   public static boolean checkClientId(HttpServletRequest request, SessionData session, Map<String, ClientData> clients) {
     String hostName = request.getHeader("host");
-    var client = clients.get(hostName);
-    logger.info("Post request from " + session.clientName + " as " + hostName);
-
-    if ((session.client == null) && (client != null)) {
-      // init client on first access
-      session.client = client;
-      session.clientName = hostName;
-      logger.debug("Initialize new session to client " + client.name);
-    }
+    boolean result;
     
-    var result = (session.client != null) ? session.client.id == client.id : true;
-    if (!result) {
-      logger.warn("Invalid client access " + client.name + " of " + session.clientName);
+    if (clients.isEmpty() && (session.client == null)) {
+      session.client = new ClientData();
+      session.client.id = 1;
+      session.client.hostName = "TAMM";
+      logger.info("New session with default client TAMM, 1.");
+      result = true;
+    } else {    
+      var client = clients.get(hostName);
+      logger.info("Post request from " + session.clientName + " as " + hostName);
+
+      if ((session.client == null) && (client != null)) {
+        // init client on first access
+        session.client = client;
+        session.clientName = hostName;
+        logger.debug("Initialize new session to client " + client.name);
+      }
+      
+      result = (client == null) ? false : ((session.client != null) ? session.client.id == client.id : true);
+      
+      if (!result) {
+        logger.warn("Invalid client access " + ((client == null) ? "null" : client.name) + " of " + session.clientName);
+      }
     }
     
     return result;
