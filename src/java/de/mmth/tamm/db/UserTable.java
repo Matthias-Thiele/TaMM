@@ -26,6 +26,7 @@ public class UserTable extends DBTable {
   protected static final String TABLE_CONFIG = 
     """
     id I G
+    clientid I
     name V 100
     pwd V 100
     mail V 100
@@ -47,6 +48,7 @@ public class UserTable extends DBTable {
       UserData admin = new UserData();
       admin.name = "admin";
       admin.pwd = "tamm279";
+      admin.clientId = 1;
       admin.mainAdmin = true;
       admin.subAdmin = true;
       admin.supervisorId = 1;
@@ -67,11 +69,12 @@ public class UserTable extends DBTable {
    * @return
    * @throws TammError 
    */
-  public UserData readUser(int byId, String byNameOrMail) throws TammError {
+  public UserData readUser(int clientId, int byId, String byNameOrMail) throws TammError {
     UserData result = null;
-    var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE ";
+    var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE clientid = ? AND ";
+    
     if (byNameOrMail != null) {
-      cmd += " name = ? or mail = ?";
+      cmd += " (name = ? OR mail = ?)";
     } else {
       cmd += " id = ?";
     }
@@ -79,11 +82,12 @@ public class UserTable extends DBTable {
     
     try {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        stmt.setInt(1, clientId);
         if (byNameOrMail == null) {
-          stmt.setInt(1, byId);
+          stmt.setInt(2, byId);
         } else {
-          stmt.setString(1, byNameOrMail);
           stmt.setString(2, byNameOrMail);
+          stmt.setString(3, byNameOrMail);
         }
         
         var userRows = stmt.executeQuery();
@@ -121,6 +125,7 @@ public class UserTable extends DBTable {
     try {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
         var col = 1;
+        stmt.setInt(col++, user.clientId);
         stmt.setString(col++, user.name);
         stmt.setString(col++, user.pwd);
         stmt.setString(col++, user.mail);
@@ -142,20 +147,23 @@ public class UserTable extends DBTable {
    * 
    * Create a new User with user.id == -1
    * 
+   * @param clientId
    * @param userId
    * @param loginDate
    * @throws TammError 
    */
-  public void updateLoginDate(int userId, String loginDate) throws TammError {
+  public void updateLoginDate(int clientId, int userId, String loginDate) throws TammError {
     String cmd;
-    cmd = "UPDATE " + tableName + " SET lastlogin = ? WHERE id = " + userId;
+    cmd = "UPDATE " + tableName + " SET lastlogin = ? WHERE clientid = ? AND id = ?";
     logger.debug("SQL: " + cmd);
     
     try {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
         var col = 1;
         stmt.setString(col++, loginDate);
-
+        stmt.setInt(col++, clientId);
+        stmt.setInt(col++, userId);
+        
         stmt.execute();
       }
     } catch (SQLException ex) {
@@ -167,21 +175,22 @@ public class UserTable extends DBTable {
   /**
    * Lists all users of an admininstrator oder subadmin.
    * 
+   * @param clientId
    * @param administratorId
    * @param filter
    * @return
    * @throws TammError 
    */
-  public List<UserData> listUsers(int administratorId, String filter) throws TammError {
+  public List<UserData> listUsers(int clientId, int administratorId, String filter) throws TammError {
     boolean hasId = administratorId != -1;
     boolean hasFilter = filter != null && !filter.isBlank();
     
     List<UserData> result = new ArrayList<>();
     
-    var cmd = "SELECT " + this.selectNames + " FROM " + tableName;
+    var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE clientid = ? ";
     
     if (hasId || hasFilter) {
-      cmd += " WHERE ";
+      cmd += " AND ";
     }
     
     if (hasId) {
@@ -202,6 +211,8 @@ public class UserTable extends DBTable {
     try {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
         int paramCol = 1;
+        stmt.setInt(paramCol++, clientId);
+        
         if (hasId) {
           stmt.setInt(paramCol++, administratorId);
         }
@@ -228,17 +239,20 @@ public class UserTable extends DBTable {
   /**
    * Lists all usersnames.
    * 
+   * @param clientId
    * @return
    * @throws TammError 
    */
-  public List<KeyValue> listUserNames() throws TammError {
+  public List<KeyValue> listUserNames(int clientId) throws TammError {
     List<KeyValue> result = new ArrayList<>();
     
-    var cmd = "SELECT id, name FROM " + tableName + " ORDER BY name";
+    var cmd = "SELECT id, name FROM " + tableName + " WHERE clientid = ? ORDER BY name";
     logger.debug("SQL: " + cmd);
     
     try {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        stmt.setInt(1, clientId);
+        
         var userRows = stmt.executeQuery();
         while (userRows.next()) {
           int id = userRows.getInt(1);
@@ -265,13 +279,14 @@ public class UserTable extends DBTable {
     UserData result = new UserData();
     
     result.id = userRows.getInt(1);
-    result.name = userRows.getString(2);
-    result.pwd = userRows.getString(3);
-    result.mail = userRows.getString(4);
-    result.setFlags(userRows.getInt(5));
-    result.supervisorId = userRows.getInt(6);
-    result.administratorId = userRows.getInt(7);
-    result.lastLogin = userRows.getString(8);
+    result.clientId = userRows.getInt(2);
+    result.name = userRows.getString(3);
+    result.pwd = userRows.getString(4);
+    result.mail = userRows.getString(5);
+    result.setFlags(userRows.getInt(6));
+    result.supervisorId = userRows.getInt(7);
+    result.administratorId = userRows.getInt(8);
+    result.lastLogin = userRows.getString(9);
     
     return result;
   }

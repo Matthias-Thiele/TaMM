@@ -41,7 +41,8 @@ public class ApplicationData {
   
   public RequestCache requests;
   public String tammUrl;
-  public List<KeyValue> userNames;
+  public Map<String, List<KeyValue>> userNamesMap = new HashMap<>();
+  public List<ClientData> clientList;
   public Map<String, ClientData> clientNames;
   
   /**
@@ -66,12 +67,6 @@ public class ApplicationData {
         db = con;
         
         users = new UserTable(db, "userlist");
-        try {
-          userNames = users.listUserNames();
-        } catch (TammError ex) {
-          logger.warn("Cannot read usernames list.");
-          userNames = new ArrayList<>();
-        }
         tasks = new TaskTable(db, "tasklist");
         clients = new ClientTable(db, "clientlist");
         refreshClientNames();
@@ -84,10 +79,16 @@ public class ApplicationData {
   
   public void refreshClientNames() {
     try {
-      var clientList = clients.listClients();
+      clientList = clients.listClients();
       var localClientNames = new HashMap<String, ClientData>(clientList.size());
       for (var c: clientList) {
         localClientNames.put(c.hostName, c);
+        if ((c.hostName2 != null) && !c.hostName2.isBlank()) {
+          localClientNames.put(c.hostName2, c);
+        }
+        if ((c.hostName3 != null) && !c.hostName3.isBlank()) {
+          localClientNames.put(c.hostName3, c);
+        }
       }
       
       clientNames = localClientNames;

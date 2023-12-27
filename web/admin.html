@@ -107,8 +107,7 @@ GNU General Public License v3.0
             function createClientList(clientlist) {
                 var list = document.getElementById("clientlist");
                 list.innerHTML = "";
-                for(var clientName in clientlist) {
-                    var clientInfo = clientlist[clientName];
+                clientlist.forEach( (clientInfo) => {
                     var client = document.createElement("button");
                     var text = document.createTextNode(clientInfo.name)
                     client.appendChild(text);
@@ -116,7 +115,7 @@ GNU General Public License v3.0
                     client.onclick = function() { fillClient(window.event.srcElement.key); };
                     client.style = "margin: 3pt;";
                     list.appendChild(client);
-                };
+                });
             };
             
             function changed() {
@@ -143,6 +142,8 @@ GNU General Public License v3.0
                 setValue("clientid", selectedClient.id);
                 setValue("clientname", selectedClient.name);
                 setValue("clienthost", selectedClient.hostName);
+                setValue("clienthost2", selectedClient.hostName2);
+                setValue("clienthost3", selectedClient.hostName3);
                 setValue("clientmaxmb", selectedClient.maxDocMB);
                 setValue("clientmaxuser", selectedClient.maxUser);
             }
@@ -150,6 +151,8 @@ GNU General Public License v3.0
             function saveClient() {
                 selectedClient.name = getValue("clientname");
                 selectedClient.hostName = getValue("clienthost");
+                selectedClient.hostName2 = getValue("clienthost2");
+                selectedClient.hostName3 = getValue("clienthost3");
                 selectedClient.maxDocMB = getValue("clientmaxmb");
                 selectedClient.maxUser = getValue("clientmaxuser");
                 
@@ -204,6 +207,8 @@ GNU General Public License v3.0
                             <div><label for="clientid">Id</label><input type="text" id="clientid" readonly></div>
                             <div><label for="clientname">Mandantenname</label><input type="text" id="clientname"></div>
                             <div><label for="clienthost">Hostname</label><input type="text" id="clienthost"></div>
+                            <div><label for="clienthost2">Alias 1</label><input type="text" id="clienthost2"></div>
+                            <div><label for="clienthost3">Alias 2</label><input type="text" id="clienthost3"></div>
                             <div><label for="clientmaxmb">Id</label><input type="number" id="clientmaxmb"></div>
                             <div><label for="clientmaxuser">Id</label><input type="number" id="clientmaxuser"></div>
                             <button onclick="saveClient();">Mandant speichern</button>

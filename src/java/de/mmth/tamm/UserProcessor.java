@@ -50,7 +50,7 @@ public class UserProcessor {
     logger.debug("Search userlist " + findData.filterText);
     int userId = session.user.id; 
     if (userId == 1) userId = -1; // TODO remove
-    var searchResult = application.users.listUsers(userId, findData.filterText);
+    var searchResult = application.users.listUsers(session.client.id, userId, findData.filterText);
     for (UserData user: searchResult) {
       user.pwd = ""; // do not leak user passwords to the outside.
     }
@@ -85,6 +85,7 @@ public class UserProcessor {
     }
     
     userData.administratorId = session.user.id;
+    userData.clientId = session.client.id;
     
     String errorMsg = "";
     if (userData.id == -1) {
@@ -95,7 +96,7 @@ public class UserProcessor {
     } else {
       // update existing user
       logger.info("Update user data for user" + userData.name);
-      var checkUser = application.users.readUser(userData.id, null);
+      var checkUser = application.users.readUser(session.client.id, userData.id, null);
       if (checkUser.administratorId == 0) {
         checkUser.administratorId = checkUser.id;
       }

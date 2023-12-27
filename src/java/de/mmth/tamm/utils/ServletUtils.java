@@ -5,6 +5,7 @@
 package de.mmth.tamm.utils;
 
 import com.google.gson.Gson;
+import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.SessionData;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -41,6 +43,25 @@ public class ServletUtils {
     return remoteAddr;
   }
 
+  public static boolean checkClientId(HttpServletRequest request, SessionData session, Map<String, ClientData> clients) {
+    String hostName = request.getHeader("host");
+    var client = clients.get(hostName);
+    logger.info("Post request from " + session.clientName + " as " + hostName);
+
+    if ((session.client == null) && (client != null)) {
+      // init client on first access
+      session.client = client;
+      session.clientName = hostName;
+      logger.debug("Initialize new session to client " + client.name);
+    }
+    
+    var result = (session.client != null) ? session.client.id == client.id : true;
+    if (!result) {
+      logger.warn("Invalid client access " + client.name + " of " + session.clientName);
+    }
+    
+    return result;
+  }
   
   /**
    * Create and populate a JSON result object and send it to the OutputStream.

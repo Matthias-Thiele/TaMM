@@ -42,7 +42,7 @@ public class UserTableTest {
   @Test
   public void testCheckColumns() {
     String[] cols = UserTable.TABLE_CONFIG.split("\\R");
-    assertEquals("Number of columns changed", 8, cols.length);
+    assertEquals("Number of columns changed", 9, cols.length);
   }
   
   /**
@@ -53,8 +53,10 @@ public class UserTableTest {
     System.out.println("writeReadUser");
     UserTable instance = new UserTable(con, "testusers");
     // admin user with id=1 automatically created
+    int clientId = 1;
     
     UserData user = new UserData();
+    user.clientId = clientId;
     user.name = "Test1";
     user.pwd = "";
     user.mail = "mtest1@test.de";
@@ -65,7 +67,7 @@ public class UserTableTest {
     
     instance.writeUser(user);
     
-    UserData user2 = instance.readUser(-1, "Test1");
+    UserData user2 = instance.readUser(clientId, -1, "Test1");
     assertEquals("User name mismatch", user.name, user2.name);
     assertEquals("EMail mismatch", user.mail, user2.mail);
     assertEquals("Main Admin mismatch", user.mainAdmin, user2.mainAdmin);
@@ -75,42 +77,54 @@ public class UserTableTest {
     assertEquals("Last login date mismatch", user.lastLogin, user2.lastLogin);
     
     String newLoginDate = "2024010122334";
-    instance.updateLoginDate(user2.id, newLoginDate);
-    UserData user3 = instance.readUser(user2.id, null);
+    instance.updateLoginDate(clientId, user2.id, newLoginDate);
+    UserData user3 = instance.readUser(clientId, user2.id, null);
     assertEquals("User name mismatch", user3.name, user2.name);
     assertEquals("Last login date mismatch", newLoginDate, user3.lastLogin);
     
     user3.name = "Test1 name changed";
     instance.writeUser(user3);
     
-    UserData user4 = instance.readUser(user2.id, null);
+    UserData user4 = instance.readUser(clientId, user2.id, null);
     assertEquals("Update error.", user3.name, user4.name);
     
     try {
-      instance.readUser(-1, "Unknown user");
+      instance.readUser(clientId, -1, "Unknown user");
       fail("Reading an unknown user should have raised an exception.");
     } catch(TammError e) {
       // as expected
     }
     
+    try {
+      instance.readUser(clientId + 1, user2.id, null);
+      fail("Try reading an user of another client should have raised an exception.");
+    } catch(TammError e) {
+      // as expected
+    }
+    
     UserData user5 = new UserData();
+    user5.clientId = clientId;
     user5.name = "Test2";
     user5.administratorId = 2;
     user5.mail = "mtest2@test.de";
     instance.writeUser(user5);
     
-    List<UserData> users1 = instance.listUsers(-1, null);
-    assertEquals("Three users expected.", users1.size(), 3);
+    List<UserData> users1 = instance.listUsers(clientId, -1, null);
+    assertEquals("Three users expected.", 3, users1.size());
     
-    List<UserData> users2 = instance.listUsers(2, null);
-    assertEquals("One user expected.", users2.size(), 1);
+    List<UserData> users2 = instance.listUsers(clientId, 2, null);
+    assertEquals("One user expected.", 1, users2.size());
     assertEquals("User Test2 expected.", users2.get(0).name, user5.name);
 
-    List<UserData> users3 = instance.listUsers(-1, "test%");
-    assertEquals("Two users expected.", users3.size(), 2);
+    List<UserData> users3 = instance.listUsers(clientId, -1, "test%");
+    assertEquals("Two users expected.", 2, users3.size());
 
-    List<UserData> users4 = instance.listUsers(2, "MTest%");
-    assertEquals("Only user test2 expected.", users4.size(), 1);
+    List<UserData> users4 = instance.listUsers(clientId, 2, "MTest%");
+    assertEquals("Only user test2 expected.", 1, users4.size());
+    
+    List<UserData> users5 = instance.listUsers(clientId + 99, -1, "test%");
+    assertEquals("No users expected.", 0, users5.size());
+
   }
 
 }

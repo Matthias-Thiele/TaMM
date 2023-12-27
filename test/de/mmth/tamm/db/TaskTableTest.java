@@ -39,7 +39,7 @@ public class TaskTableTest {
   @Test
   public void testCheckColumns() {
     String[] cols = TaskTable.TABLE_CONFIG.split("\\R");
-    assertEquals("Number of columns changed", 10, cols.length);
+    assertEquals("Number of columns changed", 11, cols.length);
   }
 
   /**
@@ -48,8 +48,11 @@ public class TaskTableTest {
   @Test
   public void testWriteReadTask() throws Exception {
     System.out.println("writeTask");
+    int clientId = 99;
+    
     TaskData task = new TaskData();
     task.lId = -1;
+    task.clientId = clientId;
     task.name = "First test task";
     task.description = "This is the description of the new task.";
     task.createDate = DateUtils.formatZ(null);
@@ -66,7 +69,7 @@ public class TaskTableTest {
     assertTrue("Task long id malformed", result > 0);
     
     System.out.println("readTask");
-    TaskData task2 = instance.readTask(result);
+    TaskData task2 = instance.readTask(clientId, result);
     assertEquals("Task Id mismatch", result, task2.lId);
     assertEquals("Task name mismatch", task.name, task2.name);
     assertEquals("Task description mismatch", task.description, task2.description);
@@ -79,7 +82,7 @@ public class TaskTableTest {
     assertEquals("Task interval mismatch", task.interval, task2.interval);
     
     try {
-      instance.readTask(12345);
+      instance.readTask(clientId, 12345);
       fail("Reading an unknown task should have raised an exception.");
     } catch(TammError e) {
       // as expected
@@ -89,8 +92,17 @@ public class TaskTableTest {
     task2.name = "changed to test2";
     instance.writeTask(task2);
     
-    TaskData task3 = instance.readTask(task2.lId);
+    TaskData task3 = instance.readTask(clientId, task2.lId);
     assertEquals("Task name mismatch", task2.name, task3.name);
+    
+    try {
+      instance.readTask(clientId + 1, task2.lId);
+      fail("Reading a task of another client should have raised an exception.");
+    } catch(TammError e) {
+      // as expected
+    }
+    
+    
   }
 
 }

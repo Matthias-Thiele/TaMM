@@ -25,6 +25,8 @@ public class ClientTable extends DBTable {
     id I G
     name V 100
     hostname V 20
+    hostname2 V 20
+    hostname3 V 20
     maxdocmb I
     maxuser I
     """;
@@ -93,6 +95,8 @@ public class ClientTable extends DBTable {
         var col = 1;
         stmt.setString(col++, client.name);
         stmt.setString(col++, client.hostName);
+        stmt.setString(col++, client.hostName2);
+        stmt.setString(col++, client.hostName3);
         stmt.setInt(col++, client.maxDocMB);
         stmt.setInt(col++, client.maxUser);
 
@@ -145,8 +149,10 @@ public class ClientTable extends DBTable {
     result.id = clientRows.getInt(1);
     result.name = clientRows.getString(2);
     result.hostName = clientRows.getString(3);
-    result.maxDocMB = clientRows.getInt(4);
-    result.maxUser = clientRows.getInt(5);
+    result.hostName2 = clientRows.getString(4);
+    result.hostName3 = clientRows.getString(5);
+    result.maxDocMB = clientRows.getInt(6);
+    result.maxUser = clientRows.getInt(7);
     
     return result;
   }

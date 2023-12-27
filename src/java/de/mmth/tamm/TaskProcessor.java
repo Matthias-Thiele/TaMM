@@ -10,7 +10,6 @@ import com.google.gson.LongSerializationPolicy;
 import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.data.TaskData;
-import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.progress.Interval;
 import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.ServletUtils;
@@ -51,6 +50,8 @@ public class TaskProcessor {
       taskData.createDate = taskData.lastChanged;
       taskData.creator = session.user.id;
     }
+    
+    taskData.clientId = session.client.id;
     long lid = application.tasks.writeTask(taskData);
     logger.debug("Task written: " + lid + " : " + taskData.name);
     ServletUtils.sendResult(resultData, true, "", "", "", Long.toString(lid));
@@ -74,7 +75,7 @@ public class TaskProcessor {
     FindData findData = gson.fromJson(reader, FindData.class);
     logger.debug("Search tasklist " + findData.filterText);
     int userId = findData.userId; 
-    var searchResult = application.tasks.listTasks(userId, findData.filterText);
+    var searchResult = application.tasks.listTasks(session.client.id, userId, findData.filterText);
     
     try (Writer writer = new OutputStreamWriter(resultData)) {
       gson.toJson(searchResult, writer);
@@ -96,7 +97,7 @@ public class TaskProcessor {
     }
     
     TaskData advanceTask = gson.fromJson(reader, TaskData.class);
-    TaskData taskData = application.tasks.readTask(advanceTask.lId);
+    TaskData taskData = application.tasks.readTask(session.client.id, advanceTask.lId);
     if ((taskData.owner != session.user.id) && !session.user.mainAdmin) {
       throw new TammError("Not your task.");
     }

@@ -15,6 +15,7 @@ public class UserData {
   private final static int FG_SUBADMIN = 2;
   
   public int id = -1;
+  public int clientId;
   public String name;
   public String pwd;
   public String mail;

@@ -51,23 +51,15 @@ public class PostProcessor {
    * Process incoming post request.
    * 
    * @param session
-   * @param uri
+   * @param cmd
    * @param sourceData
    * @param resultData
    * @throws IOException 
    * @throws de.mmth.tamm.TammError 
    */
-  public void process(SessionData session, String uri, InputStream sourceData, OutputStream resultData) throws IOException, TammError {
-    String[] uriParts = uri.split("/");
-    String cmd = uriParts[3];
-    if (!application.checkInit() && !cmd.equals("initdata")) {
-      logger.warn("Missing initialisation data, request aborted.");
-      ServletUtils.gotoErrorPage(resultData);
-      return;
-    }
-    
+  public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData) throws IOException, TammError {
     try (Reader reader = new InputStreamReader(sourceData)) {
-      switch (uriParts[3]) {
+      switch (cmd) {
         case "login":
           processLogin(reader, resultData, session);
           break;
@@ -85,11 +77,11 @@ public class PostProcessor {
           break;
           
         case "pwdreq":
-          processPasswordRequest(reader, resultData);
+          processPasswordRequest(reader, resultData, session);
           break;
           
         case "updatepwd":
-          processUpdatePassword(reader, resultData);
+          processUpdatePassword(reader, resultData, session);
           break;
           
         case "savetask":
@@ -131,14 +123,14 @@ public class PostProcessor {
     logger.debug("Process login request for user" + loginData.name);
     JsonResult result = new JsonResult();
     try {
-    var user = application.users.readUser(-1, loginData.name);
+    var user = application.users.readUser(session.client.id, -1, loginData.name);
     if (PasswordUtils.comparePassword(user.pwd, loginData.pwd)) {
       result.result = "ok";
       result.nextPage = "index.html";
       session.loginTime = DateUtils.formatZ(null); 
       session.user = user;
       session.user.pwd = ""; // do not leak password.
-      application.users.updateLoginDate(user.id, session.loginTime);
+      application.users.updateLoginDate(session.client.id, user.id, session.loginTime);
     } else {
       result.result = "error";
       result.nextPage = "";
@@ -186,13 +178,13 @@ public class PostProcessor {
    * @param resultData
    * @throws IOException 
    */
-  private void processPasswordRequest(Reader reader, OutputStream resultData) throws IOException {
+  private void processPasswordRequest(Reader reader, OutputStream resultData, SessionData session) throws IOException {
     UserData userData = new Gson().fromJson(reader, UserData.class);
     logger.debug("Password request for user " + userData.name);
     boolean found = false;
     String message = "Unbekannter Anwender oder Mailadresse";
     try {
-      var checkUser = application.users.readUser(-1, userData.name);
+      var checkUser = application.users.readUser(session.client.id, -1, userData.name);
       if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
         String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS);
         logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
@@ -216,13 +208,13 @@ public class PostProcessor {
    * @throws IOException
    * @throws TammError 
    */
-  private void processUpdatePassword(Reader reader, OutputStream resultData) throws IOException, TammError {
+  private void processUpdatePassword(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     String message = "";
     boolean found = false;
     LoginData loginData = new Gson().fromJson(reader, LoginData.class);
     UserData requestUser = application.requests.getUserItem(loginData.key);
     if (requestUser != null) {
-      var updateUser = application.users.readUser(requestUser.id, null);
+      var updateUser = application.users.readUser(session.client.id, requestUser.id, null);
       updateUser.pwd = PasswordUtils.encodePassword(loginData.pwd);
       application.users.writeUser(updateUser);
       found = true;

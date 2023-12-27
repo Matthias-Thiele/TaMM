@@ -4,11 +4,14 @@
  */
 package de.mmth.tamm;
 
+import de.mmth.tamm.data.ClientData;
+import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,22 +37,14 @@ public class GetProcessor {
    * Process incoming post request.
    * 
    * @param session
-   * @param uri
+   * @param cmd
    * @param sourceData
    * @param resultData
    * @throws IOException 
    * @throws de.mmth.tamm.TammError 
    */
-  public void process(SessionData session, String uri, InputStream sourceData, OutputStream resultData) throws IOException, TammError {
-    String[] uriParts = uri.split("/");
-    String cmd = uriParts[3];
-    if (!application.checkInit() && !cmd.equals("initdata")) {
-      logger.warn("Missing initialisation data, request aborted.");
-      ServletUtils.gotoErrorPage(resultData);
-      return;
-    }
-    
-    switch (uriParts[3]) {
+  public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData) throws IOException, TammError {
+    switch (cmd) {
       case "session":
         processSession(resultData, session);
         break;
@@ -75,7 +70,13 @@ public class GetProcessor {
    */
   private void processSession(OutputStream resultData, SessionData session) throws IOException, TammError {
     boolean isOk = session.user != null;
-    session.userNames = application.userNames;
+    ClientData client = session.client;
+    List<KeyValue> clientNames = application.userNamesMap.get(client.name);
+    if (clientNames == null) {
+      clientNames = application.users.listUserNames(client.id);
+      application.userNamesMap.put(client.name, clientNames);
+    }
+    session.userNames = clientNames;
     ServletUtils.sendResult(resultData, isOk, "", "login.html", "", session);
   }
   
@@ -94,7 +95,7 @@ public class GetProcessor {
   }
   
   private void processClientList(OutputStream resultData, SessionData session) throws IOException, TammError {
-    ServletUtils.sendResult(resultData, true, "", "", "", application.clientNames);
+    ServletUtils.sendResult(resultData, true, "", "", "", application.clientList);
   }
   
 }

@@ -45,12 +45,25 @@ public class System extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
     try (InputStream content = request.getInputStream()) {
-      SessionData sd = ServletUtils.prepareSession(request);
       ServletOutputStream out = response.getOutputStream();
-      
       try {
+        SessionData sd = ServletUtils.prepareSession(request);
+
         String requestUri = request.getRequestURI();
-        getProcessor.process(sd, requestUri, content, out);
+        String[] uriParts = requestUri.split("/");
+        String cmd = uriParts[3];
+
+        if (!application.checkInit() && !cmd.equals("initdata")) {
+          logger.warn("Missing initialisation data, request aborted.");
+          ServletUtils.gotoErrorPage(out);
+          return;
+        }
+
+        if (!ServletUtils.checkClientId(request, sd, application.clientNames)) {
+          throw new TammError("Invalid client access.");
+        }
+
+        getProcessor.process(sd, cmd, content, out);
         out.flush();
       } catch(TammError te) {
         ServletUtils.sendResult(out, false, "", "", te.getMessage(), null);
@@ -79,14 +92,26 @@ public class System extends HttpServlet {
         application.tammUrl = url.substring(0, tammPos + 6);
       }
     }
-    
+
     try (InputStream content = request.getInputStream()) {
       SessionData sd = ServletUtils.prepareSession(request);
       ServletOutputStream out = response.getOutputStream();
-      
+
       try {
         String requestUri = request.getRequestURI();
-        postProcessor.process(sd, requestUri, content, out);
+        String[] uriParts = requestUri.split("/");
+        String cmd = uriParts[3];
+        if (!application.checkInit() && !cmd.equals("initdata")) {
+          logger.warn("Missing initialisation data, request aborted.");
+          ServletUtils.gotoErrorPage(out);
+          return;
+        }
+
+        if (!ServletUtils.checkClientId(request, sd, application.clientNames)) {
+          throw new TammError("Invalid client access.");
+        }
+
+        postProcessor.process(sd, cmd, content, out);
         out.flush();
       } catch(TammError te) {
         ServletUtils.sendResult(out, false, "", "", te.getMessage(), null);

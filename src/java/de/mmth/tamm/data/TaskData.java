@@ -10,6 +10,7 @@ package de.mmth.tamm.data;
  */
 public class TaskData {
   public long lId;
+  public int clientId;
   public String name;
   public String description;
   public int creator;

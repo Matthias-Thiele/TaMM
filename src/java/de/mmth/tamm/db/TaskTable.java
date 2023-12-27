@@ -23,6 +23,7 @@ public class TaskTable extends DBTable {
   protected static final String TABLE_CONFIG = 
     """
     lid L
+    clientid I
     name V 100
     description V 2000
     creator I
@@ -63,6 +64,7 @@ public class TaskTable extends DBTable {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
         var col = 1;
         stmt.setLong(col++, task.lId);
+        stmt.setInt(col++, task.clientId);
         stmt.setString(col++, task.name);
         stmt.setString(col++, task.description);
         stmt.setInt(col++, task.creator);
@@ -86,18 +88,20 @@ public class TaskTable extends DBTable {
   /**
    * Read a task object by id.
    * 
+   * @param clientId
    * @param byId
    * @return
    * @throws TammError 
    */
-  public TaskData readTask(long byId) throws TammError {
+  public TaskData readTask(int clientId, long byId) throws TammError {
     TaskData result = null;
-    var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE lid = ?";
+    var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE clientId = ? and lid = ?";
     logger.debug("SQL: " + cmd);
     
     try {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
-        stmt.setLong(1, byId);
+        stmt.setInt(1, clientId);
+        stmt.setLong(2, byId);
          
         var taskRows = stmt.executeQuery();
         if (!taskRows.next()) {
@@ -119,27 +123,28 @@ public class TaskTable extends DBTable {
    * 
    * The filter matches the name part of the task.
    * 
+   * @param clientId
    * @param ownerId optional, -1: all tasks of all users
    * @param filter optional null: no filter
    * @return
    * @throws TammError 
    */
-  public List<TaskData> listTasks(int ownerId, String filter) throws TammError {
+  public List<TaskData> listTasks(int clientId, int ownerId, String filter) throws TammError {
     boolean hasId = ownerId != -1;
     boolean hasFilter = filter != null;
     
     List<TaskData> result = new ArrayList<>();
     
-    var cmd = "SELECT " + this.selectNames + " FROM " + tableName;
+    var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE clientid = ? ";
     
     if (hasId || hasFilter) {
-      cmd += " WHERE ";
+      cmd += " AND ";
     }
     
     if (hasId) {
       cmd += "owner = ? ";
       if (hasFilter) {
-        cmd += "and ";
+        cmd += "AND ";
       }
     }
     
@@ -154,6 +159,8 @@ public class TaskTable extends DBTable {
     try {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
         int paramCol = 1;
+        stmt.setInt(paramCol++, clientId);
+        
         if (hasId) {
           stmt.setInt(paramCol++, ownerId);
         }
@@ -188,6 +195,7 @@ public class TaskTable extends DBTable {
     
     int col = 1;
     result.lId = taskRows.getLong(col++);
+    result.clientId = taskRows.getInt(col++);
     result.name = taskRows.getString(col++);
     result.description = taskRows.getString(col++);
     result.creator = taskRows.getInt(col++);
