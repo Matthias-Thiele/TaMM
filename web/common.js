@@ -102,6 +102,21 @@ function getValues(name, seperator) {
     return result.sort().join(seperator);
 }
 
+/**
+ * Shows or hides a block element by id
+ * 
+ * @param {type} elementName
+ * @param {type} doShow
+ * @returns {undefined}
+ */
+function showBlockElement(elementName, doShow) {
+  var x = document.getElementById(elementName);
+  if (doShow) {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+} 
 
 /**
  * Helper function for user selection.

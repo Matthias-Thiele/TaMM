@@ -109,20 +109,23 @@ public class UserTableTest {
     user5.mail = "mtest2@test.de";
     instance.writeUser(user5);
     
-    List<UserData> users1 = instance.listUsers(clientId, -1, null);
+    List<UserData> users1 = instance.listUsers(clientId, -1, null, false);
     assertEquals("Three users expected.", 3, users1.size());
     
-    List<UserData> users2 = instance.listUsers(clientId, 2, null);
+    List<UserData> users6 = instance.listUsers(clientId, -1, null, true);
+    assertEquals("Three users expected.", 2, users6.size());
+    
+    List<UserData> users2 = instance.listUsers(clientId, 2, null, false);
     assertEquals("One user expected.", 1, users2.size());
     assertEquals("User Test2 expected.", users2.get(0).name, user5.name);
 
-    List<UserData> users3 = instance.listUsers(clientId, -1, "test%");
+    List<UserData> users3 = instance.listUsers(clientId, -1, "test%", false);
     assertEquals("Two users expected.", 2, users3.size());
 
-    List<UserData> users4 = instance.listUsers(clientId, 2, "MTest%");
+    List<UserData> users4 = instance.listUsers(clientId, 2, "MTest%", false);
     assertEquals("Only user test2 expected.", 1, users4.size());
     
-    List<UserData> users5 = instance.listUsers(clientId + 99, -1, "test%");
+    List<UserData> users5 = instance.listUsers(clientId + 99, -1, "test%", false);
     assertEquals("No users expected.", 0, users5.size());
 
   }

@@ -50,6 +50,12 @@
                             window.location = response.nextPage + "?next=index.html";
                         } else {
                             sessionData = response.data;
+                            var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
+                            
+                            if (!someKindOfAdmin) {
+                                showBlockElement("menuuser", false);
+                            }
+                            
                             userlist = new Userlist(sessionData.userNames);
                             userlist.createOptionList("userlist");
                             setTimeout(filterTasks, 200);
@@ -343,7 +349,7 @@
 
             <ul class="menu__box">
                 <li><a class="menu__item" href="index.html">Home</a></li>
-                <li><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
                 <li><a class="menu__item" href="about.html">Über das Programm</a></li>
                 <li><a class="menu__item" onclick="logout();">Logout</a></li>
             </ul>

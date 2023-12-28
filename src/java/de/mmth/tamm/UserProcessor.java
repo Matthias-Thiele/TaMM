@@ -51,7 +51,7 @@ public class UserProcessor {
     int userId = session.user.id; 
     if (userId == 1) userId = -1; // TODO remove
     int clientId = (session.user.mainAdmin) ? -1 : session.client.id;
-    var searchResult = application.users.listUsers(clientId, userId, findData.filterText);
+    var searchResult = application.users.listUsers(clientId, userId, findData.filterText, findData.onlyAdmins);
     for (UserData user: searchResult) {
       user.pwd = ""; // do not leak user passwords to the outside.
     }

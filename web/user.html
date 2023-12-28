@@ -39,6 +39,11 @@ GNU General Public License v3.0
                             clientNames.createOptionList("clientnames");
                             var clientInput = document.getElementById("client");
                             clientInput.disabled = !sessionData.user.mainAdmin;
+                            var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
+                            showBlockElement("onlyadmins", sessionData.user.mainAdmin);
+                            if (!someKindOfAdmin) {
+                                window.location = "index.html";
+                            }
                         }
                     }
                 };
@@ -92,7 +97,8 @@ GNU General Public License v3.0
                 if (data.filterText.slice(-1) !== "%") {
                     data.filterText = data.filterText + "%";
                 }
-                console.log("Search for" + data);
+                data.onlyAdmins = getValue("onlyadmins");
+                console.log(data);
                 status.innerText = "Warte auf Server...";
                 
                 var request = new XMLHttpRequest();
@@ -167,7 +173,7 @@ GNU General Public License v3.0
 
             <ul class="menu__box">
                 <li><a class="menu__item" href="index.html">Home</a></li>
-                <li><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
                 <li><a class="menu__item" href="about.html">Über das Programm</a></li>
                 <li><a class="menu__item" onclick="logout('index.html');">Logout</a></li>
             </ul>
@@ -181,6 +187,7 @@ GNU General Public License v3.0
                     <input id="filtervalue" size="12">
                     <button onclick="filterUsers();">Suchen</button>
                     <button onclick="addUser();">Neu</button>
+                    <div><label for="onlyadmins">Nur Administratoren</label><input type="checkbox" id="onlyadmins"></div>
                     <div id="userlist" class="selectlist"></div>
                 </div>
                 <div class="">

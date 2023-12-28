@@ -64,6 +64,7 @@ public class UserTable extends DBTable {
   /**
    * Read a user by id or by name or mail address.
    * 
+   * @param clientId
    * @param byId ignored if other parameter is not null
    * @param byNameOrMail null if read by id
    * @return
@@ -178,10 +179,11 @@ public class UserTable extends DBTable {
    * @param clientId
    * @param administratorId
    * @param filter
+   * @param onlyAdmins
    * @return
    * @throws TammError 
    */
-  public List<UserData> listUsers(int clientId, int administratorId, String filter) throws TammError {
+  public List<UserData> listUsers(int clientId, int administratorId, String filter, boolean onlyAdmins) throws TammError {
     boolean hasClientId = clientId > 0;
     boolean hasId = administratorId > 0;
     boolean hasFilter = filter != null && !filter.isBlank();
@@ -190,26 +192,33 @@ public class UserTable extends DBTable {
     
     var cmd = "SELECT " + this.selectNames + " FROM " + tableName;
     
-    if (hasClientId || hasId || hasFilter) {
+    if (hasClientId || hasId || hasFilter || onlyAdmins) {
       cmd += " WHERE ";
     }
     
     if (hasClientId) {
       cmd += "clientid = ? ";
-      if (hasId || hasFilter) {
+      if (hasId || hasFilter || onlyAdmins) {
         cmd += " AND ";
       }
     }
     
     if (hasId) {
       cmd += "administrator = ? ";
-      if (hasFilter) {
+      if (hasFilter || onlyAdmins) {
         cmd += "AND ";
       }
     }
     
     if (hasFilter) {
       cmd += "( name ILIKE ? or mail ILIKE ? ) ";
+      if (onlyAdmins) {
+        cmd += "AND ";
+      }
+    }
+    
+    if (onlyAdmins) {
+      cmd += " ((flags & 3) <> 0) ";
     }
     
     cmd += " ORDER BY name";
