@@ -6,6 +6,9 @@ GNU General Public License v3.0
     Created on : 21.12.2023, 15:34:49
     Author     : https://alvarotrigo.com/blog/hamburger-menu-css/
 */
+.hamburger-menu {
+    
+}
 
 #menu__toggle {
   opacity: 0;

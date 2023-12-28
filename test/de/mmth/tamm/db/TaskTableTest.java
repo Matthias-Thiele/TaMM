@@ -65,7 +65,7 @@ public class TaskTableTest {
     task.interval = "single|1|2024-01-02";
     
     TaskTable instance = new TaskTable(con, "testtasks");
-    long result = instance.writeTask(task);
+    long result = instance.writeTask(task, false);
     assertTrue("Task long id malformed", result > 0);
     
     System.out.println("readTask");
@@ -90,7 +90,7 @@ public class TaskTableTest {
     
     // Test update
     task2.name = "changed to test2";
-    instance.writeTask(task2);
+    instance.writeTask(task2, false);
     
     TaskData task3 = instance.readTask(clientId, task2.lId);
     assertEquals("Task name mismatch", task2.name, task3.name);

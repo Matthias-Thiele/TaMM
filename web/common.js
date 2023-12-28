@@ -120,6 +120,15 @@ function showBlockElement(elementName, doShow) {
 } 
 
 /**
+ * Actual date in ISO format.
+ * 
+ * @returns {String}
+ */
+function toDay() {
+    return new Date().toJSON().slice(0, 10);
+}
+
+/**
  * Helper function for user selection.
  * @param {type} users
  * @returns {Userlist}

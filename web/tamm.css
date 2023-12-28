@@ -8,7 +8,7 @@ GNU General Public License v3.0
 */
 
 body {
-    font-family: Tahoma;
+    font-family: Lucida Sans, Nimbus Sans;
 }
 
 .dialogbox {
@@ -98,3 +98,48 @@ label {
         width:calc(88% / 3 * 2);
     }
 }
+
+/* modal dialog box */
+ /* Modal Header */
+.modal-header {
+  padding: 2px 16px;
+  background-color: #e0e0ff;
+}
+
+/* Modal Body */
+.modal-body {padding: 2px 16px;}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 2px 16px;
+  background-color: #e0e0ff;
+}
+
+.modal-content button {
+    position: relative;
+    margin: 5pt;
+    padding: 3pt;
+    min-width: 100pt;
+}
+
+/* Modal Content */
+.modal-content {
+  display: none;
+  position: absolute;
+  left: 20%;
+  bottom: 20%;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 2px solid #e0e0ff;
+  border-radius: 3pt;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+/* Add Animation */
+@keyframes animatetop {
+  from {bottom: 10%; opacity: 0}
+  to {bottom: 20%; opacity: 1}
+} 

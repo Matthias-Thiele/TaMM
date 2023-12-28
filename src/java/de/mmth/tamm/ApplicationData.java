@@ -36,6 +36,7 @@ public class ApplicationData {
   public DBConnect db;
   public UserTable users;
   public TaskTable tasks;
+  public TaskTable history;
   public ClientTable clients;
   
   public RequestCache requests;
@@ -68,6 +69,7 @@ public class ApplicationData {
         users = new UserTable(db, "userlist");
         users.assureAdminUser();
         tasks = new TaskTable(db, "tasklist");
+        history = new TaskTable(db, "taskhistory");
         clients = new ClientTable(db, "clientlist");
         refreshClientNames();
         requests = new RequestCache();

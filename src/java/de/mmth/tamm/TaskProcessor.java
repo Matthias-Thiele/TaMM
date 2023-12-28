@@ -52,7 +52,7 @@ public class TaskProcessor {
     }
     
     taskData.clientId = session.client.id;
-    long lid = application.tasks.writeTask(taskData);
+    long lid = application.tasks.writeTask(taskData, false);
     logger.debug("Task written: " + lid + " : " + taskData.name);
     ServletUtils.sendResult(resultData, true, "", "", "", Long.toString(lid));
   }
@@ -107,9 +107,14 @@ public class TaskProcessor {
       throw new TammError("Invalid interval.");
     }
     
-    String next = interval.nextDate(DateUtils.toDay());
+    String next = interval.nextDate(taskData.nextDueDate);
+    var rememberNextDueDate = taskData.nextDueDate;
     taskData.nextDueDate = next;
-    application.tasks.writeTask(taskData);
+    application.tasks.writeTask(taskData, false);
+    
+    // create history data record
+    taskData.startDate = rememberNextDueDate;
+    application.history.writeTask(taskData, true);
     
     ServletUtils.sendResult(resultData, true, "", "", next, null);
     

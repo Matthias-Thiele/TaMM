@@ -81,6 +81,7 @@
              * @returns {undefined}
              */
             function fillForm(taskData) {
+                hideDialog();
                 selectedTask = taskData;
                 document.getElementById("advance").disabled = taskData.lId === "-1";
                 var status = document.getElementById("status");
@@ -129,9 +130,30 @@
              * Advances the selected task to the next event date
              * after today.
              * 
+             * @@param {type} noQuery 
              * @returns {undefined}
              */
-            function doAdvance() {
+            function doAdvance(noQuery) {
+                var today = toDay();
+                if ((selectedTask.nextDueDate > today) && !noQuery) {
+                    document.getElementById("showduedate").textContent = selectedTask.nextDueDate;
+                    document.getElementById("showtoday").textContent = today;
+                    document.getElementById("queryadvance").style.display = "block";
+                    return;
+                }
+                
+                if (document.getElementById("save").disabled) {
+                    advanceNow();
+                } else {
+                    doSave(true);
+                }
+            }
+              
+            function hideDialog() {
+                document.getElementById("queryadvance").style.display = "none";
+            }
+            
+            function advanceNow() {
                 var taskData = {};
                 taskData.lId = selectedTask.lId;
                 
@@ -148,9 +170,10 @@
                         var status = document.getElementById("status");
                         var response = JSON.parse(this.responseText);
                         if (response.result === "ok") {
-                          status.innerText = "Aufgabe weitergeleitet: " + response.message;
-                          emptyTask = {};
-                          fillForm(emptyTask);
+                            status.innerText = "Aufgabe weitergeleitet: " + response.message;
+                            emptyTask = {};
+                            fillForm(emptyTask);
+                            setTimeout(filterTasks, 200);
                         } else {
                             if (!response.message) {
                                 response.message = "Unbekannter Fehler beim Weiterleiten.";
@@ -164,9 +187,10 @@
             /**
              * Fills the current task item with the data from the
              * form area and sends it to the server.
+             * @@param {type} deferredAdvance advance after save
              * @returns {undefined}
              */
-            function doSave() {
+            function doSave(deferredAdvance) {
                 selectedTask.lId = getValue("tasklid");
                 if (selectedTask.lId === "") {
                     selectedTask.lId = "-1";
@@ -189,9 +213,13 @@
                         var status = document.getElementById("status");
                         var response = JSON.parse(this.responseText);
                         if (response.result === "ok") {
-                          status.innerText = "Aufgabe gespeichert."
-                          emptyTask = {};
-                          fillForm(emptyTask);
+                            status.innerText = "Aufgabe gespeichert.";
+                            if (deferredAdvance) {
+                                advanceNow();
+                            } else {
+                                emptyTask = {};
+                                fillForm(emptyTask);
+                            }
                         } else {
                             if (!response.message) {
                                 response.message = "Unbekannter Fehler beim Speichern.";
@@ -208,12 +236,13 @@
              * @returns {undefined}
              */
             function filterTasks() {
+                hideDialog();
                 var status = document.getElementById("status");
                 var data = {};
                 data.source = "tasklist";
                 data.filterText = "%" + document.getElementById("filtervalue").value + "%";
                 data.userId = sessionData.user.id;
-                console.log("Search for" + data);
+                console.log(data);
                 status.innerText = "Warte auf Server...";
                 
                 var request = new XMLHttpRequest();
@@ -271,6 +300,7 @@
              */
             function changed() {
                 document.getElementById("save").disabled = false;
+                hideDialog();
             }
             
             /**
@@ -356,6 +386,20 @@
 
         </div>
         
+        <div id="queryadvance" class="modal-content" style="width:400pt">
+            <div class="modal-header">
+                <h2>Aufgabe vor Ablauf erledigt</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 125%;">Die Aufgabe wäre erst zum <span id="showduedate"></span> fällig</p>
+                <p>Wenn Sie jetzt weiterleiten, wird der nächste Fälligkeitstermin
+                    nach diesem Datum und nicht zum <span id="showtoday"></span> errechnet.</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="hideDialog();doAdvance(true)">Erledigt</button><button onclick="hideDialog()">Abbruch</button>
+            </div>
+        </div>
+
         <div class="bodybox">
             <div class="header">TaMM Aufgaben</div>
             <div class="left-sidebar">

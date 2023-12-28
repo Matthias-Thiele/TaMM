@@ -47,14 +47,17 @@ public class TaskTable extends DBTable {
    * be pretty random.
    * 
    * @param task
+   * @param insertAlways
    * @return returns task long Id
    * @throws TammError 
    */
-  public long writeTask(TaskData task) throws TammError {
+  public long writeTask(TaskData task, boolean insertAlways) throws TammError {
     String cmd;
-    if (task.lId == -1) {
+    if (task.lId == -1 || insertAlways) {
       cmd = "INSERT INTO " + tableName + " (" + insertNames + ") values " + paramPlaceholders;
-      task.lId = System.nanoTime();
+      if (task.lId < 1) {
+        task.lId = System.nanoTime();
+      }
     } else {
       cmd = "UPDATE " + tableName + " SET " + updateNames + " WHERE lid = " + task.lId;
     }
