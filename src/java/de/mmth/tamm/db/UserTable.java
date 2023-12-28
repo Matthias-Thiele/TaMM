@@ -44,6 +44,13 @@ public class UserTable extends DBTable {
    */
   public UserTable(DBConnect conn, String tableName) {
     super(conn, tableName, TABLE_CONFIG);
+  }
+  
+  /**
+   * Make sure that a new table at least contains
+   * the default admin user.
+   */
+  public void assureAdminUser() {
     if (isNewTable) {
       UserData admin = new UserData();
       admin.name = "admin";

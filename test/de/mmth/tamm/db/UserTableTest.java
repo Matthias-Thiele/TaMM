@@ -47,13 +47,20 @@ public class UserTableTest {
   
   /**
    * Test of readUser and writeUser methods, of class UserTable.
+   * @throws de.mmth.tamm.TammError
    */
   @Test
   public void testWriteReadUser() throws TammError {
     System.out.println("writeReadUser");
-    UserTable instance = new UserTable(con, "testusers");
-    // admin user with id=1 automatically created
     int clientId = 1;
+    UserTable instance = new UserTable(con, "testusers");
+    List<UserData> users0before = instance.listUsers(clientId, -1, null, false);
+    assertEquals("Three users expected.", 0, users0before.size());
+    
+    instance.assureAdminUser();
+    // admin user with id=1 automatically created
+    List<UserData> users0after = instance.listUsers(clientId, -1, null, false);
+    assertEquals("Three users expected.", 1, users0after.size());
     
     UserData user = new UserData();
     user.clientId = clientId;

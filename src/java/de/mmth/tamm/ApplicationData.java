@@ -66,6 +66,7 @@ public class ApplicationData {
         db = con;
         
         users = new UserTable(db, "userlist");
+        users.assureAdminUser();
         tasks = new TaskTable(db, "tasklist");
         clients = new ClientTable(db, "clientlist");
         refreshClientNames();
