@@ -19,7 +19,7 @@ GNU General Public License v3.0
             var clientNames;
             
             function loadSessionData() {
-                initForm("save");
+                initDefaultAction("save", doSave);
                 
                 var request = new XMLHttpRequest();
                 request.open("GET", "system/session");

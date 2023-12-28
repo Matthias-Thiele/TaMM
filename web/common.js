@@ -27,15 +27,16 @@ function logout(next) {
 
 /**
  * Initializes global behaviour.
- * @param {type} saveButtonId
+ * @param {type} checkButtonId
+ * @param {type} action 
  * @returns {undefined}
  */
-function initForm(saveButtonId) {
-    if (saveButtonId) {
+function initDefaultAction(checkButtonId, action) {
+    if (checkButtonId) {
         document.addEventListener("keypress", function (event) {
             if (event.keyCode === 13) {
-                if (!document.getElementById(saveButtonId).disabled) {
-                    doSave();
+                if (!document.getElementById(checkButtonId).disabled) {
+                    action();
                 }
             }
          });

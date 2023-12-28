@@ -12,6 +12,7 @@ Task Management and Monitoring
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
         <link rel="shortcut icon" href="favicon.ico"/> 
+        <script src="common.js"></script> 
         <script>
             function doLogin() {
                 var loginData = {};
@@ -55,12 +56,12 @@ Task Management and Monitoring
             }
         </script>
     </head>
-    <body>
+    <body onload="initDefaultAction('login', doLogin);">
         <div class="dialogbox">
             <div class="header">TaMM - Task Management & Monitoring</div>
             <div><label>Anwendername</label><input type="text" id="name"></div>
             <div><label>Passwort</label><input type="password" id="pwd"></div>
-            <div><button onclick="doLogin();">Anmelden</button></div>
+            <div><button id="login" onclick="doLogin();">Anmelden</button></div>
             <a href="pwdreq.html">Passwort anfordern</a>
             <div class="statusbar" id="status"></div>
         </div>

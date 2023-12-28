@@ -36,7 +36,7 @@
              * @returns {undefined}
              */
             function loadSessionData() {
-                initForm("save");
+                initDefaultAction("save", doSave);
                 
                 var request = new XMLHttpRequest();
                 request.open("GET", "system/session");
