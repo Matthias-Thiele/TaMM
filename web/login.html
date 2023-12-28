@@ -45,15 +45,6 @@ Task Management and Monitoring
                 };
             }
             
-            function getUrlParam(name) {
-                var url_string = window.location;
-                var url = new URL(url_string);
-                var c = url.searchParams.get(name);
-                if (!c || (c === "undefined")) {
-                    c="";
-                }
-                return c;
-            }
         </script>
     </head>
     <body onload="initDefaultAction('login', doLogin);">

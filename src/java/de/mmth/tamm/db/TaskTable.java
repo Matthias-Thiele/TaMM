@@ -187,6 +187,41 @@ public class TaskTable extends DBTable {
   }
   
   /**
+   * Read task history list of the given task.
+   * 
+   * @param clientId
+   * @param taskId
+   * @return
+   * @throws TammError 
+   */
+  public List<TaskData> listTasks(int clientId, long taskId) throws TammError {
+    List<TaskData> result = new ArrayList<>();
+    
+    var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE clientid = ? and lid = ? ORDER BY startdate desc, createdate";
+    
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        int paramCol = 1;
+        stmt.setInt(paramCol++, clientId);
+        stmt.setLong(paramCol++, taskId);
+        
+        var taskRows = stmt.executeQuery();
+        while (taskRows.next()) {
+          var task = getData(taskRows);
+          logger.debug("Task found: " + task.startDate);
+          result.add(task);
+        }
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error reading task list.", ex);
+      throw new TammError("Error reading task list.");
+    }
+    return result;
+  }
+  
+  /**
    * Copies the ResultSet user data into an TaskData object.
    * 
    * @param taskRows

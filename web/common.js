@@ -3,6 +3,22 @@
  * GNU General Public License v3.0
  */
 
+/**
+ * Returns the requested url parameter.
+ * 
+ * @param {type} name
+ * @returns {String|null} Empty string if not found.
+ */
+function getUrlParam(name) {
+    var url_string = window.location;
+    var url = new URL(url_string);
+    var c = url.searchParams.get(name);
+    if (!c || (c === "undefined")) {
+        c="";
+    }
+    return c;
+}
+
 /*
  * Send the logout command to the server and switch to the login page.
  */
@@ -126,6 +142,11 @@ function showBlockElement(elementName, doShow) {
  */
 function toDay() {
     return new Date().toJSON().slice(0, 10);
+}
+
+function formatIso(dateTime) {
+    var parts = dateTime.split("T");
+    return parts.join(" ");
 }
 
 /**

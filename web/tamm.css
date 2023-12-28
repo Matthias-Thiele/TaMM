@@ -54,6 +54,7 @@ label {
 .selectlist {
     margin-top: 10pt;
     font-size: 10pt;
+    overflow: auto;
 }
 
 .listitem {
@@ -63,6 +64,38 @@ label {
     padding: 3pt;
     cursor: pointer;
 }
+
+input[type=radio] {
+display: none;
+    & ~ label {
+        cursor: pointer;
+        background-color: #f8f8fc;
+        border-radius: 3px;
+        box-shadow: 2px 1px 1px gray;
+        padding: 3pt;
+        margin: 3pt;
+        width: 80pt;
+        text-align: center;
+    }
+}
+
+input[type="radio"]:checked + label {
+    background-color: #e0e0ff;
+}
+
+.datelist {
+    margin: 5pt;
+}
+
+.flex-container {
+    display: flex;
+}
+
+.flex-container > div {
+    margin: 10px;
+    padding: 8px;
+}
+
 
 /* whole page, two column layout */
 .bodybox {
@@ -77,6 +110,7 @@ label {
 .left-sidebar {
     display:flex;
     flex-wrap:wrap;
+    min-height:0px;
 }
 
 /* columns */
@@ -90,6 +124,7 @@ label {
     .left-sidebar > *:nth-child(1) {
         width:calc(88% / 3);
         max-width: 180pt;
+        min-height:0;
         order:-1;
         border-right: 1px solid silver
     }

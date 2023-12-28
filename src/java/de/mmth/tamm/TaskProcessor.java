@@ -18,6 +18,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -58,7 +60,7 @@ public class TaskProcessor {
   }
 
   /**
-   * Processes a filter request from the web page.
+   * Processes a task list request from the web page.
    * 
    * returns a list of found entries.
    * @param reader
@@ -75,13 +77,29 @@ public class TaskProcessor {
     FindData findData = gson.fromJson(reader, FindData.class);
     logger.debug("Search tasklist " + findData.filterText);
     int userId = findData.userId; 
-    var searchResult = application.tasks.listTasks(session.client.id, userId, findData.filterText);
     
+    List<TaskData> searchResult;
+    switch (findData.source) {
+      case "tasklist":
+        searchResult = application.tasks.listTasks(session.client.id, userId, findData.filterText);
+        break;
+    
+      case "historylist":
+        long taskId = Long.parseLong(findData.filterText); 
+        searchResult = application.history.listTasks(session.client.id, taskId);
+        break;
+        
+      default:
+        searchResult = new ArrayList<>();
+        break;
+    }
+
     try (Writer writer = new OutputStreamWriter(resultData)) {
       gson.toJson(searchResult, writer);
     }
   }
 
+  
   /**
    * Advance selected task to next date after today.
    * 

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<!--
+(c) 2023 by Matthias Thiele
+GNU General Public License v3.0
+-->
+<html>
+    <head>
+        <title>TaMM Erledigte Aufgaben</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="tamm.css">
+        <link rel="stylesheet" href="menu.css">
+        <link rel="shortcut icon" href="favicon.ico"/> 
+        <style>
+            .taskname {
+                font-weight: bold;
+            }
+            
+            .duedate {
+                color: #202020;
+            }
+            
+            .escalated {
+                color: #c00040;
+            }
+        </style>
+        <script src="common.js"></script> 
+        <script src="task.js"></script> 
+        <script>
+            var sessionData;
+            var selectedTask;
+            var userlist;
+            /**
+             * Load user information and other session data.
+             * @returns {undefined}
+             */
+            function loadSessionData() {
+                var request = new XMLHttpRequest();
+                request.open("GET", "system/session");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send();
+                request.overrideMimeType('application/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        if (response.result === "error") {
+                            window.location = response.nextPage + "?next=index.html";
+                        } else {
+                            sessionData = response.data;
+                            var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
+                            
+                            if (!someKindOfAdmin) {
+                                showBlockElement("menuuser", false);
+                            }
+                            
+                            userlist = new Userlist(sessionData.userNames);
+                            setTimeout(listHistory, 200);
+                        }
+                    }
+                };
+            }
+            
+            function listHistory() {
+                var status = document.getElementById("status");
+                var data = {};
+                data.source = "historylist";
+                data.filterText = getUrlParam("taskid");
+                data.userId = sessionData.user.id;
+                console.log(data);
+                status.innerText = "Warte auf Server...";
+                
+                var request = new XMLHttpRequest();
+                request.open("POST", "system/filtertask");
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.send(JSON.stringify(data));
+                request.overrideMimeType('text/json');
+                request.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        if (response.result !== "error") {
+                          listTasks(response);
+                          status.innerText = "";
+                        } else {
+                          status.innerText = "Unbekannter Fehler beim Suchen.";
+                        }
+                    }
+                };
+            }
+            
+            function hideDialog() {
+                
+            }
+        </script>
+            
+    </head>
+    <body onload="loadSessionData();">
+        <div class="bodybox">
+            <div class="header">TaMM Erledigte Aufgaben</div>
+            <div class="left-sidebar">
+                <div id="tasklist" class="selectlist" style="overflow-y: auto; max-height:700px;"></div>
+                <div>
+                    <div><label for="tasklid">Id</label><input type="text" id="tasklid" readonly></div>
+                    <div><label for="name">Bezeichnung</label><input onchange="changed()" size="30" type="text" id="name" readonly></div>
+                    <div><label for="description">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description" readonly></textarea></div>
+                    <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
+                    <div><label for="lastchanged">Erledigt am</label><input id="lastchanged" readonly></div>
+                    <div><label for="owner">Eigentümer</label><input id="owner" readonly></div>
+                    <div><label for="duedate">Nächster Start</label><input id="duedate" type="date" readonly></div>
+                    <hr>
+                    Intervall<br>
+                    <div class="flex-container">
+                        <div style="min-height:0;">
+                            <input type="radio" name="interval" id="single" value="single" checked disabled> <label for="single">Einmal</label><br>
+                            <input type="radio" name="interval" id="daily" value="daily" disabled> <label for="daily">Täglich</label><br>
+                            <input type="radio" name="interval" id="weekly" value="weekly" disabled> <label for="weekly">Wöchentlich</label><br>
+                            <input type="radio" name="interval" id="monthly" value="monthly" disabled> <label for="monthly">Monatlich</label><br>
+                            <input type="radio" name="interval" id="yearly" value="yearly" disabled> <label for="yearly">Jährlich</label><br>
+                        </div>
+                        <div style="min-height:0;">
+                            <div>Teiler <input type="number" id="divider" style="width: 40pt" value="1" min="1" max="9999" readonly>
+                            </div>
+                            <div id="datelist" class="datelist"></div>
+                        </div>
+                    </div>
+                    <div></div>
+                </div>
+            </div>
+            <div class="statusbar" id="status"></div>
+        </div>
+    </body>
+</html>

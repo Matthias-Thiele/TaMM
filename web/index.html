@@ -27,6 +27,7 @@
             }
         </style>
         <script src="common.js"></script> 
+        <script src="task.js"></script> 
         <script>
             var sessionData;
             var selectedTask;
@@ -64,65 +65,9 @@
                 };
             }
             
-            
-            /**
-             * Creates a new empty task item and displays it in the form area.
-             * @returns {undefined}
-             */
-            function addTask() {
-                var task = {};
-                task.lid = "-1";
-                fillForm(task);
-            }
-
-            /**
-             * Displays the given task item in the form area.
-             * @param {type} taskData
-             * @returns {undefined}
-             */
-            function fillForm(taskData) {
-                hideDialog();
-                selectedTask = taskData;
-                document.getElementById("advance").disabled = taskData.lId === "-1";
-                var status = document.getElementById("status");
-                status.innerText = "";
-                
-                setValue("tasklid", taskData.lId);
-                setValue("name", taskData.name);
-                setValue("description", taskData.description);
-                setValue("owner", userlist.nameFromId(taskData.owner));
-                setValue("duedate", taskData.nextDueDate);
-                fillInterval(taskData.interval);
-                
-                document.getElementById("save").disabled = true;
-            }
-            
-            /**
-             * Splits the given intervalData string into parts
-             * and fill the interval fields with the given values.
-             * 
-             * @param {type} intervalData
-             * @returns {undefined}
-             */
-            function fillInterval(intervalData) {
-                var intervalInitNeeded = true;
-                if (intervalData) {
-                    var intervalParts = intervalData.split("|");
-                    if (intervalParts.length === 3) {
-                        document.getElementById(intervalParts[0]).checked = true;
-                        setValue("divider", intervalParts[1]);
-                        var startDates = intervalParts[2].split(";");
-                        document.getElementById("datelist").innerHTML = "";
-                        startDates.forEach((startDate) => {addDateField(startDate);});
-                        intervalInitNeeded = false;
-                    }
-                }
-                
-                if (intervalInitNeeded) {
-                    document.getElementById("single").checked = true;
-                    document.getElementById("divider").value = 1;
-                    document.getElementById("datelist").innerHTML = "";
-                    addDateField();
+            function doHistory() {
+                if (selectedTask.lId !== "-1") {
+                    window.open("history.html?taskid=" + selectedTask.lId, "history");
                 }
             }
             
@@ -264,37 +209,6 @@
             }
             
             /**
-             * Populates the tasklist with the selection of the
-             * returned task items.
-             * @param {type} tasklist
-             * @returns {undefined}
-             */
-            function listTasks(tasklist) {
-                var list = document.getElementById("tasklist");
-                list.innerHTML = "";
-                var td = toDay();
-                tasklist.forEach((task) => {
-                    var newItem = document.createElement("div");
-                    newItem.className = "listitem";
-                    var taskName = document.createElement("div");
-                    taskName.className = "taskname";
-                    taskName.innerText = task.name;
-                    var dueDate = document.createElement("div");
-                    dueDate.innerText = task.nextDueDate;
-                    dueDate.className = "duedate";
-                    if (task.nextDueDate < td) {
-                        dueDate.classList.add("escalated");
-                    }
-                    
-                    newItem.appendChild(taskName);
-                    newItem.appendChild(dueDate);
-                    newItem.userData = task;
-                    newItem.onclick = function() {fillForm(task);};
-                    list.appendChild(newItem);
-                });
-            }
-            
-            /**
              * Save button enabled after changig an input element.
              * @returns {undefined}
              */
@@ -303,71 +217,12 @@
                 hideDialog();
             }
             
-            /**
-             * Adds a date field into the list of start dates.
-             * @param {type} initialValue
-             * @returns {undefined}
-             */
-            function addDateField(initialValue) {
-                var root = document.getElementById("datelist");
-                var dateField = document.createElement("input");
-                dateField.type = "date";
-                dateField.style = "margin-right: 5pt;";
-                dateField.name = "startdate";
-                dateField.onchange = function() {changed();};
-                if (initialValue) {
-                    dateField.value = initialValue;
-                }
-                root.appendChild(dateField);
-            }
-            
-            /**
-             * Reads the values of the interval fields and build
-             * the interval string for storage.
-             * @returns {String}
-             */
-            function getInterval() {
-                var interval = document.querySelector('input[name="interval"]:checked').value;
-                var divider = document.getElementById("divider").value;
-                var dates = getValues("startdate", ";");
-                return interval + "|" + divider + "|" + dates;
-            }
             
             function toDay() {
                 return new Date().toISOString().split('T')[0];
             }
         </script>
         <style>
-            input[type=radio] {
-            display: none;
-                & ~ label {
-                    cursor: pointer;
-                    background-color: #f8f8fc;
-                    border-radius: 3px;
-                    box-shadow: 2px 1px 1px gray;
-                    padding: 3pt;
-                    margin: 3pt;
-                    width: 80pt;
-                    text-align: center;
-                }
-            }
-            
-            input[type="radio"]:checked + label {
-                background-color: #e0e0ff;
-            }
-               
-            .datelist {
-                margin: 5pt;
-            }
-            
-            .flex-container {
-                display: flex;
-            }
-   
-            .flex-container > div {
-                margin: 10px;
-                padding: 8px;
-            }
         </style>
     </head>
     <body onload="loadSessionData();">
@@ -414,6 +269,7 @@
                     <div><label for="name">Bezeichnung</label><input onchange="changed()" size="30" type="text" id="name"></div>
                     <div><label for="description">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
                     <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
+                    <div><label for="lastchanged">Erledigt am</label><input id="lastchanged" readonly></div>
                     <div><label for="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed()"></div>
                     <div><label for="duedate">Nächster Start</label><input id="duedate" type="date" onchange="changed()"></div>
                     <hr>
@@ -433,7 +289,11 @@
                             <div id="datelist" class="datelist"><input name="startdate" type="date" style="margin-right: 5pt" onchange="changed()"></div>
                         </div>
                     </div>
-                    <div><button id="save" disabled onclick="doSave();" style="margin-right: 5pt;">Speichern</button><button id="advance" disabled onclick="doAdvance();">Erledigt</button></div>
+                    <div>
+                        <button id="save" disabled onclick="doSave();" style="margin-right: 5pt;">Speichern</button>
+                        <button id="advance" disabled onclick="doAdvance();">Erledigt</button>
+                        <button id="history" onclick="doHistory();">History</button>
+                    </div>
                 </div>
             </div>
             <div class="statusbar" id="status"></div>
