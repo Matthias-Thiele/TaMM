@@ -42,7 +42,98 @@ function fillForm(taskData) {
     if (btSave) {
         btSave.disabled = true;
     }
+    
+    loadAttachments();
 }
+
+/**
+ * Create a new attachment download link element.
+ * 
+ * @param {type} a attachment data.
+ * @returns {HTMLElement|makeAttachmentLink.anchor}
+ */
+function makeAttachmentLink(a) {
+    var anchor = document.createElement("a");
+    anchor.style = "text-decoration: none; color: black";
+    var div = document.createElement("div");
+    var text = document.createTextNode(a.fileName);
+    div.appendChild(text);
+    div.className = "filelistitem";
+    anchor.appendChild(div);
+    var url = "upload/" + a.guid + "/" + a.fileName;
+    anchor.href = url;
+    anchor.target = "_blank";
+    return anchor;
+}
+
+/**
+ * Load the list of attachment of this task
+ * and render a selection list in the user
+ * interface.
+ * 
+ * @returns {undefined}
+ */
+async function loadAttachments() {
+    const response = await fetch("system/attachments/" + selectedTask.lId, {'method': 'GET'});
+    const responseData = await response.json();
+    console.log(responseData);
+
+    let filelist = document.getElementById("filelist");
+    filelist.innerHTML = "";
+    
+    var attachments = responseData.data;
+    attachments.forEach((a) => {
+        filelist.appendChild(makeAttachmentLink(a));
+    });
+}
+
+/**
+ * Upload selected files to the server.
+ * 
+ * @returns {undefined}
+ */
+async function uploadFile() {
+  let uploadfile = document.getElementById("uploadfile");
+  let parent = uploadfile.parentNode;
+  let filelist = document.getElementById("filelist");
+  let formData = new FormData(); 
+  let taskid = selectedTask.lId;
+  formData.append("taskid", taskid);
+
+  var newElements = [];
+  for (var i = 0; i < uploadfile.files.length; i++) {
+      formData.append("file", uploadfile.files[i]); 
+      var name = uploadfile.files[i].name;
+      var data = {};
+      data.guid = "!!!placeholder!!!";
+      data.fileName = name;
+      var anchor = makeAttachmentLink(data);
+      filelist.appendChild(anchor);
+      newElements.push(anchor);
+  }
+  var newInput = document.createElement("input");
+  newInput.type = "file";
+  newInput.multiple = true;
+  newInput.id=uploadfile.id;
+  newInput.onchange = uploadfile.onchange;
+
+  parent.replaceChild(newInput, uploadfile);
+  const response = await fetch('upload', {
+    method: "POST", 
+    body: formData
+  }); 
+  
+  // update guid in href
+  const responseData = await response.json();
+  console.log(responseData);
+  for (var i = 0; i < newElements.length; i++) {
+      var guid = responseData.data[i];
+      var href = newElements[i].href;
+      href = href.replace("!!!placeholder!!!", guid);
+      newElements[i].href = href;
+  }
+}
+
 
 /**
  * Splits the given intervalData string into parts

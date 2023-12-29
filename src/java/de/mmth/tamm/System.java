@@ -31,6 +31,8 @@ public class System extends HttpServlet {
   @Override
   public void init() {
     application.setSchema("tamm");
+    var sc = this.getServletContext();
+    sc.setAttribute("application", application);
   }
   
   /**
@@ -63,7 +65,8 @@ public class System extends HttpServlet {
           throw new TammError("Invalid client access.");
         }
 
-        getProcessor.process(sd, cmd, content, out);
+        String cmd4 = (uriParts.length > 4) ? uriParts[4] : "";
+        getProcessor.process(sd, cmd, content, out, cmd4);
         out.flush();
       } catch(TammError te) {
         ServletUtils.sendResult(out, false, "", "", te.getMessage(), null);

@@ -6,16 +6,19 @@ package de.mmth.tamm.utils;
 
 import com.google.gson.Gson;
 import de.mmth.tamm.ApplicationData;
+import de.mmth.tamm.data.AttachmentData;
 import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.SessionData;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
@@ -76,7 +79,7 @@ public class ServletUtils {
     }
     
     if ((session.user != null) && session.user.mainAdmin) {
-      session.clientList = new ArrayList<KeyValue>(application.clientList.size()); 
+      session.clientList = new ArrayList<>(application.clientList.size()); 
       for (var client: application.clientList) {
         session.clientList.add(new KeyValue(client.id, client.name));
       }
@@ -93,6 +96,7 @@ public class ServletUtils {
    * @param nextPageOk
    * @param nextPageError
    * @param errorMsg
+   * @param data
    * @throws IOException 
    */
   public static void sendResult(OutputStream resultData, boolean isOk, String nextPageOk, String nextPageError, String errorMsg, Object data) throws IOException {
@@ -151,5 +155,12 @@ public class ServletUtils {
     }
   }
   
-  
+  public static File prepareDestinationPath(File fileRoot, AttachmentData data) throws IOException {
+    File clientDir = new File(fileRoot, "Client_" + data.clientId);
+    File scatterDir = new File(clientDir, "Guid_" + data.guid.substring(0, 2));
+    Files.createDirectories(scatterDir.toPath());
+    
+    File destinationFile = new File(scatterDir, data.guid);
+    return destinationFile;
+  }
 }

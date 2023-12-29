@@ -25,6 +25,19 @@
             .escalated {
                 color: #c00040;
             }
+            
+            .filelistitem {
+                margin-top: 4pt;
+                padding: 6pt;
+                background-color: #f8f8fc;
+                border-right: 3pt;
+                cursor: pointer;
+            }
+            
+            .filelistitem:hover {
+                background-color: #d0d0ff;
+                border: 1px solid navy;
+            }
         </style>
         <script src="common.js"></script> 
         <script src="task.js"></script> 
@@ -221,6 +234,7 @@
             function toDay() {
                 return new Date().toISOString().split('T')[0];
             }
+            
         </script>
         <style>
         </style>
@@ -287,6 +301,10 @@
                                 <button style="margin-left: 10pt;" id="dateadd" onclick="addDateField();">+ Startdatum hinzufügen</button>
                             </div>
                             <div id="datelist" class="datelist"><input name="startdate" type="date" style="margin-right: 5pt" onchange="changed()"></div>
+                        </div>
+                        <div>
+                            <input id="uploadfile" type="file" multiple onchange="uploadFile()"/>
+                            <div id="filelist" style="margin-top: 5pt;"></div>
                         </div>
                     </div>
                     <div>

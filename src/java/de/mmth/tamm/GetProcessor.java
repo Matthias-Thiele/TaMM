@@ -43,7 +43,7 @@ public class GetProcessor {
    * @throws IOException 
    * @throws de.mmth.tamm.TammError 
    */
-  public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData) throws IOException, TammError {
+  public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData, String cmd4) throws IOException, TammError {
     switch (cmd) {
       case "session":
         processSession(resultData, session);
@@ -55,6 +55,10 @@ public class GetProcessor {
         
       case "clientlist":
         processClientList(resultData, session);
+        break;
+        
+      case "attachments":
+        processAttachmentsList(resultData, session, cmd4);
         break;
     }
   }
@@ -96,6 +100,11 @@ public class GetProcessor {
   
   private void processClientList(OutputStream resultData, SessionData session) throws IOException, TammError {
     ServletUtils.sendResult(resultData, true, "", "", "", application.clientList);
+  }
+  
+  private void processAttachmentsList(OutputStream resultData, SessionData session, String param) throws IOException, TammError {
+    var attachmentList = application.attachments.listAttachments(session.client.id, Long.parseLong(param));
+    ServletUtils.sendResult(resultData, true, "", "", "", attachmentList);
   }
   
 }

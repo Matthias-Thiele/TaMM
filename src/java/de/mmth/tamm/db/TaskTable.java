@@ -222,7 +222,7 @@ public class TaskTable extends DBTable {
   }
   
   /**
-   * Copies the ResultSet user data into an TaskData object.
+   * Copies the ResultSet task data into an TaskData object.
    * 
    * @param taskRows
    * @return

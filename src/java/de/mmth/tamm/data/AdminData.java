@@ -13,4 +13,5 @@ public class AdminData {
   public String dburl;
   public String name;
   public String password;
+  public String uploadbase;
 }
