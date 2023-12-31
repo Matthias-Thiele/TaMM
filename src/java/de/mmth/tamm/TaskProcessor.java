@@ -53,6 +53,13 @@ public class TaskProcessor {
       taskData.creator = session.user.id;
     }
     
+    if (taskData.owner < 1) {
+      taskData.owner = session.client.id;
+    }
+    
+    if (taskData.nextDueDate.isBlank()) {
+      taskData.nextDueDate = nextDueDate(taskData);
+    }
     taskData.clientId = session.client.id;
     long lid = application.tasks.writeTask(taskData, false);
     logger.debug("Task written: " + lid + " : " + taskData.name);
@@ -120,15 +127,14 @@ public class TaskProcessor {
       throw new TammError("Not your task.");
     }
     
-    Interval interval = new Interval(taskData.interval);
-    if (!interval.isValid()) {
-      throw new TammError("Invalid interval.");
-    }
-    
-    String next = interval.nextDate(taskData.nextDueDate);
     var rememberNextDueDate = taskData.nextDueDate;
-    taskData.nextDueDate = next;
-    application.tasks.writeTask(taskData, false);
+    String next = nextDueDate(taskData);
+    if (next.isEmpty()) {
+      application.tasks.removeTask(taskData);
+    } else {
+      taskData.nextDueDate = next;
+      application.tasks.writeTask(taskData, false);
+    }
     
     // create history data record
     taskData.startDate = rememberNextDueDate;
@@ -136,6 +142,16 @@ public class TaskProcessor {
     
     ServletUtils.sendResult(resultData, true, "", "", next, null);
     
+  }
+  
+  private String nextDueDate(TaskData taskData) throws TammError {
+    Interval interval = new Interval(taskData.interval);
+    if (!interval.isValid()) {
+      throw new TammError("Invalid interval.");
+    }
+    
+    var result = interval.nextDate(taskData.nextDueDate);
+    return (result == null) ? "" : result;
   }
   
 }

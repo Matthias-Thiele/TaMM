@@ -27,6 +27,7 @@ public class System extends HttpServlet {
   private final ApplicationData application = new ApplicationData();
   private final PostProcessor postProcessor = new PostProcessor(application);
   private final GetProcessor getProcessor = new GetProcessor(application);
+  private final DeleteProcessor deleteProcessor = new DeleteProcessor(application);
   
   @Override
   public void init() {
@@ -125,6 +126,48 @@ public class System extends HttpServlet {
     }
   }
 
+  /**
+   * Processes incoming delete requests.
+   * 
+   * @param request
+   * @param response
+   * @throws ServletException
+   * @throws IOException 
+   */
+  @Override
+  protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
+    try (InputStream content = request.getInputStream()) {
+      ServletOutputStream out = response.getOutputStream();
+      try {
+        SessionData sd = ServletUtils.prepareSession(request);
+
+        String requestUri = request.getRequestURI();
+        String[] uriParts = requestUri.split("/");
+        String cmd = uriParts[3];
+
+        if (!application.checkInit() && !cmd.equals("initdata")) {
+          logger.warn("Missing initialisation data, request aborted.");
+          ServletUtils.gotoErrorPage(out);
+          return;
+        }
+
+        if (!ServletUtils.checkClientId(request, sd, application)) {
+          throw new TammError("Invalid client access.");
+        }
+
+        String cmd4 = (uriParts.length > 4) ? uriParts[4] : "";
+        deleteProcessor.process(sd, cmd, content, out, cmd4);
+        out.flush();
+      } catch(TammError te) {
+        ServletUtils.sendResult(out, false, "", "", te.getMessage(), null);
+      } catch(Throwable ex) {
+        // dont leak internal exceptions to browser
+        logger.warn("Unexpected error in delete processing.", ex);
+      }
+    }
+  }
+  
   /**
    * Returns a short description of the servlet.
    *

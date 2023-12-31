@@ -177,6 +177,7 @@
                             } else {
                                 emptyTask = {};
                                 fillForm(emptyTask);
+                                setTimeout(filterTasks, 200);
                             }
                         } else {
                             if (!response.message) {
@@ -214,6 +215,7 @@
                         if (response.result !== "error") {
                           listTasks(response);
                           status.innerText = "";
+                          document.getElementById("filtervalue").focus();
                         } else {
                           status.innerText = "Unbekannter Fehler beim Suchen.";
                         }
@@ -235,6 +237,12 @@
                 return new Date().toISOString().split('T')[0];
             }
             
+            function doRemove() {
+                removeTask(selectedTask.lId);
+                emptyTask = {};
+                fillForm(emptyTask);
+                setTimeout(filterTasks, 200);
+            }
         </script>
         <style>
         </style>
@@ -310,8 +318,9 @@
                     </div>
                     <div>
                         <button id="save" disabled onclick="doSave();" style="margin-right: 5pt;">Speichern</button>
-                        <button id="advance" disabled onclick="doAdvance();">Erledigt</button>
-                        <button id="history" onclick="doHistory();">History</button>
+                        <button id="advance" disabled onclick="doAdvance();" style="margin-right: 5pt;">Erledigt</button>
+                        <button id="history" onclick="doHistory();" style="margin-right: 5pt;" disabled>History</button>
+                        <button id="remove" onclick="doRemove();" style="margin-right: 5pt;" disabled>Löschen</button>
                     </div>
                 </div>
             </div>

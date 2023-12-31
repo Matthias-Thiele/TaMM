@@ -10,8 +10,22 @@
  */
 function addTask() {
     var task = {};
-    task.lid = "-1";
+    task.lId = "-1";
     fillForm(task);
+}
+
+/**
+ * Disables given button if there is no valid task.
+ * 
+ * @param {type} buttonName
+ * @param {type} taskId
+ * @returns {undefined}
+ */
+function disableButton(buttonName, taskId) {
+    var bt = document.getElementById(buttonName);
+    if (bt) {
+        bt.disabled = (taskId === "-1") || !taskId;
+    }
 }
 
 /**
@@ -22,10 +36,9 @@ function addTask() {
 function fillForm(taskData) {
     hideDialog();
     selectedTask = taskData;
-    var btAdv = document.getElementById("advance");
-    if (btAdv) {
-        btAdv.disabled = taskData.lId === "-1";
-    }
+    disableButton("advance", taskData.lId);
+    disableButton("remove", taskData.lId);
+    disableButton("history", taskData.lId);
     
     var status = document.getElementById("status");
     status.innerText = "";
@@ -44,6 +57,7 @@ function fillForm(taskData) {
     }
     
     loadAttachments();
+    document.getElementById("name").focus();
 }
 
 /**
@@ -107,6 +121,17 @@ async function removeAttachment(event, node, attachGuid) {
     node.parentNode.removeChild(node);
 }
 
+async function removeTask(taskId) {
+    if ((selectedTask.lId === "-1") || !selectedTask.lId) {
+        // new task, has not been stored before.
+        return;
+    }
+    
+    const response = await fetch("system/removetask/" + selectedTask.lId, {'method': 'DELETE'});
+    const responseData = await response.json();
+    console.log(responseData);
+}
+
 /**
  * Load the list of attachment of this task
  * and render a selection list in the user
@@ -115,6 +140,11 @@ async function removeAttachment(event, node, attachGuid) {
  * @returns {undefined}
  */
 async function loadAttachments() {
+    if ((selectedTask.lId === "-1") || !selectedTask.lId) {
+        // new task, has not been stored before.
+        return;
+    }
+    
     const response = await fetch("system/attachments/" + selectedTask.lId, {'method': 'GET'});
     const responseData = await response.json();
     console.log(responseData);
@@ -185,13 +215,14 @@ async function uploadFile() {
  */
 function fillInterval(intervalData) {
     var intervalInitNeeded = true;
+    document.getElementById("datelist").innerHTML = "";
+    
     if (intervalData) {
         var intervalParts = intervalData.split("|");
         if (intervalParts.length === 3) {
             document.getElementById(intervalParts[0]).checked = true;
             setValue("divider", intervalParts[1]);
             var startDates = intervalParts[2].split(";");
-            document.getElementById("datelist").innerHTML = "";
             startDates.forEach((startDate) => {addDateField(startDate);});
             intervalInitNeeded = false;
         }

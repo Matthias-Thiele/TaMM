@@ -247,4 +247,31 @@ public class TaskTable extends DBTable {
     return result;
   }
 
+  /**
+   * Removes task from database.
+   * 
+   * This call does not remove the attachment list, since
+   * these attachments are also used by the history table.
+   * 
+   * @param taskData
+   * @throws TammError 
+   */
+  public void removeTask(TaskData taskData) throws TammError {
+    String cmd;
+    cmd = "DELETE FROM " + tableName + " where lId = ?";
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        var col = 1;
+        stmt.setLong(col++, taskData.lId);
+
+        stmt.execute();
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error deleting task.", ex);
+      throw new TammError("Error deleting task.");
+    }
+  }
+
 }

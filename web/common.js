@@ -145,8 +145,12 @@ function toDay() {
 }
 
 function formatIso(dateTime) {
-    var parts = dateTime.split("T");
-    return parts.join(" ");
+    if (dateTime) {
+        var parts = dateTime.split("T");
+        return parts.join(" ");
+    } else {
+        return "";
+    }
 }
 
 /**

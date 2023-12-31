@@ -33,6 +33,7 @@ public class GetProcessor {
   public GetProcessor(ApplicationData application) {
     this.application = application;
   }
+  
   /**
    * Process incoming post request.
    * 
@@ -40,6 +41,7 @@ public class GetProcessor {
    * @param cmd
    * @param sourceData
    * @param resultData
+   * @param cmd4
    * @throws IOException 
    * @throws de.mmth.tamm.TammError 
    */
