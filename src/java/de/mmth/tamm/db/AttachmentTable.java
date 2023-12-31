@@ -24,7 +24,7 @@ public class AttachmentTable extends DBTable {
     """
     lid L
     clientid I
-    name V 100
+    name V 250
     guid V 40
     """;
   

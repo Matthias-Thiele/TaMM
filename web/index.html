@@ -34,13 +34,16 @@
                 margin-top: 4pt;
                 padding: 6pt;
                 background-color: #f8f8fc;
-                border-right: 3pt;
+                border: 1px solid #f0f0f8;
+                border-radius: 3pt;
                 cursor: pointer;
+                max-width: 250pt;
+                overflow-wrap: break-word;
             }
             
             .filelistitem:hover {
                 background-color: #d0d0ff;
-                border: 1px solid navy;
+                border: 1px solid #c0c0f0;
             }
         </style>
         <script src="common.js"></script> 
@@ -245,8 +248,6 @@
             }
   
         </script>
-        <style>
-        </style>
     </head>
     <body onload="loadSessionData();">
         <div class="hamburger-menu">
@@ -288,8 +289,8 @@
                     <div id="tasklist" class="selectlist"></div>
                 </div>
                 <div class="">
-                    <div><label for="tasklid">Id</label><input type="text" id="tasklid" readonly></div>
-                    <div><label for="name">Bezeichnung</label><input onchange="changed()" size="30" type="text" id="name"></div>
+                    <div class="subheader">Aufgabenbeschreibung</div>
+                    <div><label for="name">Bezeichnung</label><input onchange="changed()" size="50" type="text" id="name"><input type="text" id="tasklid" readonly hidden></div>
                     <div><label for="description">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
                     <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
                     <div><label for="lastchanged">Geändert am</label><input id="lastchanged" readonly></div>
@@ -307,14 +308,13 @@
                         </div>
                         <div>
                             <div class="subheader">Startdatum</div>
-                            <div>Teiler <input type="number" id="divider" style="width: 40pt" value="1" min="1" max="9999" onchange="changed()">
-                                <button style="margin-left: 10pt;" id="dateadd" onclick="addDateField();">+ Datum hinzufügen</button>
-                            </div>
+                            <div>Teiler <input type="number" id="divider" style="width: 40pt; margin-bottom: 6pt;" value="1" min="1" max="9999" onchange="changed()"></div>
+                            <div><button id="dateadd" onclick="addDateField();">+ Datum hinzufügen</button></div>
                             <div id="datelist" class="datelist"><input name="startdate" type="date" style="margin-right: 5pt" onchange="changed()"></div>
                         </div>
                         <div>
                             <div class="subheader">Dateianbindungen</div>
-                            <input id="uploadfile" type="file" multiple onchange="uploadFile()"/>
+                            <input id="uploadfile" type="file" multiple onchange="uploadFile()" style="max-width: 300pt;"/>
                             <div id="filelist" style="margin-top: 5pt;">
                             </div>
                         </div>

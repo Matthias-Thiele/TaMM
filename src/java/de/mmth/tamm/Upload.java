@@ -111,6 +111,10 @@ public class Upload extends HttpServlet {
         continue;
       }
       
+      if (fileName.length() > 198) {
+        fileName = fileName.substring(0, 150) + "..." + fileName.substring(fileName.length() - 45);
+      }
+      
       AttachmentData attachment = new AttachmentData();
       attachment.fileName = fileName;
       attachment.taskId = taskId;
