@@ -176,6 +176,10 @@ public class Interval {
    * @return 
    */
   private String nextDailyDate(String afterThisDate, int localDivider, String[] localIsoDates) {
+    if (afterThisDate.isBlank()) {
+      afterThisDate = DateUtils.toDay();
+    }
+    
     LocalDate dateAfter = DateUtils.fromIso(afterThisDate);
     if (localIsoDates.length == 1) {
       LocalDate nextDay = dateAfter.plusDays(localDivider);

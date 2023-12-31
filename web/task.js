@@ -69,11 +69,11 @@ function fillForm(taskData) {
 function makeAttachmentLink(a) {
     var div = document.createElement("div");
     var anchor = document.createElement("a");
-    anchor.style = "text-decoration: none; color: black";
+    anchor.style = "text-decoration: none; color: black; border 1px solid blue";
     var text = document.createElement("span");
     text.innerText = a.fileName;
     text.style = "width: calc(100% - 25px); display:inline-block";
-    anchor.appendChild(text);
+    //anchor.appendChild(text);
     var url = "upload/" + a.guid + "/" + a.fileName;
     anchor.href = url;
     anchor.target = "_blank";
@@ -85,6 +85,7 @@ function makeAttachmentLink(a) {
     button.style = "float: right";
     
     div.appendChild(anchor);
+    div.appendChild(text);
     div.appendChild(button);
     div.onclick = function(event) { redirectClick(event, anchor);};
     div.className = "filelistitem";
@@ -199,9 +200,10 @@ async function uploadFile() {
   console.log(responseData);
   for (var i = 0; i < newElements.length; i++) {
       var guid = responseData.data[i];
-      var href = newElements[i].href;
+      var anchor = newElements[i].childNodes[0];
+      var href = anchor.href;
       href = href.replace("!!!placeholder!!!", guid);
-      newElements[i].href = href;
+      anchor.href = href;
   }
 }
 
