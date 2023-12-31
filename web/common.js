@@ -140,8 +140,13 @@ function showBlockElement(elementName, doShow) {
  * 
  * @returns {String}
  */
-function toDay() {
-    return new Date().toJSON().slice(0, 10);
+function toDay(daysOffset) {
+    var dt = new Date();
+    if (daysOffset) {
+        dt.setDate(dt.getDate() + daysOffset);
+    }
+    
+    return dt.toJSON().slice(0, 10);
 }
 
 function formatIso(dateTime) {

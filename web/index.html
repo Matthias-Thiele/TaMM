@@ -26,6 +26,10 @@
                 color: #c00040;
             }
             
+            .futuretask {
+                color: #606068;
+            }
+            
             .filelistitem {
                 margin-top: 4pt;
                 padding: 6pt;
@@ -232,10 +236,6 @@
                 hideDialog();
             }
             
-            
-            function toDay() {
-                return new Date().toISOString().split('T')[0];
-            }
             
             function doRemove() {
                 removeTask(selectedTask.lId);

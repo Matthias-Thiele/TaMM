@@ -248,6 +248,10 @@ function listTasks(tasklist) {
     var list = document.getElementById("tasklist");
     list.innerHTML = "";
     var td = toDay();
+    var nextWeek = toDay(7);
+    var futureBarInserted = false;
+    var insertEscalationBar = false;
+    
     tasklist.forEach((task) => {
         var newItem = document.createElement("div");
         newItem.className = "listitem";
@@ -259,6 +263,22 @@ function listTasks(tasklist) {
         dueDate.className = "duedate";
         if (task.nextDueDate < td) {
             dueDate.classList.add("escalated");
+            insertEscalationBar = true;
+        } else if (insertEscalationBar) {
+            insertEscalationBar = false;
+            bar = document.createElement("div");
+            bar.style = "height: 10pt;";
+            list.appendChild(bar);
+        }
+        if (task.nextDueDate > nextWeek) {
+            newItem.classList.add("futuretask");
+            dueDate.classList.add("futuretask");
+            if (!futureBarInserted) {
+                futureBarInserted = true;
+                bar = document.createElement("div");
+                bar.style = "height: 10pt;";
+                list.appendChild(bar);
+            }
         }
 
         newItem.appendChild(taskName);
