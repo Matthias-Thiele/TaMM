@@ -4,6 +4,8 @@
  */
 package de.mmth.tamm;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import de.mmth.tamm.data.AttachmentData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.utils.ServletUtils;
@@ -17,10 +19,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,6 +41,7 @@ import org.apache.logging.log4j.Logger;
 )
 public class Upload extends HttpServlet {
   private static final Logger logger = LogManager.getLogger(Upload.class);
+  private final Gson gson = new GsonBuilder().create();
   private FileProcessor fileProcessor = null;
   
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -115,7 +120,7 @@ public class Upload extends HttpServlet {
       
       result.add(attachment.guid);
       try {
-        application.attachments.writeTask(attachment);
+        application.attachments.writeAttachment(attachment);
       } catch (TammError ex) {
         message = "Error writing file attachment.";
       }
@@ -128,6 +133,31 @@ public class Upload extends HttpServlet {
     ServletUtils.sendResult(response.getOutputStream(), message.isBlank(), "", "", message, result);
   }
 
+  @Override
+  public void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    SessionData sd = ServletUtils.prepareSession(request);
+    ApplicationData application = getApplication();
+    String requestUri = request.getRequestURI();
+    String[] uriParts = requestUri.split("/");
+    String guid = uriParts[3];
+      
+    logger.info("Delete " + guid);
+    AttachmentData att = new AttachmentData();
+    att.guid = guid;
+    att.clientId = sd.client.id;
+    String message = "";
+    try {
+      application.attachments.removeAttachment(att);
+      File dest = ServletUtils.prepareDestinationPath(application.rootPath, att);
+      dest.delete();
+    } catch (TammError ex) {
+      message = "Error deleting attachment.";
+      logger.warn(message, ex);
+    }
+    
+    ServletUtils.sendResult(response.getOutputStream(), message.isBlank(), "", "", message, null);
+  }
+  
   /**
    * Returns a short description of the servlet.
    *

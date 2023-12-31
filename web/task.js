@@ -53,17 +53,58 @@ function fillForm(taskData) {
  * @returns {HTMLElement|makeAttachmentLink.anchor}
  */
 function makeAttachmentLink(a) {
+    var div = document.createElement("div");
     var anchor = document.createElement("a");
     anchor.style = "text-decoration: none; color: black";
-    var div = document.createElement("div");
-    var text = document.createTextNode(a.fileName);
-    div.appendChild(text);
-    div.className = "filelistitem";
-    anchor.appendChild(div);
+    var text = document.createElement("span");
+    text.innerText = a.fileName;
+    text.style = "width: calc(100% - 25px); display:inline-block";
+    anchor.appendChild(text);
     var url = "upload/" + a.guid + "/" + a.fileName;
     anchor.href = url;
     anchor.target = "_blank";
-    return anchor;
+    
+    var button = document.createElement("button");
+    var x = document.createTextNode("\u274C");
+    button.appendChild(x);
+    button.onclick = function(event) {removeAttachment(event, div, a.guid);};
+    button.style = "float: right";
+    
+    div.appendChild(anchor);
+    div.appendChild(button);
+    div.onclick = function(event) { redirectClick(event, anchor);};
+    div.className = "filelistitem";
+    return div;
+}
+
+/**
+ * User clicked outside of the anchor area, redirect it
+ * to the anchor to view the document.
+ * 
+ * Do not redirect the delete button click.
+ * 
+ * @param {type} event
+ * @param {type} anchor
+ * @returns {undefined}
+ */
+function redirectClick(event, anchor) {
+    if (event.target.nodeName !== "BUTTON") {
+        anchor.click(); 
+    }   
+}
+
+/**
+ * User clicked the delete attachment button.
+ * 
+ * @param {type} event
+ * @param {type} node
+ * @param {type} attachGuid
+ * @returns {undefined}
+ */
+async function removeAttachment(event, node, attachGuid) {
+    console.log("Remove guid: " + attachGuid);
+    const response = await fetch("upload/" + attachGuid, {'method': 'DELETE'});
+    node.parentNode.removeChild(node);
 }
 
 /**

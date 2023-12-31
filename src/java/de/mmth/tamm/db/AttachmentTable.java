@@ -45,7 +45,7 @@ public class AttachmentTable extends DBTable {
    * @param attachment
    * @throws TammError 
    */
-  public void writeTask(AttachmentData attachment) throws TammError {
+  public void writeAttachment(AttachmentData attachment) throws TammError {
     String cmd;
     cmd = "INSERT INTO " + tableName + " (" + insertNames + ") values " + paramPlaceholders;
     logger.debug("SQL: " + cmd);
@@ -63,6 +63,34 @@ public class AttachmentTable extends DBTable {
     } catch (SQLException ex) {
       logger.warn("Error writing attachment data.", ex);
       throw new TammError("Error writing attachment data.");
+    }
+  }
+
+  /**
+   * Remove attachment from the attachment table.
+   * 
+   * This function does not delete the file. This has
+   * to be done by the caller after successful deletion.
+   * 
+   * @param attachment
+   * @throws TammError 
+   */
+  public void removeAttachment(AttachmentData attachment) throws TammError {
+    String cmd;
+    cmd = "DELETE FROM " + tableName + " where clientid = ? and guid = ? ";
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        var col = 1;
+        stmt.setInt(col++, attachment.clientId);
+        stmt.setString(col++, attachment.guid);
+
+        stmt.execute();
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error deleting attachment data.", ex);
+      throw new TammError("Error deleting attachment data.");
     }
   }
 
