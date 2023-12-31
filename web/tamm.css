@@ -26,6 +26,12 @@ body {
     padding: 5px;
 }
 
+.subheader {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 6pt;
+    margin-bottom: 3pt;
+}
 
 label {
     width: 130pt;

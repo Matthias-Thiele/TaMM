@@ -48,7 +48,9 @@ function fillForm(taskData) {
     setValue("description", taskData.description);
     setValue("owner", userlist.nameFromId(taskData.owner));
     setValue("duedate", taskData.nextDueDate);
-    setValue("lastchanged", formatIso(taskData.lastChanged));
+    setValue("createdate", formatIso(taskData.createDate));
+    var changed = (taskData.createDate === taskData.lastChanged) ? "" : taskData.lastChanged
+    setValue("lastchanged", formatIso(changed));
     fillInterval(taskData.interval);
 
     var btSave = document.getElementById("save");
