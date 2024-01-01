@@ -12,11 +12,11 @@ import de.mmth.tamm.db.ClientTable;
 import de.mmth.tamm.db.DBConnect;
 import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
+import de.mmth.tamm.progress.SendMail;
 import de.mmth.tamm.utils.RequestCache;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,12 +33,13 @@ public class ApplicationData {
   private static final String DB_NAME = "dbname";
   private static final String DB_PASSWORD = "dbpassword";
   private static final String FILE_UPLOAD_BASE = "uploadbase";
+  private static final String MAIL_HOST = "mailhost";
+  private static final String MAIL_ADMIN = "mailadmin";
+  private static final String MAIL_PWD = "mailpwd";
+  private static final String MAIL_REPLY = "mailreply";
   
   private String schemaName;
-  private String dbUrl;
-  private String dbAdmin;
-  private String dbPassword;
-  private String uploadBase;
+  public AdminData adminData = new AdminData();
   
   public DBConnect db;
   public UserTable users;
@@ -53,6 +54,7 @@ public class ApplicationData {
   public Map<String, ClientData> clientNames;
   public File rootPath;
   public AttachmentTable attachments;
+  public SendMail mailer = null;
   
   /**
    * Reads the database access information from the registry
@@ -66,13 +68,17 @@ public class ApplicationData {
     }
     
     var prefs = Preferences.userRoot().node("Tamm");
-    dbUrl = prefs.get(DB_URL, "");
-    dbAdmin = prefs.get(DB_NAME, "");
-    dbPassword = prefs.get(DB_PASSWORD, "");
-    uploadBase = prefs.get(FILE_UPLOAD_BASE, "/var/TaMM/files");
+    adminData.dburl = prefs.get(DB_URL, "");
+    adminData.name = prefs.get(DB_NAME, "");
+    adminData.password = prefs.get(DB_PASSWORD, "");
+    adminData.uploadbase = prefs.get(FILE_UPLOAD_BASE, "/var/TaMM/files");
+    adminData.mailadminname = prefs.get(MAIL_ADMIN, "");
+    adminData.mailadminpwd = prefs.get(MAIL_PWD, "");
+    adminData.mailhost = prefs.get(MAIL_HOST, "");
+    adminData.mailreply = prefs.get(MAIL_REPLY, "");
     
-    if (!dbUrl.isBlank() && !dbAdmin.isBlank() && !dbPassword.isBlank()) {
-      DBConnect con = new DBConnect(dbUrl, schemaName, dbAdmin, dbPassword);
+    if (!adminData.dburl.isBlank() && !adminData.name.isBlank() && !adminData.password.isBlank()) {
+      DBConnect con = new DBConnect(adminData.dburl, schemaName, adminData.name, adminData.password);
       if (con.isValid()) {
         db = con;
         
@@ -82,6 +88,11 @@ public class ApplicationData {
         history = new TaskTable(db, "taskhistory");
         clients = new ClientTable(db, "clientlist");
         attachments = new AttachmentTable(db, "attachments");
+        
+        if (!adminData.mailadminname.isBlank() && !adminData.mailadminpwd.isBlank() && !adminData.mailhost.isBlank()) {
+          mailer = new SendMail(adminData.mailhost, adminData.mailadminname, adminData.mailadminpwd);
+        }
+        
         refreshClientNames();
         requests = new RequestCache();
         prepareUploadBase();
@@ -95,12 +106,12 @@ public class ApplicationData {
    * Creates all directories for the root path of the upload base.
    */
   private void prepareUploadBase() {
-    if ((uploadBase == null) || uploadBase.isBlank()) {
+    if ((adminData.uploadbase == null) || adminData.uploadbase.isBlank()) {
       rootPath = null;
       return;
     }
     
-    File rootFile = new File(uploadBase);
+    File rootFile = new File(adminData.uploadbase);
     try {
       Files.createDirectories(rootFile.toPath());
       rootPath = rootFile;
@@ -145,16 +156,17 @@ public class ApplicationData {
    * @param data 
    */
   public void setAdminData(AdminData data) {
-    dbUrl = data.dburl;
-    dbAdmin = data.name;
-    dbPassword = data.password;
-    uploadBase = data.uploadbase;
+    adminData = data;
     
     var prefs = Preferences.userRoot().node("Tamm");
-    prefs.put(DB_URL, dbUrl);
-    prefs.put(DB_NAME, dbAdmin);
-    prefs.put(DB_PASSWORD, dbPassword);
-    prefs.put(FILE_UPLOAD_BASE, uploadBase);
+    prefs.put(DB_URL, data.dburl);
+    prefs.put(DB_NAME, data.name);
+    prefs.put(DB_PASSWORD, data.password);
+    prefs.put(FILE_UPLOAD_BASE, data.uploadbase);
+    prefs.put(MAIL_ADMIN, data.mailadminname);
+    prefs.put(MAIL_PWD, data.mailadminpwd);
+    prefs.put(MAIL_HOST, data.mailhost);
+    prefs.put(MAIL_REPLY, data.mailreply);
   }
 
   void setSchema(String name) {

@@ -56,7 +56,7 @@ GNU General Public License v3.0
              * Load user information and other session data.
              * @returns {undefined}
              */
-            function loadAdminData() {
+            async function loadAdminData() {
                 status = document.getElementById("status");
                 status.innerText = "Wait for server...";
                 
@@ -76,14 +76,35 @@ GNU General Public License v3.0
                         }
                     }
                 };
+                
+                const response = await fetch("system/initdata", {'method': 'GET'});
+                const responseData = await response.json();
+                console.log(responseData);
+                if (responseData.data) {
+                    var data = responseData.data;
+                    setValue("dburl", data.dburl);
+                    setValue("name", data.name);
+                    setValue("password", data.password);
+                    setValue("uploadbase", data.uploadbase);
+                    setValue("mailadminname", data.mailadminname);
+                    setValue("mailadminpwd", data.mailadminpwd);
+                    setValue("mailhost", data.mailhost);
+                    setValue("mailreply", data.mailreply);
+                }
+                
             }
 
             function doSave() {
                 var data = {};
-                data.dburl = document.getElementById("dburl").value;
-                data.name = document.getElementById("name").value;
-                data.password = document.getElementById("password").value;
-                data.uploadbase = document.getElementById("uploadbase").value;
+                data.dburl = getValue("dburl");
+                data.name = getValue("name");
+                data.password = getValue("password");
+                data.uploadbase = getValue("uploadbase");
+                data.mailadminname = getValue("mailadminname");
+                data.mailadminpwd = getValue("mailadminpwd");
+                data.mailhost = getValue("mailhost");
+                data.mailreply = getValue("mailreply");
+                
                 console.log(data);
                 
                 var request = new XMLHttpRequest();
@@ -95,7 +116,7 @@ GNU General Public License v3.0
                     if (this.readyState === 4 && this.status === 200) {
                         var response = JSON.parse(this.responseText);
                         if (response.result === "ok") {
-                          createOptionList("clientnames", result.data);
+                          //createOptionList("clientnames", result.data);
                         } else {
                           var status = document.getElementById("status");
                           status.innerText = "Unbekannter Fehler beim Speichern.";
@@ -193,13 +214,17 @@ GNU General Public License v3.0
                     <div><label>Database URL</label><input type="text" id="dburl"></div>
                     <div><label>DB Admin Name</label><input type="text" id="name"></div>
                     <div><label>DB Password</label><input type="text" id="password"></div>
-                    <h4>Datenbankverbindung</h4>
+                    <h4>Dateisystem</h4>
                     <div><label>Dokumentenspeicher</label><input type="text" id="uploadbase"></div>
-                    <hr>
-                    <div><button id="save" onclick="doSave();">Speichern</button></div>
                 </div>
                 <div>
                     <div>Mailserver</div>
+                    <div><label for="mailadminname">Name Mailkonto</label><input type="text" id="mailadminname"></div>
+                    <div><label for="mailadminpwd">Passwort Mailkonto</label><input type="text" id="mailadminpwd"></div>
+                    <div><label for="mailhost">Hostname</label><input type="text" id="mailhost"></div>
+                    <div><label for="mailreply">Reply-To Name</label><input type="text" id="mailreply"></div>
+                    <hr>
+                    <div><button id="save" onclick="doSave();">Speichern</button></div>
                 </div>
                 <div>
                     <div>Mandanten<button style="margin-left: 10pt;" onclick="createClient();">Neu</button></div>

@@ -10,8 +10,17 @@ package de.mmth.tamm.data;
  * @author matthias
  */
 public class AdminData {
+  // Database access
   public String dburl;
   public String name;
   public String password;
+  
+  // Filesystem storage
   public String uploadbase;
+  
+  // Mail access
+  public String mailadminname;
+  public String mailadminpwd;
+  public String mailhost;
+  public String mailreply;
 }

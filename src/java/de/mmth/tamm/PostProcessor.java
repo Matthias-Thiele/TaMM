@@ -22,8 +22,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.CharBuffer;
 import java.util.UUID;
+import org.apache.commons.mail.EmailException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -226,7 +226,18 @@ public class PostProcessor {
       if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
         String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS);
         logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
-        message = "Anforderung per Mail verschickt";
+        if (application.mailer != null) {
+          message = "Anforderung per Mail verschickt.";
+          var mailmessage = application.tammUrl + "newpwd.html?key=" + key;
+          try {
+            application.mailer.send(application.adminData.mailreply, userData.mail, "Passwort erneuern", mailmessage);
+          } catch (EmailException ex) {
+            logger.warn("Error sending mail.", ex);
+            message = "Fehler beim Versenden der Mail.";
+          }
+        } else {
+          message = "Fehlende Mail-Konfiguration. Anforderung im Log verzeichnet.";
+        }
         found = true;
       } else {
         logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);

@@ -4,6 +4,7 @@
  */
 package de.mmth.tamm;
 
+import de.mmth.tamm.data.AdminData;
 import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.SessionData;
@@ -62,6 +63,10 @@ public class GetProcessor {
       case "attachments":
         processAttachmentsList(resultData, session, cmd4);
         break;
+        
+      case "initdata":
+        processInitdata(resultData, session);
+        break;
     }
   }
   
@@ -101,12 +106,22 @@ public class GetProcessor {
   }
   
   private void processClientList(OutputStream resultData, SessionData session) throws IOException, TammError {
-    ServletUtils.sendResult(resultData, true, "", "", "", application.clientList);
+    boolean isUser = session.user != null;
+    ServletUtils.sendResult(resultData, isUser, "", "", "", isUser ? application.clientList : null);
   }
   
   private void processAttachmentsList(OutputStream resultData, SessionData session, String param) throws IOException, TammError {
     var attachmentList = application.attachments.listAttachments(session.client.id, Long.parseLong(param));
     ServletUtils.sendResult(resultData, true, "", "", "", attachmentList);
+  }
+
+  private void processInitdata(OutputStream resultData, SessionData session) throws IOException {
+    AdminData data = null;
+    if ((session.user != null) && session.user.mainAdmin) {
+      data = application.adminData;
+    }
+    
+    ServletUtils.sendResult(resultData, true, "", "", "", data);
   }
   
 }
