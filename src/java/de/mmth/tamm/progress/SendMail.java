@@ -7,7 +7,7 @@ package de.mmth.tamm.progress;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailConstants;
 import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.MultiPartEmail;
+import org.apache.commons.mail.HtmlEmail;
 
 /**
  * Helper class for sending password request mails.
@@ -40,11 +40,12 @@ public class SendMail {
    * @param to
    * @param subject
    * @param message
+   * @param htmlMessage
    * @return
    * @throws EmailException 
    */
-  public String send(String from, String to, String subject, String message) throws EmailException {
-      MultiPartEmail email = new MultiPartEmail();
+  public String send(String from, String to, String subject, String message, String htmlMessage) throws EmailException {
+      var email = new HtmlEmail();
       email.setAuthenticator( new DefaultAuthenticator( user, password ) );
       email.setSSLOnConnect( true );
       email.setHostName(host);
@@ -53,6 +54,7 @@ public class SendMail {
       email.setCharset(EmailConstants.UTF_8);
       email.setSubject(subject);
       email.setMsg(message);
+      email.setHtmlMsg(htmlMessage);
       return email.send();
    }
     

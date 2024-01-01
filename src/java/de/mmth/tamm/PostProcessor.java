@@ -228,9 +228,25 @@ public class PostProcessor {
         logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
         if (application.mailer != null) {
           message = "Anforderung per Mail verschickt.";
-          var mailmessage = application.tammUrl + "newpwd.html?key=" + key;
+          var requestUrl = application.tammUrl + "newpwd.html?key=" + key;
+          var lockUrl = application.tammUrl + "system/lockmail/" + key;
+          var htmlmessage = new StringBuilder(); 
+          htmlmessage.append("<html><body><p>Es wurde ein neues Passwort für Ihren Zugang zum TaMM System angefordert.</p>");
+          htmlmessage.append("<p>Sie können es über <a href='" );
+          htmlmessage.append(requestUrl);
+          htmlmessage.append("'>diesen Link</a> einfügen.</p><p>Falls Sie es nicht selber angefordert haben und in Zukunft keine weiteren Mails ");
+          htmlmessage.append("empfangen wollen, können Sie Ihre Mailadresse über <a href='");
+          htmlmessage.append(lockUrl);
+          htmlmessage.append("'>diesen Link</a> sperren.");
+          var textmessage = new StringBuilder(); 
+          textmessage.append("Es wurde ein neues Passwort für Ihren Zugang zum TaMM System angefordert.\r\n");
+          textmessage.append("Sie können es über diesen Link einfügen:\r\n" );
+          textmessage.append(requestUrl);
+          textmessage.append("\r\n.Falls Sie es nicht selber angefordert haben und in Zukunft keine weiteren Mails\r\n");
+          textmessage.append("empfangen wollen, können Sie Ihre Mailadresse über diesen Link sperren:\r\n");
+          textmessage.append(lockUrl);
           try {
-            application.mailer.send(application.adminData.mailreply, userData.mail, "Passwort erneuern", mailmessage);
+            application.mailer.send(application.adminData.mailreply, userData.mail, "Passwort erneuern", textmessage.toString(), htmlmessage.toString());
             found = true;
           } catch (EmailException ex) {
             logger.warn("Error sending mail.", ex);

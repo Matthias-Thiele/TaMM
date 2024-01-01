@@ -30,8 +30,9 @@ public class SendMailTest {
   @Test
   public void testSend() throws EmailException {
     System.out.println("send mail test");
-    SendMail instance = new SendMail("smtp.strato.de", "tamm@auchmonoabspielbar.de", "missing password");
-    String result = instance.send("NoReply@mmth.de", "matthias@auchmonoabspielbar.de", "Test", "das ist eine Testmail");
+    SendMail instance = new SendMail("smtp.strato.de", "tamm@auchmonoabspielbar.de", "b!=cNotEqual");
+    String htmlMessage = "<html><body>HTML Message: <a href='http://auchmonoabspielbar.de'>Auch mono abspielbar</a></body></html>";
+    String result = instance.send("NoReply@mmth.de", "matthias@auchmonoabspielbar.de", "Test", "das ist eine Testmail", htmlMessage);
     assertEquals("Mailresult", "test", result);
   }
 }

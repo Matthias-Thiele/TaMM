@@ -10,6 +10,7 @@ import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.db.AttachmentTable;
 import de.mmth.tamm.db.ClientTable;
 import de.mmth.tamm.db.DBConnect;
+import de.mmth.tamm.db.LockTable;
 import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.progress.SendMail;
@@ -46,6 +47,7 @@ public class ApplicationData {
   public TaskTable tasks;
   public TaskTable history;
   public ClientTable clients;
+  public LockTable locks;
   
   public RequestCache requests;
   public String tammUrl;
@@ -87,6 +89,7 @@ public class ApplicationData {
         tasks = new TaskTable(db, "tasklist");
         history = new TaskTable(db, "taskhistory");
         clients = new ClientTable(db, "clientlist");
+        locks = new LockTable(db, "locklist");
         attachments = new AttachmentTable(db, "attachments");
         
         if (!adminData.mailadminname.isBlank() && !adminData.mailadminpwd.isBlank() && !adminData.mailhost.isBlank()) {

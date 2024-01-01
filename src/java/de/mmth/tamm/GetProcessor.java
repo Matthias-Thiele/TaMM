@@ -7,7 +7,10 @@ package de.mmth.tamm;
 import de.mmth.tamm.data.AdminData;
 import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.KeyValue;
+import de.mmth.tamm.data.LockData;
 import de.mmth.tamm.data.SessionData;
+import de.mmth.tamm.data.UserData;
+import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,6 +70,24 @@ public class GetProcessor {
       case "initdata":
         processInitdata(resultData, session);
         break;
+        
+      case "lockmail":
+        processLock(cmd4);
+    }
+  }
+  
+  /**
+   * User request to add his mail address to the lock list.
+   * @param key 
+   */
+  private void processLock(String key) throws TammError {
+    logger.info(key);
+    UserData reqUser = application.requests.getUserItem(key);
+    if (reqUser != null) {
+      LockData lock = new LockData();
+      lock.mailAddress = reqUser.mail;
+      lock.lockDate = DateUtils.formatZ(null);
+      application.locks.writeLock(lock);
     }
   }
   
