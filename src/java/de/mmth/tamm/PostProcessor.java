@@ -231,6 +231,7 @@ public class PostProcessor {
           var mailmessage = application.tammUrl + "newpwd.html?key=" + key;
           try {
             application.mailer.send(application.adminData.mailreply, userData.mail, "Passwort erneuern", mailmessage);
+            found = true;
           } catch (EmailException ex) {
             logger.warn("Error sending mail.", ex);
             message = "Fehler beim Versenden der Mail.";
@@ -238,7 +239,6 @@ public class PostProcessor {
         } else {
           message = "Fehlende Mail-Konfiguration. Anforderung im Log verzeichnet.";
         }
-        found = true;
       } else {
         logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);
       }
