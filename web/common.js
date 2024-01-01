@@ -159,6 +159,20 @@ function formatIso(dateTime) {
 }
 
 /**
+ * Writes a status message if the page has an Element
+ * with the id status.
+ * 
+ * @param {type} message
+ * @returns {undefined}
+ */
+function statusMsg(message) {
+    var status = document.getElementById("status");
+    if (status) {
+        status.innerText = message;
+    }
+}
+
+/**
  * Helper function for user selection.
  * @param {type} users
  * @returns {Userlist}

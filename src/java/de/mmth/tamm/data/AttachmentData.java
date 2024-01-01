@@ -11,6 +11,7 @@ package de.mmth.tamm.data;
 public class AttachmentData {
   public long taskId;
   public String fileName;
+  public String url;
   public int clientId;
   public String guid;
 }

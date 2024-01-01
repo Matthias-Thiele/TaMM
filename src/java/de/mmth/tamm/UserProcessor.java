@@ -5,6 +5,7 @@
 package de.mmth.tamm;
 
 import com.google.gson.Gson;
+import de.mmth.tamm.data.AttachmentData;
 import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.data.UserData;

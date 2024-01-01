@@ -67,7 +67,9 @@ label {
     margin-top: 4pt;
     background-color: #f8f8fc;
     box-shadow: 2px 1px 1px gray;
+    border-radius: 3pt;
     padding: 3pt;
+    margin: 3pt;
     cursor: pointer;
 }
 
@@ -100,7 +102,7 @@ input[type="radio"]:checked + label {
 .flex-container > div {
     margin: 10px;
     padding: 8px;
-    background-color: #f0f0f8;
+    background-color: #f8f8fc;
     border-radius: 3pt;
 }
 

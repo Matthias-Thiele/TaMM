@@ -75,8 +75,7 @@ function makeAttachmentLink(a) {
     var text = document.createElement("span");
     text.innerText = a.fileName;
     text.style = "width: calc(100% - 25px); display:inline-block";
-    //anchor.appendChild(text);
-    var url = "upload/" + a.guid + "/" + a.fileName;
+    var url = (a.url) ? a.url : "upload/" + a.guid + "/" + a.fileName;
     anchor.href = url;
     anchor.target = "_blank";
     
@@ -162,51 +161,96 @@ async function loadAttachments() {
 }
 
 /**
+ * Writes an URL attachment into the database.
+ * The created guid will be inserted into the
+ * href of the newElementNode.
+ * 
+ * @param {string} name 
+ * @param {string} url 
+ * @param {Node} newElementNode 
+ * @returns {undefined}
+ */
+async function saveUrlAttachment(name, url, newElementNode) {
+    if ((selectedTask.lId === "-1") || !selectedTask.lId) {
+        // new task, has not been stored before.
+        return;
+    }
+    
+    let postData = {}; 
+    postData.taskId = selectedTask.lId;
+    postData.fileName = name;
+    postData.url = url;
+    const response = await fetch("system/saveurl", {'method': 'POST', 'body': JSON.stringify(postData)});
+    
+    const responseData = await response.json();
+    console.log(responseData);
+    
+    var guid = responseData.message;
+    var anchor = newElementNode.childNodes[0];
+    var href = anchor.href;
+    href = href.replace("!!!placeholder!!!", guid);
+    anchor.href = href;
+}
+
+function msgMissingSelection() {
+    if (!selectedTask || selectedTask.lId === "-1") {
+        statusMsg("Wählen Sie zuerst eine Aufgabe aus.");
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * Upload selected files to the server.
  * 
  * @returns {undefined}
  */
 async function uploadFile() {
-  let uploadfile = document.getElementById("uploadfile");
-  let parent = uploadfile.parentNode;
-  let filelist = document.getElementById("filelist");
-  let formData = new FormData(); 
-  let taskid = selectedTask.lId;
-  formData.append("taskid", taskid);
+    if (msgMissingSelection()) {
+        return;
+    }
+    
+    let uploadfile = document.getElementById("uploadfile");
+    let parent = uploadfile.parentNode;
+    let filelist = document.getElementById("filelist");
+    let formData = new FormData(); 
+    let taskid = selectedTask.lId;
+    formData.append("taskid", taskid);
 
-  var newElements = [];
-  for (var i = 0; i < uploadfile.files.length; i++) {
-      formData.append("file", uploadfile.files[i]); 
-      var name = uploadfile.files[i].name;
-      var data = {};
-      data.guid = "!!!placeholder!!!";
-      data.fileName = name;
-      var anchor = makeAttachmentLink(data);
-      filelist.appendChild(anchor);
-      newElements.push(anchor);
-  }
-  var newInput = document.createElement("input");
-  newInput.type = "file";
-  newInput.multiple = true;
-  newInput.id=uploadfile.id;
-  newInput.onchange = uploadfile.onchange;
+    var newElements = [];
+    for (var i = 0; i < uploadfile.files.length; i++) {
+        formData.append("file", uploadfile.files[i]); 
+        var name = uploadfile.files[i].name;
+        var data = {};
+        data.guid = "!!!placeholder!!!";
+        data.fileName = name;
+        var anchor = makeAttachmentLink(data);
+        filelist.appendChild(anchor);
+        newElements.push(anchor);
+    }
+    var newInput = document.createElement("input");
+    newInput.type = "file";
+    newInput.multiple = true;
+    newInput.id=uploadfile.id;
+    newInput.onchange = uploadfile.onchange;
 
-  parent.replaceChild(newInput, uploadfile);
-  const response = await fetch('upload', {
-    method: "POST", 
-    body: formData
-  }); 
-  
-  // update guid in href
-  const responseData = await response.json();
-  console.log(responseData);
-  for (var i = 0; i < newElements.length; i++) {
-      var guid = responseData.data[i];
-      var anchor = newElements[i].childNodes[0];
-      var href = anchor.href;
-      href = href.replace("!!!placeholder!!!", guid);
-      anchor.href = href;
-  }
+    parent.replaceChild(newInput, uploadfile);
+    const response = await fetch('upload', {
+      method: "POST", 
+      body: formData
+    }); 
+
+    // update guid in href
+    const responseData = await response.json();
+    console.log(responseData);
+    for (var i = 0; i < newElements.length; i++) {
+        var guid = responseData.data[i];
+        var anchor = newElements[i].childNodes[0];
+        var href = anchor.href;
+        href = href.replace("!!!placeholder!!!", guid);
+        anchor.href = href;
+    }
 }
 
 

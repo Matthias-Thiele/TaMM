@@ -38,7 +38,7 @@ public class AttachmentTableTest {
   @Test
   public void testCheckColumns() {
     var cols = AttachmentTable.TABLE_CONFIG.split("\\R");
-    assertEquals("Number of columns changed", 4, cols.length);
+    assertEquals("Number of columns changed", 5, cols.length);
   }
 
   /**
@@ -56,6 +56,7 @@ public class AttachmentTableTest {
     AttachmentData att = new AttachmentData();
     att.clientId = clientId;
     att.fileName = "testfile1.something";
+    att.url = "https://somewhere.de/something";
     att.guid = UUID.randomUUID().toString();
     att.taskId = taskId;
     instance.writeAttachment(att);
@@ -65,6 +66,7 @@ public class AttachmentTableTest {
     AttachmentData res = result.get(0);
     assertEquals("ClientId mismatch", att.clientId, res.clientId);
     assertEquals("File name mismatch", att.fileName, res.fileName);
+    assertEquals("Url mismatch", att.url, res.url);
     assertEquals("Task id mismatch", att.taskId, res.taskId);
     assertEquals("Guid mismatch", att.guid, res.guid);
     

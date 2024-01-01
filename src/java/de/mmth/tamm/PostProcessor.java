@@ -8,6 +8,7 @@ import de.mmth.tamm.data.LoginData;
 import de.mmth.tamm.data.SessionData;
 import com.google.gson.Gson;
 import de.mmth.tamm.data.AdminData;
+import de.mmth.tamm.data.AttachmentData;
 import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.UserData;
@@ -21,6 +22,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.CharBuffer;
+import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -99,10 +102,45 @@ public class PostProcessor {
         case "saveclient":
           processSaveClient(reader, resultData, session);
           break;
+          
+        case "saveurl":
+          processSaveUrlAttachment(reader, resultData, session);
+          break;
       }
     }
   }
   
+  /**
+   * Write an URL Attachment data block into the database.
+   * 
+   * @param reader
+   * @param resultData
+   * @param session
+   * @throws IOException
+   * @throws TammError 
+   */
+  protected void processSaveUrlAttachment(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
+    if (session.user == null) {
+      ServletUtils.sendResult(resultData, false, "", "", "Sie sind noch nicht angemeldet.", null);
+      return;
+    }
+    AttachmentData data = new Gson().fromJson(reader, AttachmentData.class);
+    data.clientId = session.client.id;
+    data.guid = UUID.randomUUID().toString();
+    application.attachments.writeAttachment(data);
+    
+    ServletUtils.sendResult(resultData, true, "", "", data.guid, null);
+  }
+  
+  /**
+   * Writes the client info into the database.
+   * 
+   * @param reader
+   * @param resultData
+   * @param session
+   * @throws IOException
+   * @throws TammError 
+   */
   private void processSaveClient(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     ClientData clientData = new Gson().fromJson(reader, ClientData.class);
     logger.debug("Process login request for user" + clientData.name);

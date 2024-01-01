@@ -86,6 +86,10 @@
             }
             
             function doHistory() {
+                if (msgMissingSelection()) {
+                    return;
+                }
+    
                 if (selectedTask.lId !== "-1") {
                     window.open("history.html?taskid=" + selectedTask.lId, "history");
                 }
@@ -99,6 +103,10 @@
              * @returns {undefined}
              */
             function doAdvance(noQuery) {
+                if (msgMissingSelection()) {
+                    return;
+                }
+    
                 var today = toDay();
                 if ((selectedTask.nextDueDate > today) && !noQuery) {
                     document.getElementById("showduedate").textContent = selectedTask.nextDueDate;
@@ -116,6 +124,7 @@
               
             function hideDialog() {
                 document.getElementById("queryadvance").style.display = "none";
+                document.getElementById("urlattachment").style.display = "none";
             }
             
             function advanceNow() {
@@ -241,12 +250,39 @@
             
             
             function doRemove() {
+                if (msgMissingSelection()) {
+                    return;
+                }
+
                 removeTask(selectedTask.lId);
                 emptyTask = {};
                 fillForm(emptyTask);
                 setTimeout(filterTasks, 200);
             }
   
+            function showUrlDialog() {
+                if (msgMissingSelection()) {
+                    return;
+                }
+
+                setValue("urlname", "");
+                setValue("urlurl", "");
+                document.getElementById("urlattachment").style.display = "block";
+            }
+            
+            function doCreateUrlAttachment() {
+                var name = getValue("urlname");
+                var url = getValue("urlurl");
+                
+                var data = {};
+                data.guid = "!!!placeholder!!!";
+                data.fileName = name;
+                data.url = url;
+                var anchor = makeAttachmentLink(data);
+                let filelist = document.getElementById("filelist");
+                filelist.appendChild(anchor);
+                saveUrlAttachment(name, url, anchor);
+            }
         </script>
     </head>
     <body onload="loadSessionData();">
@@ -279,6 +315,21 @@
             </div>
         </div>
 
+        <div id="urlattachment" class="modal-content" style="width: 600pt">
+            <div class="modal-header">
+                <h2>URL Dateianbindung eintragen</h2>
+            </div>
+            <div class="modal-body">
+                <p>Tragen Sie hier den Namen und die URL für eine Anzeige aus dem Internet ein.</p>
+                <div>
+                    <label for="urlname">Bezeichnung</label><input type="text" id="urlname" style="display: inline-block; width: 400pt"></div>
+                <div><label for="urlurl">URL</label><input type="text" id="urlurl" style="display: inline-block; width: 400pt">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="hideDialog();doCreateUrlAttachment()">Anlegen</button><button onclick="hideDialog()">Abbruch</button>
+            </div>
+        </div>
         <div class="bodybox">
             <div class="header">TaMM Aufgaben</div>
             <div class="left-sidebar">
@@ -314,7 +365,7 @@
                         </div>
                         <div>
                             <div class="subheader">Dateianbindungen</div>
-                            <input id="uploadfile" type="file" multiple onchange="uploadFile()" style="max-width: 300pt;"/>
+                            <button onclick="showUrlDialog()">URL</button><input id="uploadfile" autocomplete="off" type="file" multiple onchange="uploadFile()" style="max-width: 300pt;"/>
                             <div id="filelist" style="margin-top: 5pt;">
                             </div>
                         </div>

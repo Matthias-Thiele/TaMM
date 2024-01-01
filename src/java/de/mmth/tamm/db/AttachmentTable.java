@@ -25,6 +25,7 @@ public class AttachmentTable extends DBTable {
     lid L
     clientid I
     name V 250
+    url V 250
     guid V 40
     """;
   
@@ -56,6 +57,7 @@ public class AttachmentTable extends DBTable {
         stmt.setLong(col++, attachment.taskId);
         stmt.setInt(col++, attachment.clientId);
         stmt.setString(col++, attachment.fileName);
+        stmt.setString(col++, attachment.url);
         stmt.setString(col++, attachment.guid);
 
         stmt.execute();
@@ -144,6 +146,7 @@ public class AttachmentTable extends DBTable {
     result.taskId = rows.getLong(col++);
     result.clientId = rows.getInt(col++);
     result.fileName = rows.getString(col++);
+    result.url = rows.getString(col++);
     result.guid = rows.getString(col++);
     
     return result;
