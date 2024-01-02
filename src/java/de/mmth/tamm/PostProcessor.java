@@ -230,50 +230,77 @@ public class PostProcessor {
   private void processPasswordRequest(Reader reader, OutputStream resultData, SessionData session) throws IOException {
     UserData userData = new Gson().fromJson(reader, UserData.class);
     logger.debug("Password request for user " + userData.name);
-    boolean found = false;
     String message = "Unbekannter Anwender oder Mailadresse";
+    boolean isOk = false;
     try {
-      var checkUser = application.users.readUser(session.client.id, -1, userData.name);
-      if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
-        String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS);
-        logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
-        if (application.mailer != null) {
-          message = "Anforderung per Mail verschickt.";
-          var requestUrl = application.tammUrl + "newpwd.html?key=" + key;
-          var lockUrl = application.tammUrl + "system/lockmail/" + key;
-          var htmlmessage = new StringBuilder(); 
-          htmlmessage.append("<html><body><p>Es wurde ein neues Passwort für Ihren Zugang zum TaMM System angefordert.</p>");
-          htmlmessage.append("<p>Sie können es über <a href='" );
-          htmlmessage.append(requestUrl);
-          htmlmessage.append("'>diesen Link</a> einfügen.</p><p>Falls Sie es nicht selber angefordert haben und in Zukunft keine weiteren Mails ");
-          htmlmessage.append("empfangen wollen, können Sie Ihre Mailadresse über <a href='");
-          htmlmessage.append(lockUrl);
-          htmlmessage.append("'>diesen Link</a> sperren.");
-          var textmessage = new StringBuilder(); 
-          textmessage.append("Es wurde ein neues Passwort für Ihren Zugang zum TaMM System angefordert.\r\n");
-          textmessage.append("Sie können es über diesen Link einfügen:\r\n" );
-          textmessage.append(requestUrl);
-          textmessage.append("\r\n.Falls Sie es nicht selber angefordert haben und in Zukunft keine weiteren Mails\r\n");
-          textmessage.append("empfangen wollen, können Sie Ihre Mailadresse über diesen Link sperren:\r\n");
-          textmessage.append(lockUrl);
-          try {
-            application.mailer.send(application.adminData.mailreply, userData.mail, "Passwort erneuern", textmessage.toString(), htmlmessage.toString());
-            found = true;
-          } catch (EmailException ex) {
-            logger.warn("Error sending mail.", ex);
-            message = "Fehler beim Versenden der Mail.";
-          }
-        } else {
-          message = "Fehlende Mail-Konfiguration. Anforderung im Log verzeichnet.";
-        }
+      if (application.locks.checkLock(userData.mail)) {
+        message = "Diese Mail Adresse ist gesperrt.";
       } else {
-        logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);
+        String domain = userData.mail;
+        int pos = domain.indexOf('@');
+        if (pos > 0) {
+          domain = domain.substring(pos);
+        }
+        if (application.locks.checkLock(domain)) {
+          message = "Diese Mail Domäne ist gesperrt.";
+        } else {
+          var checkUser = application.users.readUser(session.client.id, -1, userData.name);
+          if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
+            String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS);
+            logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
+            if (application.mailer != null) {
+              var requestUrl = application.tammUrl + "newpwd.html?key=" + key;
+              var lockUrl = application.tammUrl + "system/lockmail/" + key;
+              try {
+                message = processMail(requestUrl, lockUrl, userData.mail);
+                isOk = true;
+              } catch (EmailException ex) {
+                logger.warn("Error sending mail.", ex);
+                message = "Fehler beim Versenden der Mail.";
+              }
+            } else {
+              message = "Fehlende Mail-Konfiguration. Anforderung im Log verzeichnet.";
+            }
+          } else {
+            logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);
+          }
+        }
       }
     } catch(TammError ex) {
       logger.debug("Invalid password request for " + userData.name);
     }
     
-    ServletUtils.sendResult(resultData, found, "", "", message, null);
+    ServletUtils.sendResult(resultData, isOk, "", "", message, null);
+  }
+  
+  /**
+   * Create the mail body and send it to the given address.
+   * 
+   * @param requestUrl
+   * @param lockUrl
+   * @param mailAddress
+   * @return
+   * @throws EmailException 
+   */
+  private String processMail(String requestUrl, String lockUrl, String mailAddress) throws EmailException {
+    var htmlmessage = new StringBuilder(); 
+    htmlmessage.append("<html><body><p>Es wurde ein neues Passwort für Ihren Zugang zum TaMM System angefordert.</p>");
+    htmlmessage.append("<p>Sie können es über <a href='" );
+    htmlmessage.append(requestUrl);
+    htmlmessage.append("'>diesen Link</a> einfügen.</p><p>Falls Sie es nicht selber angefordert haben und in Zukunft keine weiteren Mails ");
+    htmlmessage.append("empfangen wollen, können Sie Ihre Mailadresse über <a href='");
+    htmlmessage.append(lockUrl);
+    htmlmessage.append("'>diesen Link</a> sperren.");
+    var textmessage = new StringBuilder(); 
+    textmessage.append("Es wurde ein neues Passwort für Ihren Zugang zum TaMM System angefordert.\r\n");
+    textmessage.append("Sie können es über diesen Link einfügen:\r\n" );
+    textmessage.append(requestUrl);
+    textmessage.append("\r\n.Falls Sie es nicht selber angefordert haben und in Zukunft keine weiteren Mails\r\n");
+    textmessage.append("empfangen wollen, können Sie Ihre Mailadresse über diesen Link sperren:\r\n");
+    textmessage.append(lockUrl);
+    application.mailer.send(application.adminData.mailreply, mailAddress, "Passwort erneuern", textmessage.toString(), htmlmessage.toString());
+    
+    return "Anforderung per Mail verschickt.";
   }
   
   /**

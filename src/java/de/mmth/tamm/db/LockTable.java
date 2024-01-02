@@ -121,6 +121,35 @@ public class LockTable extends DBTable {
   }
   
   /**
+   * Returns if the given address is part of the lock list.
+   * 
+   * @param mailAddress
+   * @return
+   * @throws TammError 
+   */
+  public boolean checkLock(String mailAddress) throws TammError {
+    boolean result = false;
+    
+    var cmd = "SELECT lockdate FROM " + tableName + " WHERE mailaddress = ? LIMIT 1";
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        int paramCol = 1;
+        stmt.setString(paramCol++, mailAddress);
+
+        var rows = stmt.executeQuery();
+        result = rows.next();
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error checking lock list.", ex);
+      throw new TammError("Error checking lock list.");
+    }
+    
+    return result;
+  }
+  
+  /**
    * Removes the give lock from the lock table.
    * 
    * @param lock

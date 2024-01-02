@@ -64,6 +64,12 @@ public class LockTableTest {
     assertEquals("Lock IP address mismatch", lock.lockIP, data1.lockIP);
     assertEquals("No increment yet", 0, data1.lockCounter);
     
+    boolean isInList = instance.checkLock(lock.mailAddress);
+    assertTrue("User has been inserted before.", isInList);
+    
+    boolean notInList = instance.checkLock("not in list" + lock.mailAddress);
+    assertFalse("This user cannot be in the lock list", notInList);
+    
     instance.incrementLockCount(lock.mailAddress);
     List<LockData> result2 = instance.listLocks("%test.de");
     LockData data2 = result2.get(0);
