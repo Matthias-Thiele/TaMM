@@ -9,6 +9,7 @@ GNU General Public License v3.0
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
+        <link rel="stylesheet" href="menu.css">
         <link rel="shortcut icon" href="favicon.ico"/> 
         <style>
             .admin-sidebar {
@@ -51,34 +52,32 @@ GNU General Public License v3.0
         <script>
             var clientlist;
             var selectedClient = {};
+            var sessionData;
             
             /**
              * Load user information and other session data.
              * @returns {undefined}
              */
             async function loadAdminData() {
-                status = document.getElementById("status");
-                status.innerText = "Wait for server...";
+                statusMsg("Wait for server...");
                 
-                var request = new XMLHttpRequest();
-                request.open("GET", "system/clientlist");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send();
-                request.overrideMimeType('application/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var response = JSON.parse(this.responseText);
-                        if (response.result === "error") {
-                            status.innerText = response.message;
-                        } else {
-                            clientlist = response.data;
-                            createClientList(clientlist);
-                        }
+                const session = await fetch("system/session", {'method': 'GET'});
+                const sessionObj = await session.json();
+                if (sessionObj.result === "ok") {
+                    sessionData = sessionObj.data;
+                    if (!sessionData.user.mainAdmin) {
+                        showBlockElement("menuadmin", false);
+                        showBlockElement("menulock", false);
                     }
-                };
+                } else {
+                    showBlockElement("menuhome", false);
+                    showBlockElement("menuuser", false);
+                    showBlockElement("menuadmin", false);
+                    showBlockElement("menulock", false);
+                }
                 
-                const response = await fetch("system/initdata", {'method': 'GET'});
-                const responseData = await response.json();
+                const initdata = await fetch("system/initdata", {'method': 'GET'});
+                const responseData = await initdata.json();
                 console.log(responseData);
                 if (responseData.data) {
                     var data = responseData.data;
@@ -92,6 +91,17 @@ GNU General Public License v3.0
                     setValue("mailreply", data.mailreply);
                 }
                 
+                const clients = await fetch("system/clientlist", {'method': 'GET'});
+                const clientData = await clients.json();
+                console.log(clientData);
+                if (clientData.result === "ok") {
+                    clientlist = clientData.data;
+                    createClientList(clientlist);
+                    statusMsg("");
+                } else {
+                    statusMsg(clientData.message);
+                    showBlockElement("clientcol", false);
+                }
             }
 
             function doSave() {
@@ -115,9 +125,7 @@ GNU General Public License v3.0
                 request.onreadystatechange = function() {
                     if (this.readyState === 4 && this.status === 200) {
                         var response = JSON.parse(this.responseText);
-                        if (response.result === "ok") {
-                          //createOptionList("clientnames", result.data);
-                        } else {
+                        if (response.result !== "ok") {
                           var status = document.getElementById("status");
                           status.innerText = "Unbekannter Fehler beim Speichern.";
                         }
@@ -206,6 +214,23 @@ GNU General Public License v3.0
         </script>
     </head>
     <body onload="loadAdminData()">
+        <div class="hamburger-menu">
+            <input id="menu__toggle" type="checkbox" />
+            <label class="menu__btn" for="menu__toggle">
+                <span></span>
+            </label>
+
+            <ul class="menu__box">
+                <li id="menuhome"><a class="menu__item" href="index.html">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
+                <li><a class="menu__item" href="about.html">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();">Logout</a></li>
+            </ul>
+
+        </div>
+        
         <div class="bodybox">
             <div class="header">System Administration</div>
             <div class="admin-sidebar">
@@ -226,7 +251,7 @@ GNU General Public License v3.0
                     <hr>
                     <div><button id="save" onclick="doSave();">Speichern</button></div>
                 </div>
-                <div>
+                <div id="clientcol">
                     <div>Mandanten<button style="margin-left: 10pt;" onclick="createClient();">Neu</button></div>
                     <div>
                         

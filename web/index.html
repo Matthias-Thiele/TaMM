@@ -68,15 +68,17 @@
                     if (this.readyState === 4 && this.status === 200) {
                         var response = JSON.parse(this.responseText);
                         if (response.result === "error") {
-                            window.location = response.nextPage + "?next=index.html";
+                            window.location = response.nextPageError + "?next=index.html";
                         } else {
                             sessionData = response.data;
                             var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
                             
                             if (!someKindOfAdmin) {
                                 showBlockElement("menuuser", false);
-                                showBlockElement("menuadmin", false);
-                                showBlockElement("menulock", false);
+                                if (!sessionData.user.mainAdmin) {
+                                    showBlockElement("menuadmin", false);
+                                    showBlockElement("menulock", false);
+                                }
                             }
                             
                             userlist = new Userlist(sessionData.userNames);

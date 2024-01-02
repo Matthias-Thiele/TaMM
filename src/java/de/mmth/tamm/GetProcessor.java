@@ -154,7 +154,18 @@ public class GetProcessor {
    */
   private void processClientList(OutputStream resultData, SessionData session) throws IOException, TammError {
     boolean isUser = session.user != null;
-    ServletUtils.sendResult(resultData, isUser, "", "", "", isUser ? application.clientList : null);
+    String message = "";
+    String errorNext = "";
+    if (isUser) {
+      if (!session.user.mainAdmin) {
+        message = "Keine Berechtigung.";
+      }
+    } else {
+      message = "Keine Anmeldung.";
+      errorNext = "login.html";
+    }
+    
+    ServletUtils.sendResult(resultData, isUser, "", errorNext, message, isUser ? application.clientList : null);
   }
   
   /**

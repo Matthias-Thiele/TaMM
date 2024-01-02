@@ -33,9 +33,14 @@ function logout(next) {
             var response = JSON.parse(this.responseText);
             if (response.result === "ok") {
                 console.log("Next page: " + response.nextPage + "?next=" + next);
-                window.location = response.nextPage + "?next=" + next;
+                var np = response.nextPage;
+                if (next) {
+                    np = np + "?next=" + next;
+                }
+                window.location = np;
             } else {
                 // logout failed? why?
+                statusMsg(response.message);
             }
         }
     };
@@ -138,6 +143,7 @@ function showBlockElement(elementName, doShow) {
 /**
  * Actual date in ISO format.
  * 
+ * @param {type} daysOffset offset from today in days
  * @returns {String}
  */
 function toDay(daysOffset) {
@@ -149,6 +155,12 @@ function toDay(daysOffset) {
     return dt.toJSON().slice(0, 10);
 }
 
+/**
+ * Replaces the T in a standard ISO date with a space.
+ * 
+ * @param {type} dateTime
+ * @returns {String}
+ */
 function formatIso(dateTime) {
     if (dateTime) {
         var parts = dateTime.split("T");
