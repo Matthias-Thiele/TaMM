@@ -75,6 +75,8 @@
                             
                             if (!someKindOfAdmin) {
                                 showBlockElement("menuuser", false);
+                                showBlockElement("menuadmin", false);
+                                showBlockElement("menulock", false);
                             }
                             
                             userlist = new Userlist(sessionData.userNames);
@@ -295,6 +297,8 @@
             <ul class="menu__box">
                 <li><a class="menu__item" href="index.html">Home</a></li>
                 <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
                 <li><a class="menu__item" href="about.html">Über das Programm</a></li>
                 <li><a class="menu__item" onclick="logout();">Logout</a></li>
             </ul>
