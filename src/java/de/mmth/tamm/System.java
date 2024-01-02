@@ -73,6 +73,9 @@ public class System extends HttpServlet {
           cmd4 = URLDecoder.decode(cmd4, StandardCharsets.UTF_8.toString());
         }
         
+        if (cmd.equals("lockmail")) {
+          response.setHeader("Content-Type", "text/html; charset=UTF-8");
+        }
         
         getProcessor.process(sd, cmd, content, out, cmd4);
         out.flush();

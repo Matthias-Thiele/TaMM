@@ -15,6 +15,8 @@ import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,7 +74,7 @@ public class GetProcessor {
         break;
         
       case "lockmail":
-        processLock(cmd4);
+        processLock(resultData, cmd4);
         break;
         
       case "locklist":
@@ -84,7 +86,8 @@ public class GetProcessor {
    * User request to add his mail address to the lock list.
    * @param key 
    */
-  private void processLock(String key) throws TammError {
+  private void processLock(OutputStream resultData, String key) throws TammError, IOException {
+    String message;
     logger.info(key);
     UserData reqUser = application.requests.getUserItem(key);
     if (reqUser != null) {
@@ -92,7 +95,13 @@ public class GetProcessor {
       lock.mailAddress = reqUser.mail;
       lock.lockDate = DateUtils.formatZ(null);
       application.locks.writeLock(lock);
+      application.requests.removeKey(key);
+      message = "Die Mail Adresse wurde in die Sperrliste aufgenommen.";
+    } else {
+      message = "Der Zugriffsschlüssel ist bereits abgelaufen.";
     }
+    
+    resultData.write(message.getBytes(StandardCharsets.UTF_8));
   }
   
   /**

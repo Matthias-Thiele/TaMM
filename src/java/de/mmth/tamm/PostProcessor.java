@@ -321,6 +321,7 @@ public class PostProcessor {
       updateUser.pwd = PasswordUtils.encodePassword(loginData.pwd);
       application.users.writeUser(updateUser);
       found = true;
+      application.requests.removeKey(loginData.key);
     } else {
       message = "Ungültiger oder abgelaufener Schlüssel";
     }

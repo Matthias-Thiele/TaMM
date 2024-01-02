@@ -58,6 +58,14 @@ public class RequestCache {
   }
   
   /**
+   * Removes the entry with the given key from the request list.
+   * @param key 
+   */
+  public void removeKey(String key) {
+    cache.remove(key);
+  }
+  
+  /**
    * Generate a random key for the password request.
    * 
    * @return 
