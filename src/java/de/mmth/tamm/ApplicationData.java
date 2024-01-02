@@ -99,6 +99,14 @@ public class ApplicationData {
         refreshClientNames();
         requests = new RequestCache();
         prepareUploadBase();
+        
+        if (rootPath != null) {
+          File destination = new File(rootPath, "requestCache.lines");
+          if (destination.exists()) {
+            requests.load(destination.toPath());
+          }
+        }
+    
       }
     }
     

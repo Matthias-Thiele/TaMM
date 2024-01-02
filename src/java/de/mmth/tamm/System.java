@@ -13,6 +13,7 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -30,12 +31,27 @@ public class System extends HttpServlet {
   private final PostProcessor postProcessor = new PostProcessor(application);
   private final GetProcessor getProcessor = new GetProcessor(application);
   private final DeleteProcessor deleteProcessor = new DeleteProcessor(application);
+  private final BackgroundWorker backgroundWorker = new BackgroundWorker(application);
   
   @Override
   public void init() {
     application.setSchema("tamm");
     var sc = this.getServletContext();
     sc.setAttribute("application", application);
+    
+    backgroundWorker.start();
+  }
+  
+  @Override
+  public void destroy() {
+    logger.info("Stop background worker.");
+    backgroundWorker.interrupt();
+    
+    if (application.rootPath != null) {
+      File destination = new File(application.rootPath, "requestCache.lines");
+      destination.delete();
+      application.requests.save(destination.toPath());
+    }
   }
   
   /**
