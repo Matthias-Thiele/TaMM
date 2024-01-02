@@ -5,14 +5,13 @@
 package de.mmth.tamm;
 
 import de.mmth.tamm.data.ClientData;
-import de.mmth.tamm.data.KeyValue;
+import de.mmth.tamm.data.LockData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.data.TaskData;
 import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,10 +44,14 @@ public class DeleteProcessor {
    * @throws IOException 
    * @throws de.mmth.tamm.TammError 
    */
-  public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData, String cmd4) throws IOException, TammError {
+  public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData, String cmd4, String cmd5) throws IOException, TammError {
     switch (cmd) {
       case "removetask":
         processRemoveTask(resultData, session, cmd4);
+        break;
+        
+      case "deletelock":
+        processDeleteLock(resultData, session, cmd4, cmd5);
         break;
     }
   }
@@ -73,6 +76,34 @@ public class DeleteProcessor {
     }
     
     ServletUtils.sendResult(resultData, isOk, "", "", "", null);
+  }
+  
+  /**
+   * Deletes the given mail address lock.
+   * 
+   * One mail address can have several locks, for deletion 
+   * there has to be the address and the timestamp.
+   * @param resultData
+   * @param session
+   * @param cmd4 mail address
+   * @param cmd5 timestamp
+   * @throws IOException
+   * @throws TammError 
+   */
+  private void processDeleteLock(OutputStream resultData, SessionData session, String cmd4, String cmd5) throws IOException, TammError {
+    boolean isOk = (session.user != null) && session.user.mainAdmin;
+    String message = "";
+    
+    if (isOk) {
+      LockData lock = new LockData();
+      lock.mailAddress = cmd4;
+      lock.lockDate = cmd5;
+      application.locks.removeLock(lock);
+    } else {
+      message = "Zugriff verweigert.";
+    }
+    
+    ServletUtils.sendResult(resultData, isOk, "", "", message, null);
   }
   
 }

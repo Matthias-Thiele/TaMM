@@ -24,6 +24,7 @@ public class LockTable extends DBTable {
     """
     mailaddress V 250
     lockdate V 20
+    lockip V 30
     lockcounter I
     """;
   
@@ -53,6 +54,7 @@ public class LockTable extends DBTable {
         var col = 1;
         stmt.setString(col++, lock.mailAddress.toLowerCase());
         stmt.setString(col++, lock.lockDate);
+        stmt.setString(col++, lock.lockIP);
         stmt.setInt(col++, 0);
 
         stmt.execute();
@@ -143,12 +145,20 @@ public class LockTable extends DBTable {
     }
   }
   
+  /**
+   * Reads the current sql row and copies it to the LockData return object.
+   * 
+   * @param rows
+   * @return
+   * @throws SQLException 
+   */
   private LockData getData(ResultSet rows) throws SQLException {
     var result = new LockData();
     
     int col = 1;
     result.mailAddress = rows.getString(col++);
     result.lockDate = rows.getString(col++);
+    result.lockIP = rows.getString(col++);
     result.lockCounter = rows.getInt(col++);
     
     return result;

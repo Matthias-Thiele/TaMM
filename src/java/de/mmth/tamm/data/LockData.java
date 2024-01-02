@@ -11,5 +11,6 @@ package de.mmth.tamm.data;
 public class LockData {
   public String mailAddress;
   public String lockDate;
+  public String lockIP;
   public int lockCounter;
 }

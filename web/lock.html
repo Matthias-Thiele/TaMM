@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!--
+(c) 2023 by Matthias Thiele
+GNU General Public License v3.0
+-->
+<html>
+    <head>
+        <title>TaMM Gesperrte Mail Adressen</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="tamm.css">
+        <link rel="stylesheet" href="menu.css">
+        <link rel="shortcut icon" href="favicon.ico"/> 
+        <style>
+            .lockitem {
+                display: inline-block;
+                border: 1px solid silver;
+                border-radius: 5pt;
+                background-color: #f8f8fc;
+                margin: 3pt;
+                padding: 5pt;
+            }
+            
+            .lockitem button {
+                margin-left: 3pt;
+            }
+            
+            #locklist {
+                min-height: 300pt;
+            }
+        </style>
+        <script src="common.js"></script> 
+        <script>
+            var sessionData;
+            
+            async function loadSessionData() {
+                const response = await fetch("system/session", {'method': 'GET'});
+                const responseData = await response.json();
+                console.log(responseData);
+                if (responseData.result === "error") {
+                    window.location = responseData.nextPage + "?next=lock.html";
+                } else {
+                    sessionData = responseData.data;
+                }
+            }
+            
+            async function doFilter() {
+                const filterValue = encodeURIComponent(getValue("filter"));
+                const response = await fetch("system/locklist/" + filterValue, {'method': 'GET'});
+                const responseData = await response.json();
+                console.log(responseData);
+                if (responseData.result === "error") {
+                    setStaus(responseData.message);
+                } else {
+                    displayResult(responseData.data);
+                }
+            }
+            
+            async function deleteLockItem(mail, date) {
+                console.log("Remove mail" + mail);
+                var encodedMail = encodeURIComponent(mail);
+                var encodedDate = encodeURIComponent(date);
+                const responseData = await fetch("system/deletelock/" + encodedMail + "/" + encodedDate, {'method': 'DELETE'});
+                if (responseData.result === "error") {
+                    setStaus(responseData.message);
+                } else {
+                    doFilter();
+                }
+            }
+            
+            async function addDomainLock(mail) {
+                console.log(mail);
+                var data = {};
+                data.filterText = mail;
+                const response = await fetch("system/domainlock", {'method': 'POST', 'body': JSON.stringify(data)});
+                const responseData = await response.json();
+                console.log(responseData);
+                if (responseData.result === "error") {
+                    setStaus(responseData.message);
+                } else {
+                    doFilter();
+                }
+            }
+            
+            function displayResult(items) {
+                var root = document.getElementById("locklist");
+                root.innerHTML = "";
+                var line = 1;
+                
+                items.forEach((item) => {
+                    root.appendChild(createLockItem(line++, item));
+                });
+            }
+            
+            function createLockItem(itemNo, item) {
+                var outerDiv = document.createElement("div");
+                outerDiv.className = "lockitem";
+                var mailDiv = createInputLine(itemNo, "mail", "Mail Adresse", false, item.mailAddress);
+                var dateDiv = createInputLine(itemNo, "lockdate", "Gesperrt seit", false, item.lockDate);
+                var ipDiv = createInputLine(itemNo, "ip", "IP Adresse", false, item.lockIP);
+                var count = createInputLine(itemNo, "lockcount", "Anzahl Zugriffsversuche", true, item.lockCounter);
+                var btDelete = document.createElement("button");
+                btDelete.innerText = "Sperre löschen";
+                btDelete.onclick = function() { deleteLockItem(item.mailAddress, item.lockDate); };
+                var btDomain = document.createElement("button");
+                btDomain.onclick = function() { addDomainLock(item.mailAddress); };
+                btDomain.innerText = "Domäne sperren";
+                
+                outerDiv.appendChild(mailDiv);
+                outerDiv.appendChild(dateDiv);
+                outerDiv.appendChild(ipDiv);
+                outerDiv.appendChild(count);
+                outerDiv.appendChild(btDelete);
+                outerDiv.appendChild(btDomain);
+                
+                return outerDiv;
+            }
+            
+            function createInputLine(lineno, linename, labeltext, isNumber, text) {
+                var outerDiv = document.createElement("div");
+                var label = document.createElement("label");
+                label.innerText = labeltext;
+                var id = linename + lineno;
+                label.for = id;
+                
+                var input = document.createElement("input");
+                input.id = id;
+                input.disabled = true;
+                input.value = text;
+                if (isNumber) {
+                    input.type = "number";
+                    input.style = "width: 50pt;";
+                }
+                
+                outerDiv.appendChild(label);
+                outerDiv.appendChild(input);
+                return outerDiv;
+            }
+        </script>
+    </head>
+    <body onload="loadSessionData()">
+        <div class="bodybox">
+            <div class="header">Tamm Gesperrte Mail Adressen</div>
+            <div>
+                <label for="filter">Mail Adresse</label><input id="filter"><button onclick="doFilter()">Suchen</button>
+            </div>
+            <hr>
+            <div id="locklist"></div>
+            <div class="statusbar" id="status"></div>
+        </div>
+    </body>
+</html>

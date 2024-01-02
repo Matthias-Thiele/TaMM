@@ -10,7 +10,9 @@ import com.google.gson.Gson;
 import de.mmth.tamm.data.AdminData;
 import de.mmth.tamm.data.AttachmentData;
 import de.mmth.tamm.data.ClientData;
+import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.JsonResult;
+import de.mmth.tamm.data.LockData;
 import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.PasswordUtils;
@@ -106,6 +108,10 @@ public class PostProcessor {
         case "saveurl":
           processSaveUrlAttachment(reader, resultData, session);
           break;
+          
+        case "domainlock":
+          processDomainLock(reader, resultData, session);
+          break;
       }
     }
   }
@@ -142,11 +148,16 @@ public class PostProcessor {
    * @throws TammError 
    */
   private void processSaveClient(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
-    ClientData clientData = new Gson().fromJson(reader, ClientData.class);
-    logger.debug("Process login request for user" + clientData.name);
-    application.clients.writeClient(clientData);
-    application.refreshClientNames();
-    ServletUtils.sendResult(resultData, true, "", "", "", null);
+    String message = "";
+    if ((session.user == null) || !session.user.mainAdmin) {
+      message = "Kein Zugriff.";
+    } else {
+      ClientData clientData = new Gson().fromJson(reader, ClientData.class);
+      logger.debug("Process login request for user" + clientData.name);
+      application.clients.writeClient(clientData);
+      application.refreshClientNames();
+    }
+    ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, null);
   }
   
   /**
@@ -288,6 +299,36 @@ public class PostProcessor {
     }
     
     ServletUtils.sendResult(resultData, found, "login.html", "", message, null);
+  }
+
+  /**
+   * Creates a new mail address lock.
+   * 
+   * @param reader
+   * @param resultData
+   * @param session
+   * @throws TammError
+   * @throws IOException 
+   */
+  private void processDomainLock(Reader reader, OutputStream resultData, SessionData session) throws TammError, IOException {
+    String message = "";
+    if (session.user.mainAdmin) {
+      FindData findData = new Gson().fromJson(reader, FindData.class);
+      var mail = findData.filterText;
+      var pos = mail.indexOf('@');
+      if (pos > 0) {
+        mail = mail.substring(pos);
+      }
+      LockData lock = new LockData();
+      lock.mailAddress = mail;
+      lock.lockDate = DateUtils.formatZ(null);
+      lock.lockIP = "admin";
+      application.locks.writeLock(lock);
+    } else {
+      message = "Zugriff verweigert.";
+    }
+    
+    ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, null);
   }
   
 }

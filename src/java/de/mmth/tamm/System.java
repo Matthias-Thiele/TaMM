@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -67,6 +69,11 @@ public class System extends HttpServlet {
         }
 
         String cmd4 = (uriParts.length > 4) ? uriParts[4] : "";
+        if (!cmd4.isBlank()) {
+          cmd4 = URLDecoder.decode(cmd4, StandardCharsets.UTF_8.toString());
+        }
+        
+        
         getProcessor.process(sd, cmd, content, out, cmd4);
         out.flush();
       } catch(TammError te) {
@@ -157,7 +164,16 @@ public class System extends HttpServlet {
         }
 
         String cmd4 = (uriParts.length > 4) ? uriParts[4] : "";
-        deleteProcessor.process(sd, cmd, content, out, cmd4);
+        if (!cmd4.isBlank()) {
+          cmd4 = URLDecoder.decode(cmd4, StandardCharsets.UTF_8.toString());
+        }
+        
+        String cmd5 = (uriParts.length > 5) ? uriParts[5] : "";
+        if (!cmd5.isBlank()) {
+          cmd5 = URLDecoder.decode(cmd5, StandardCharsets.UTF_8.toString());
+        }
+        
+        deleteProcessor.process(sd, cmd, content, out, cmd4, cmd5);
         out.flush();
       } catch(TammError te) {
         ServletUtils.sendResult(out, false, "", "", te.getMessage(), null);

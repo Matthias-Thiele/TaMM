@@ -38,7 +38,7 @@ public class LockTableTest {
   @Test
   public void testCheckColumns() {
     var cols = LockTable.TABLE_CONFIG.split("\\R");
-    assertEquals("Number of columns changed", 3, cols.length);
+    assertEquals("Number of columns changed", 4, cols.length);
   }
   
   /**
@@ -52,6 +52,7 @@ public class LockTableTest {
     LockData lock = new LockData();
     lock.mailAddress = "someaddress@test.de";
     lock.lockDate = "20240102";
+    lock.lockIP = "192.168.1.1";
     
     instance.writeLock(lock);
     
@@ -60,6 +61,7 @@ public class LockTableTest {
     LockData data1 = result.get(0);
     assertEquals("Mailaddress mismatch", lock.mailAddress, data1.mailAddress);
     assertEquals("Lockdate mismatch", lock.lockDate, data1.lockDate);
+    assertEquals("Lock IP address mismatch", lock.lockIP, data1.lockIP);
     assertEquals("No increment yet", 0, data1.lockCounter);
     
     instance.incrementLockCount(lock.mailAddress);

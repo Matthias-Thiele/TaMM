@@ -73,6 +73,10 @@ public class GetProcessor {
         
       case "lockmail":
         processLock(cmd4);
+        break;
+        
+      case "locklist":
+        processLockList(resultData, session, cmd4);
     }
   }
   
@@ -101,15 +105,21 @@ public class GetProcessor {
    * @throws TammError 
    */
   private void processSession(OutputStream resultData, SessionData session) throws IOException, TammError {
+    String message = "";
     boolean isOk = session.user != null;
-    ClientData client = session.client;
-    List<KeyValue> clientNames = application.userNamesMap.get(client.name);
-    if (clientNames == null) {
-      clientNames = application.users.listUserNames(client.id);
-      application.userNamesMap.put(client.name, clientNames);
+    if (isOk) {
+      ClientData client = session.client;
+      List<KeyValue> clientNames = application.userNamesMap.get(client.name);
+      if (clientNames == null) {
+        clientNames = application.users.listUserNames(client.id);
+        application.userNamesMap.put(client.name, clientNames);
+      }
+      session.userNames = clientNames;
+    } else {
+      message = "Anmeldung fehlt.";
     }
-    session.userNames = clientNames;
-    ServletUtils.sendResult(resultData, isOk, "", "login.html", "", session);
+    
+    ServletUtils.sendResult(resultData, isOk, "", "login.html", message, session);
   }
   
   /**
@@ -126,16 +136,41 @@ public class GetProcessor {
     ServletUtils.sendResult(resultData, true, "login.html", "", "", session);
   }
   
+  /**
+   * Returns a list of configured clients.
+   * 
+   * @param resultData
+   * @param session
+   * @throws IOException
+   * @throws TammError 
+   */
   private void processClientList(OutputStream resultData, SessionData session) throws IOException, TammError {
     boolean isUser = session.user != null;
     ServletUtils.sendResult(resultData, isUser, "", "", "", isUser ? application.clientList : null);
   }
   
+  /**
+   * Returns a list of file or url attachments of the given task.
+   * 
+   * @param resultData
+   * @param session
+   * @param param task id
+   * @throws IOException
+   * @throws TammError 
+   */
   private void processAttachmentsList(OutputStream resultData, SessionData session, String param) throws IOException, TammError {
     var attachmentList = application.attachments.listAttachments(session.client.id, Long.parseLong(param));
     ServletUtils.sendResult(resultData, true, "", "", "", attachmentList);
   }
 
+  /**
+   * Returns the admin data object.
+   * 
+   * null if not main administrator. This is not an error.
+   * @param resultData
+   * @param session
+   * @throws IOException 
+   */
   private void processInitdata(OutputStream resultData, SessionData session) throws IOException {
     AdminData data = null;
     if ((session.user != null) && session.user.mainAdmin) {
@@ -143,6 +178,22 @@ public class GetProcessor {
     }
     
     ServletUtils.sendResult(resultData, true, "", "", "", data);
+  }
+
+  /**
+   * Returns a list of locked mail addresses.
+   * 
+   * cmd4 contains a filter. SQL wildcard characters are allowed.
+   * 
+   * @param resultData
+   * @param session
+   * @param cmd4 filter text
+   * @throws TammError
+   * @throws IOException 
+   */
+  private void processLockList(OutputStream resultData, SessionData session, String cmd4) throws TammError, IOException {
+    List<LockData> result = application.locks.listLocks(cmd4);
+    ServletUtils.sendResult(resultData, true, "", "", "", result);
   }
   
 }
