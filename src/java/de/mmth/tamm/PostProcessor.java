@@ -315,9 +315,9 @@ public class PostProcessor {
     String message = "";
     boolean found = false;
     LoginData loginData = new Gson().fromJson(reader, LoginData.class);
-    UserData requestUser = application.requests.getUserItem(loginData.key);
-    if (requestUser != null) {
-      var updateUser = application.users.readUser(session.client.id, requestUser.id, null);
+    int userId = application.requests.getUserId(loginData.key);
+    if (userId != -1) {
+      var updateUser = application.users.readUser(session.client.id, userId, null);
       updateUser.pwd = PasswordUtils.encodePassword(loginData.pwd);
       application.users.writeUser(updateUser);
       found = true;

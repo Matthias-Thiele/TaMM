@@ -25,7 +25,7 @@ public class RequestCacheTest {
   
   @BeforeClass
   public static void setUpClass() {
-    String currentUsersHomeDir = System.getProperty("user.home");
+    String currentUsersHomeDir = System.getProperty("java.io.tmpdir");
     savePath = new File(currentUsersHomeDir, "test-requests.txt").toPath();
   }
   
@@ -56,8 +56,10 @@ public class RequestCacheTest {
     assertFalse(key1.isEmpty());
     
     System.out.println("getUserItem");
-    UserData user3 = instance.getUserItem(key1);
-    assertEquals(user1, user3);
+    String user3mail = instance.getUserMail(key1);
+    assertEquals(user1.mail, user3mail);
+    int user3id = instance.getUserId(key1);
+    assertEquals(user1.id, user3id);
     
     System.out.println("save");
     String key2 = instance.add(user2, duration);
@@ -66,13 +68,13 @@ public class RequestCacheTest {
     RequestCache instance2 = new RequestCache();
     instance2.load(savePath);
     
-    UserData user1A = instance2.getUserItem(key1);
+    String user1A = instance2.getUserMail(key1);
     assertNotNull(user1A);
-    assertEquals(user1.mail, user1A.mail);
+    assertEquals(user1.mail, user1A);
     
-    UserData user2A = instance2.getUserItem(key2);
+    String user2A = instance2.getUserMail(key2);
     assertNotNull(user2A);
-    assertEquals(user2.mail, user2A.mail);
+    assertEquals(user2.mail, user2A);
   }
 
   

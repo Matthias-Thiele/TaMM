@@ -4,7 +4,6 @@
  */
 package de.mmth.tamm.utils;
 
-import de.mmth.tamm.data.UserData;
 import java.util.Date;
 
 /**
@@ -14,5 +13,7 @@ import java.util.Date;
 public class CacheItem {
   String key;
   Date expirationDate;
-  UserData item;
+  String mail;
+  String name;
+  int id;
 }

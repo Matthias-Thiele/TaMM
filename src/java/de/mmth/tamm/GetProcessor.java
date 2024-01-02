@@ -88,10 +88,10 @@ public class GetProcessor {
   private void processLock(OutputStream resultData, String key) throws TammError, IOException {
     String message;
     logger.info(key);
-    UserData reqUser = application.requests.getUserItem(key);
-    if (reqUser != null) {
+    String userMail = application.requests.getUserMail(key);
+    if (userMail != null) {
       LockData lock = new LockData();
-      lock.mailAddress = reqUser.mail;
+      lock.mailAddress = userMail;
       lock.lockDate = DateUtils.formatZ(null);
       application.locks.writeLock(lock);
       application.requests.removeKey(key);

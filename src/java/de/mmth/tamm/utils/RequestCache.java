@@ -39,7 +39,9 @@ public class RequestCache {
     String key = generateKey();
     var newEntry = new CacheItem();
     newEntry.key = key;
-    newEntry.item = item;
+    newEntry.name = item.name;
+    newEntry.mail = item.mail;
+    newEntry.id = item.id;
     newEntry.expirationDate = new Date((new Date()).getTime() + duration);
     
     cache.put(key, newEntry);
@@ -49,18 +51,18 @@ public class RequestCache {
   }
   
   /**
-   * Loads a password request from the cache.
+   * Loads the mail address of a password request from the cache.
    * 
    * Checks the expiration date and removes old entries.
    * 
    * @param key
    * @return 
    */
-  public UserData getUserItem(String key) {
+  public String getUserMail(String key) {
     var found = cache.get(key);
     if (found != null) {
       if (found.expirationDate.after(new Date())) {
-        var user = found.item;
+        var user = found.mail;
         return user;
       } else {
         cache.remove(key);
@@ -68,6 +70,28 @@ public class RequestCache {
     }
     
     return null;
+  }
+  
+  /**
+   * Loads the user id of a password request from the cache.
+   * 
+   * Checks the expiration date and removes old entries.
+   * 
+   * @param key
+   * @return 
+   */
+  public int getUserId(String key) {
+    var found = cache.get(key);
+    if (found != null) {
+      if (found.expirationDate.after(new Date())) {
+        var id = found.id;
+        return id;
+      } else {
+        cache.remove(key);
+      }
+    }
+    
+    return -1;
   }
   
   /**
@@ -115,7 +139,7 @@ public class RequestCache {
     logger.info("Save request cache.");
 
     for (var item: cache.values()) {
-      var line = item.key + "|" + item.expirationDate.getTime() + "|" + item.item.id + "|" + item.item.name + "|" + item.item.mail + "\r\n"; 
+      var line = item.key + "|" + item.expirationDate.getTime() + "|" + item.id + "|" + item.name + "|" + item.mail + "\r\n"; 
       try {
         Files.writeString(destination, line, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
       } catch (IOException ex) {
@@ -141,15 +165,12 @@ public class RequestCache {
       for (var line: lines) {
         String[] parts = line.split("\\|");
         if (parts.length == 5) {
-          UserData user = new UserData();
-          user.id = Integer.parseInt(parts[2]);
-          user.name = parts[3];
-          user.mail = parts[4];
-          
           String key = parts[0];
           var newEntry = new CacheItem();
           newEntry.key = key;
-          newEntry.item = user;
+          newEntry.id = Integer.parseInt(parts[2]);
+          newEntry.name = parts[3];
+          newEntry.mail = parts[4];
           newEntry.expirationDate = new Date(Long.parseLong(parts[1]));
 
           cache.put(key, newEntry);
