@@ -237,41 +237,27 @@ public class PostProcessor {
     String message = "Unbekannter Anwender oder Mailadresse";
     boolean isOk = false;
     try {
-      if (application.locks.checkLock(userData.mail)) {
-        message = "Diese Mail Adresse ist gesperrt.";
-        application.locks.incrementLockCount(userData.mail);
-      } else {
-        String domain = userData.mail;
-        int pos = domain.indexOf('@');
-        if (pos > 0) {
-          domain = domain.substring(pos);
-        }
-        if (application.locks.checkLock(domain)) {
-          message = "Diese Mail Domäne ist gesperrt.";
-          application.locks.incrementLockCount(domain);
-        } else {
-          var checkUser = application.users.readUser(session.client.id, -1, userData.name);
-          if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
-            String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS, session.clientIp);
-            String validUntil = DateUtils.formatD(application.requests.getValidDate(key));
-            logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
-            if (application.mailer != null) {
-              var requestUrl = application.tammUrl + "newpwd.html?key=" + key;
-              var lockUrl = application.tammUrl + "system/lockmail/" + key;
-              try {
-                message = processMail(requestUrl, lockUrl, userData.mail, validUntil);
-                isOk = true;
-              } catch (EmailException ex) {
-                logger.warn("Error sending mail.", ex);
-                message = "Fehler beim Versenden der Mail.";
-              }
-            } else {
-              message = "Fehlende Mail-Konfiguration. Anforderung im Log verzeichnet.";
-            }
-          } else {
-            logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);
+      message = checkLocked(userData.mail);
+      var checkUser = application.users.readUser(session.client.id, -1, userData.name);
+      if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
+        String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS, session.clientIp);
+        String validUntil = DateUtils.formatD(application.requests.getValidDate(key));
+        logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
+        if (application.mailer != null) {
+          var requestUrl = application.tammUrl + "newpwd.html?key=" + key;
+          var lockUrl = application.tammUrl + "system/lockmail/" + key;
+          try {
+            message = processMail(requestUrl, lockUrl, userData.mail, validUntil);
+            isOk = true;
+          } catch (EmailException ex) {
+            logger.warn("Error sending mail.", ex);
+            message = "Fehler beim Versenden der Mail.";
           }
+        } else {
+          message = "Fehlende Mail-Konfiguration. Anforderung im Log verzeichnet.";
         }
+      } else {
+        logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);
       }
     } catch(TammError ex) {
       logger.debug("Invalid password request for " + userData.name);
@@ -281,6 +267,43 @@ public class PostProcessor {
   }
   
   /**
+   * Checks if the mail address accepts mails.
+   * 
+   * Invalid requests will be counted in the lock list.
+   * 
+   * @param mail
+   * @return null if ok, otherwiese error message
+   * @throws TammError 
+   */
+  private String checkLocked(String mail) throws TammError {
+    String message = null;
+    if (application.locks.checkLock(mail)) {
+      message = "Diese Mail Adresse ist gesperrt.";
+      application.locks.incrementLockCount(mail);
+    } else {
+      String domain = mail;
+      int pos = domain.indexOf('@');
+      if (pos > 0) {
+        domain = domain.substring(pos);
+      }
+      if (application.locks.checkLock(domain)) {
+        message = "Diese Mail Domäne ist gesperrt.";
+        application.locks.incrementLockCount(domain);
+      }
+    }
+    
+    return message;
+  }
+  
+  /**
+   * Create the mail body and send it to the given address.
+   * 
+   * @param requestUrl
+   * @param lockUrl
+   * @param mailAddress
+   * @return
+   * @throws EmailException 
+   */  /**
    * Create the mail body and send it to the given address.
    * 
    * @param requestUrl
