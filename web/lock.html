@@ -61,9 +61,10 @@ GNU General Public License v3.0
                 const responseData = await response.json();
                 console.log(responseData);
                 if (responseData.result === "error") {
-                    setStaus(responseData.message);
+                    stausMsg(responseData.message);
                 } else {
-                    displayResult(responseData.data);
+                    var lines = displayResult(responseData.data) - 1;
+                    statusMsg("Sperreinträge: " + lines);
                 }
             }
             
@@ -73,7 +74,7 @@ GNU General Public License v3.0
                 var encodedDate = encodeURIComponent(date);
                 const responseData = await fetch("system/deletelock/" + encodedMail + "/" + encodedDate, {'method': 'DELETE'});
                 if (responseData.result === "error") {
-                    setStaus(responseData.message);
+                    stausMsg(responseData.message);
                 } else {
                     doFilter();
                 }
@@ -101,6 +102,8 @@ GNU General Public License v3.0
                 items.forEach((item) => {
                     root.appendChild(createLockItem(line++, item));
                 });
+                
+                return line;
             }
             
             function createLockItem(itemNo, item) {

@@ -239,6 +239,7 @@ public class PostProcessor {
     try {
       if (application.locks.checkLock(userData.mail)) {
         message = "Diese Mail Adresse ist gesperrt.";
+        application.locks.incrementLockCount(userData.mail);
       } else {
         String domain = userData.mail;
         int pos = domain.indexOf('@');
@@ -247,6 +248,7 @@ public class PostProcessor {
         }
         if (application.locks.checkLock(domain)) {
           message = "Diese Mail Domäne ist gesperrt.";
+          application.locks.incrementLockCount(domain);
         } else {
           var checkUser = application.users.readUser(session.client.id, -1, userData.name);
           if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
