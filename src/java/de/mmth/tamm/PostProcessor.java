@@ -16,6 +16,7 @@ import de.mmth.tamm.data.LockData;
 import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.PasswordUtils;
+import de.mmth.tamm.utils.Placeholder;
 import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +25,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import javax.swing.text.DateFormatter;
 import org.apache.commons.mail.EmailException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -247,12 +251,13 @@ public class PostProcessor {
           var checkUser = application.users.readUser(session.client.id, -1, userData.name);
           if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
             String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS);
+            String validUntil = DateUtils.formatD(application.requests.getValidDate(key));
             logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
             if (application.mailer != null) {
               var requestUrl = application.tammUrl + "newpwd.html?key=" + key;
               var lockUrl = application.tammUrl + "system/lockmail/" + key;
               try {
-                message = processMail(requestUrl, lockUrl, userData.mail);
+                message = processMail(requestUrl, lockUrl, userData.mail, validUntil);
                 isOk = true;
               } catch (EmailException ex) {
                 logger.warn("Error sending mail.", ex);
@@ -282,23 +287,19 @@ public class PostProcessor {
    * @return
    * @throws EmailException 
    */
-  private String processMail(String requestUrl, String lockUrl, String mailAddress) throws EmailException {
-    var htmlmessage = new StringBuilder(); 
-    htmlmessage.append("<html><body><p>Es wurde ein neues Passwort für Ihren Zugang zum TaMM System angefordert.</p>");
-    htmlmessage.append("<p>Sie können es über <a href='" );
-    htmlmessage.append(requestUrl);
-    htmlmessage.append("'>diesen Link</a> einfügen.</p><p>Falls Sie es nicht selber angefordert haben und in Zukunft keine weiteren Mails ");
-    htmlmessage.append("empfangen wollen, können Sie Ihre Mailadresse über <a href='");
-    htmlmessage.append(lockUrl);
-    htmlmessage.append("'>diesen Link</a> sperren.");
-    var textmessage = new StringBuilder(); 
-    textmessage.append("Es wurde ein neues Passwort für Ihren Zugang zum TaMM System angefordert.\r\n");
-    textmessage.append("Sie können es über diesen Link einfügen:\r\n" );
-    textmessage.append(requestUrl);
-    textmessage.append("\r\n.Falls Sie es nicht selber angefordert haben und in Zukunft keine weiteren Mails\r\n");
-    textmessage.append("empfangen wollen, können Sie Ihre Mailadresse über diesen Link sperren:\r\n");
-    textmessage.append(lockUrl);
-    application.mailer.send(application.adminData.mailreply, mailAddress, "Passwort erneuern", textmessage.toString(), htmlmessage.toString());
+  private String processMail(String requestUrl, String lockUrl, String mailAddress, String linkValidUntil) throws EmailException, TammError {
+    Map<String, String> params = new HashMap<>();
+    params.put("pwdrenewal", requestUrl);
+    params.put("pwdmaillock", lockUrl);
+    params.put("pwdexpired", linkValidUntil);
+    Placeholder ph = new Placeholder();
+    
+    var htmlmessage = application.templates.getTemplate("mail/mailtemplate.html");
+    htmlmessage = ph.resolve(htmlmessage, params);
+    
+    var textmessage = application.templates.getTemplate("mail/mailtemplate.txt");
+    textmessage = ph.resolve(textmessage, params);
+    application.mailer.send(application.adminData.mailreply, mailAddress, "Passwort erneuern", textmessage, htmlmessage);
     
     return "Anforderung per Mail verschickt.";
   }

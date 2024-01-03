@@ -1,0 +1,21 @@
+TaMM Task Management & Monitoring
+
+Es wurde ein neues Passwort für das TaMM System angefordert.
+
+Sie können über den nachfolgenden Link ein Dialog zur Erneuerung 
+des Passworts aufrufen.
+
+{[pwdrenewal]}
+
+Falls Sie diese Mail nicht angefordert haben, können Sie diesen 
+Link ignorieren. Möglicherweise verwendet jemand anderes Ihre 
+Mail Adresse um Störungen hervorzurufen. In diesem Fall können 
+Sie den Mailversand an Ihre Mail Adresse durch den nachfolgenden
+Link unterbinden.
+
+{[pwdmaillock]}
+
+Dieser Link ist bis zum {[pwdexpired]} gültig. Nach diesem Datum 
+muss ein neuer  Schlüssel angefordert werden.
+
+

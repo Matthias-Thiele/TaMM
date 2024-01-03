@@ -68,7 +68,7 @@
                     if (this.readyState === 4 && this.status === 200) {
                         var response = JSON.parse(this.responseText);
                         if (response.result === "error") {
-                            window.location = response.nextPageError + "?next=index.html";
+                            window.location = response.nextPage + "?next=index.html";
                         } else {
                             sessionData = response.data;
                             var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;

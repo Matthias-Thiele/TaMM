@@ -51,6 +51,21 @@ public class RequestCache {
   }
   
   /**
+   * Returns the expiration date of the given key.
+   * 
+   * @param key
+   * @return 
+   */
+  public Date getValidDate(String key) {
+    var found = cache.get(key);
+    if (found != null) {
+      return found.expirationDate;
+    } else {
+      return new Date();
+    }
+  }
+  
+  /**
    * Loads the mail address of a password request from the cache.
    * 
    * Checks the expiration date and removes old entries.

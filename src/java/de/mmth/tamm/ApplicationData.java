@@ -15,6 +15,7 @@ import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.progress.SendMail;
 import de.mmth.tamm.utils.RequestCache;
+import de.mmth.tamm.utils.TemplateCache;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -57,6 +58,7 @@ public class ApplicationData {
   public File rootPath;
   public AttachmentTable attachments;
   public SendMail mailer = null;
+  public TemplateCache templates = new TemplateCache("templates");
   
   /**
    * Reads the database access information from the registry
@@ -105,6 +107,7 @@ public class ApplicationData {
           if (destination.exists()) {
             requests.load(destination.toPath());
           }
+          templates.setFileRoot(rootPath);
         }
     
       }

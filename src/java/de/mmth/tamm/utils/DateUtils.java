@@ -4,10 +4,13 @@
  */
 package de.mmth.tamm.utils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  *
@@ -16,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 public class DateUtils {
   private static final DateTimeFormatter timeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
   private static final DateTimeFormatter dateformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  private static final SimpleDateFormat isoDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   
   /**
    * Format a  zoned date time object into an ISO date string.
@@ -31,6 +35,16 @@ public class DateUtils {
     }
     
     return date.format(timeformatter);
+  }
+  
+  /**
+   * Returns a Date with time as ISO string.
+   * 
+   * @param date
+   * @return 
+   */
+  public static String formatD(Date date) {
+    return isoDate.format(date);
   }
   
   /**

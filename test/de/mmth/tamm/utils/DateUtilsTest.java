@@ -6,6 +6,7 @@ package de.mmth.tamm.utils;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.Date;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -28,6 +29,10 @@ public class DateUtilsTest {
     LocalDate ldate = LocalDate.now();
     result = DateUtils.formatL(ldate);
     assertEquals(10, result.length());
+    
+    Date now = new Date();
+    result = DateUtils.formatD(now);
+    assertEquals(19, result.length());
   }
 
   /**
