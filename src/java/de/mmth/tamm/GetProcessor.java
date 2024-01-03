@@ -8,8 +8,8 @@ import de.mmth.tamm.data.AdminData;
 import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.LockData;
+import de.mmth.tamm.data.RoleData;
 import de.mmth.tamm.data.SessionData;
-import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.RequestCache;
 import de.mmth.tamm.utils.ServletUtils;
@@ -83,6 +83,10 @@ public class GetProcessor {
         
       case "pwreq":
         processPasswordRequestList(resultData, session);
+        break;
+        
+      case "roleslist":
+        processRolesList(resultData, session, cmd4);
         break;
     }
   }
@@ -246,6 +250,31 @@ public class GetProcessor {
     }
     
     ServletUtils.sendResult(resultData, message.isEmpty(), "", "", "", requests);
+  }
+
+  /**
+   * Sends a list of all roles of the current user.
+   * 
+   * Only main admins and sub admins are allowed.
+   * main admins can read all roles with parameter "all"
+   * 
+   * @param resultData
+   * @param session
+   * @param cmd4 empty or "all"
+   * @throws TammError
+   * @throws IOException 
+   */
+  private void processRolesList(OutputStream resultData, SessionData session, String cmd4) throws TammError, IOException {
+    List<RoleData> result = null;
+    String message = "";
+    if ((session.user == null) || !(session.user.mainAdmin || session.user.subAdmin)) {
+      message = "Kein Zugriff.";
+    } else {
+      int owner = (session.user.mainAdmin && cmd4.equals("all")) ? -1 : session.user.id;
+      result = application.roles.listRoles(session.client.id, owner);
+    }
+    
+    ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, result);
   }
   
 }

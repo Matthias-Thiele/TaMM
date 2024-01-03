@@ -242,9 +242,10 @@ Userlist.prototype.nameFromId = function(userId) {
  * @param {type} labeltext
  * @param {type} isNumber
  * @param {type} text
+ * @param {type} enabled 
  * @returns {createInputLine.outerDiv|HTMLElement}
  */
-function createInputLine(lineno, linename, labeltext, isNumber, text) {
+function createInputLine(lineno, linename, labeltext, isNumber, text, enabled) {
     var outerDiv = document.createElement("div");
     var label = document.createElement("label");
     label.innerText = labeltext;
@@ -253,7 +254,7 @@ function createInputLine(lineno, linename, labeltext, isNumber, text) {
 
     var input = document.createElement("input");
     input.id = id;
-    input.disabled = true;
+    input.disabled = !enabled;
     input.value = (text) ? text : "";
     if (isNumber) {
         input.type = "number";

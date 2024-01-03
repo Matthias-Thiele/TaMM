@@ -11,6 +11,7 @@ import de.mmth.tamm.db.AttachmentTable;
 import de.mmth.tamm.db.ClientTable;
 import de.mmth.tamm.db.DBConnect;
 import de.mmth.tamm.db.LockTable;
+import de.mmth.tamm.db.RoleTable;
 import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.progress.SendMail;
@@ -49,6 +50,7 @@ public class ApplicationData {
   public TaskTable history;
   public ClientTable clients;
   public LockTable locks;
+  public RoleTable roles;
   
   public RequestCache requests;
   public String tammUrl;
@@ -93,6 +95,7 @@ public class ApplicationData {
         clients = new ClientTable(db, "clientlist");
         locks = new LockTable(db, "locklist");
         attachments = new AttachmentTable(db, "attachments");
+        roles = new RoleTable(db, "roleslist");
         
         if (!adminData.mailadminname.isBlank() && !adminData.mailadminpwd.isBlank() && !adminData.mailhost.isBlank()) {
           mailer = new SendMail(adminData.mailhost, adminData.mailadminname, adminData.mailadminpwd);

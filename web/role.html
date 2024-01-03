@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<!--
+(c) 2023 by Matthias Thiele
+GNU General Public License v3.0
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="tamm.css">
+        <link rel="stylesheet" href="menu.css">
+        <link rel="shortcut icon" href="favicon.ico"/> 
+        <style>
+            .roleitem {
+                display: inline-block;
+                border: 1px solid silver;
+                border-radius: 5pt;
+                background-color: #f8f8fc;
+                margin: 3pt;
+                padding: 5pt;
+            }
+            
+            .roleitem button {
+                margin-left: 3pt;
+            }
+            
+            #rolelist {
+                min-height: 300pt;
+            }
+            
+        </style>
+        <script src="common.js"></script> 
+        <script>
+            var sessionData;
+            var lineNo = 1;
+            
+            /**
+             * Load user information and other session data.
+             * @returns {undefined}
+             */
+            async function loadSessionData() {
+                const fetchsession = await fetch("system/session", {'method': 'GET'});
+                const response = await fetchsession.json();
+                if (response.result === "error") {
+                    window.location = response.nextPage + "?next=index.html";
+                } else {
+                    sessionData = response.data;
+                    var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
+
+                    if (!someKindOfAdmin) {
+                        showBlockElement("menuuser", false);
+                    }
+
+                    setTimeout(listRoles, 200);
+                }
+            }
+            
+            async function listRoles() {
+                const fetchlist = await fetch("system/roleslist", {'method': 'GET'});
+                const response = await fetchlist.json();
+                if (response.result === "error") {
+                    statusMsg(response.message);
+                } else {
+                    fillRolesList(response.data);
+                }
+            }
+            
+            function fillRolesList(data) {
+                data.forEach((role) => {addRole(role)});
+            }
+            
+            function addRole(roleData) {
+                if (!roleData) {
+                    roleData = {id: -1, name: "", clientId: -1, owner: -1};
+                }
+                var div = createRoleItem(lineNo++, roleData);
+                var root = document.getElementById("rolelist");
+                root.appendChild(div);
+            }
+            
+            function createRoleItem(itemNo, item) {
+                var outerDiv = document.createElement("div");
+                outerDiv.className = "roleitem";
+                var idDiv = createInputLine(itemNo, "roleid", "Id", true, item.id);
+                var nameDiv = createInputLine(itemNo, "rolename", "Name", false, item.name, true);
+                var btDelete = document.createElement("button");
+                btDelete.innerText = "Rolle löschen";
+                btDelete.onclick = function() { deleteRoleItem(outerDiv, item.id); };
+                var btSave = document.createElement("button");
+                btSave.innerText = "Rolle speichern";
+                btSave.onclick = function() { saveRoleItem(outerDiv, itemNo); };
+                
+                outerDiv.appendChild(idDiv);
+                outerDiv.appendChild(nameDiv);
+                outerDiv.appendChild(btDelete);
+                outerDiv.appendChild(btSave);
+                
+                return outerDiv;
+            }
+            
+            async function deleteRoleItem(div, id) {
+                 const response = await fetch("system/deleterole/" + id, {'method': 'DELETE'});
+                const responseData = await response.json();
+                console.log(responseData);
+                statusMsg(responseData.message);
+                if (responseData.result === "ok") {
+                    var root = document.getElementById("rolelist");
+                    root.removeChild(div);
+                }
+            }
+            
+            async function saveRoleItem(div, line) {
+                var name = document.getElementById("rolename" + line).value;
+                var id = document.getElementById("roleid" + line).value;
+                
+                var data = {};
+                data.id = id;
+                data.name = name;
+                console.log(data);
+                
+                const saverole = await fetch("system/saverole", {'method': 'POST', 'body': JSON.stringify(data)});
+                const response = await saverole.json();
+                if (response.result === "ok") {
+                    var newId = response.data;
+                    statusMsg("Rolle geschrieben: " + newId);
+                    document.getElementById("roleid" + line).value = newId;
+                } else {
+                  statusMsg("Unbekannter Fehler beim Speichern.");
+                }
+            }
+        </script>
+    </head>
+    <body onload="loadSessionData();">
+        <div class="hamburger-menu">
+            <input id="menu__toggle" type="checkbox" />
+            <label class="menu__btn" for="menu__toggle">
+                <span></span>
+            </label>
+
+            <ul class="menu__box">
+                <li id="menuhome"><a class="menu__item" href="index.html">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html">Passwortanfragen</a></li>
+                <li><a class="menu__item" href="about.html">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();">Logout</a></li>
+            </ul>
+        </div>
+        
+        <div class="bodybox">
+            <div class="header">TaMM Passwortanfragen</div>
+            <div><button onclick="addRole()" style="margin: 3pt;">Neue Rolle erstellen</button></div>
+            <hr>
+            <div id='rolelist'></div>
+            <div class="statusbar" id="status"></div>
+        </div>
+    </body>
+</html>

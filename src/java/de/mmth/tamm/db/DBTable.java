@@ -108,7 +108,7 @@ public class DBTable {
         addColumn(name, type, value);
       }
       
-      if (!type.equals("I") || !value.equals("G")) {
+      if (!type.equals("I") || !value.startsWith("G")) {
         condAppend(insertList, ",");
         insertList.append(name);
         condAppend(paramList, ",");
@@ -161,8 +161,11 @@ public class DBTable {
     switch (type) {
       case "I":
         sqlType = "INTEGER";
-        if (value.equals("G")) {
+        if (value.startsWith("G")) {
           sqlType += " GENERATED ALWAYS AS IDENTITY";
+          if (value.length() > 1) {
+            sqlType += " (START WITH " + value.substring(1) + " ) ";
+          }
         }
         break;
     

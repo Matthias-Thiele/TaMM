@@ -61,6 +61,10 @@ public class DeleteProcessor {
       case "deletereq":
         processDeleteRequest(resultData, session, cmd4);
         break;
+        
+      case "deleterole":
+        processDeleteRole(resultData, session, cmd4);
+        break;
     }
   }
   
@@ -143,6 +147,28 @@ public class DeleteProcessor {
     if (isOk) {
       application.requests.removeKey(cmd4);
       message = "Passwortanfrage entfernt: " + cmd4;
+    } else {
+      message = "Zugriff verweigert.";
+    }
+    
+    ServletUtils.sendResult(resultData, isOk, "", "", message, null);
+  }
+
+  /**
+   * Deletes a role from the list of roles.
+   * 
+   * @param resultData
+   * @param session
+   * @param cmd4
+   * @throws TammError
+   * @throws IOException 
+   */
+  private void processDeleteRole(OutputStream resultData, SessionData session, String cmd4) throws TammError, IOException {
+    boolean isOk = (session.user != null) && (session.user.mainAdmin || session.user.subAdmin);
+    String message;
+    if (isOk) {
+      application.roles.removeRole(session.client.id, Integer.parseInt(cmd4));
+      message = "Rolle gelöscht";
     } else {
       message = "Zugriff verweigert.";
     }

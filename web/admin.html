@@ -117,8 +117,8 @@ GNU General Public License v3.0
                 
                 console.log(data);
                 
-                const response = await fetch("system/initdata", {'method': 'POST', 'body': JSON.stringify(data)});
-                const responseData = await response.json();
+                const initdata = await fetch("system/initdata", {'method': 'POST', 'body': JSON.stringify(data)});
+                const response = await initdata.json();
                 if (response.result !== "ok") {
                   statusMsg("Unbekannter Fehler beim Speichern.");
                 }

@@ -13,6 +13,7 @@ import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.LockData;
+import de.mmth.tamm.data.RoleData;
 import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.PasswordUtils;
@@ -28,7 +29,6 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import javax.swing.text.DateFormatter;
 import org.apache.commons.mail.EmailException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -115,6 +115,10 @@ public class PostProcessor {
           
         case "domainlock":
           processDomainLock(reader, resultData, session);
+          break;
+          
+        case "saverole":
+          processSaveRole(reader, resultData, session);
           break;
       }
     }
@@ -383,6 +387,30 @@ public class PostProcessor {
     }
     
     ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, null);
+  }
+
+  /**
+   * Update existing role or insert new role.
+   * 
+   * @param reader
+   * @param resultData
+   * @param session
+   * @throws TammError
+   * @throws IOException 
+   */
+  private void processSaveRole(Reader reader, OutputStream resultData, SessionData session) throws TammError, IOException {
+    String message = "Zugriff verweigert";
+    Integer id = -1;
+    
+    if (session.user.mainAdmin || session.user.subAdmin) {
+      RoleData data = new Gson().fromJson(reader, RoleData.class);
+      data.clientId = session.client.id;
+      data.owner = session.user.id;
+      id = application.roles.writeRole(data);
+      message = "Rolle erstellt mit id: " + id;
+    }
+    
+    ServletUtils.sendResult(resultData, true, "", "", message, id);
   }
   
 }
