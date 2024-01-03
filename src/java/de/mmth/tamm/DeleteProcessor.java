@@ -53,6 +53,10 @@ public class DeleteProcessor {
       case "deletelock":
         processDeleteLock(resultData, session, cmd4, cmd5);
         break;
+        
+      case "cleantemplates":
+        processCleanTemplates(resultData, session);
+        break;
     }
   }
   
@@ -99,6 +103,20 @@ public class DeleteProcessor {
       lock.mailAddress = cmd4;
       lock.lockDate = cmd5;
       application.locks.removeLock(lock);
+    } else {
+      message = "Zugriff verweigert.";
+    }
+    
+    ServletUtils.sendResult(resultData, isOk, "", "", message, null);
+  }
+
+  private void processCleanTemplates(OutputStream resultData, SessionData session) throws IOException {
+    boolean isOk = (session.user != null) && session.user.mainAdmin;
+    
+    String message;
+    if (isOk) {
+      int count = application.templates.clear();
+      message = "Anzahl der gelöschten Einträge aus dem Vorlagenspeicher: " + count;
     } else {
       message = "Zugriff verweigert.";
     }

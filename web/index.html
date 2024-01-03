@@ -56,37 +56,29 @@
              * Load user information and other session data.
              * @returns {undefined}
              */
-            function loadSessionData() {
+            async function loadSessionData() {
                 initDefaultAction("save", doSave);
                 
-                var request = new XMLHttpRequest();
-                request.open("GET", "system/session");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send();
-                request.overrideMimeType('application/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var response = JSON.parse(this.responseText);
-                        if (response.result === "error") {
-                            window.location = response.nextPage + "?next=index.html";
-                        } else {
-                            sessionData = response.data;
-                            var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
-                            
-                            if (!someKindOfAdmin) {
-                                showBlockElement("menuuser", false);
-                                if (!sessionData.user.mainAdmin) {
-                                    showBlockElement("menuadmin", false);
-                                    showBlockElement("menulock", false);
-                                }
-                            }
-                            
-                            userlist = new Userlist(sessionData.userNames);
-                            userlist.createOptionList("userlist");
-                            setTimeout(filterTasks, 200);
+                const fetchsession = await fetch("system/session", {'method': 'GET'});
+                const response = await fetchsession.json();
+                if (response.result === "error") {
+                    window.location = response.nextPage + "?next=index.html";
+                } else {
+                    sessionData = response.data;
+                    var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
+
+                    if (!someKindOfAdmin) {
+                        showBlockElement("menuuser", false);
+                        if (!sessionData.user.mainAdmin) {
+                            showBlockElement("menuadmin", false);
+                            showBlockElement("menulock", false);
                         }
                     }
-                };
+
+                    userlist = new Userlist(sessionData.userNames);
+                    userlist.createOptionList("userlist");
+                    setTimeout(filterTasks, 200);
+                }
             }
             
             function doHistory() {
@@ -131,35 +123,26 @@
                 document.getElementById("urlattachment").style.display = "none";
             }
             
-            function advanceNow() {
+            async function advanceNow() {
                 var taskData = {};
                 taskData.lId = selectedTask.lId;
                 
                 console.log(taskData);
                 status.innerText = "Warte auf Server...";
                 
-                var request = new XMLHttpRequest();
-                request.open("POST", "system/advancetask");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send(JSON.stringify(taskData));
-                request.overrideMimeType('text/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var status = document.getElementById("status");
-                        var response = JSON.parse(this.responseText);
-                        if (response.result === "ok") {
-                            status.innerText = "Aufgabe weitergeleitet: " + response.message;
-                            emptyTask = {};
-                            fillForm(emptyTask);
-                            setTimeout(filterTasks, 200);
-                        } else {
-                            if (!response.message) {
-                                response.message = "Unbekannter Fehler beim Weiterleiten.";
-                            }
-                            status.innerText = response.message;
-                        }
+                const fetchadvance = await fetch("system/advancetask", {'method': 'POST', 'body': JSON.stringify(taskData)});
+                const response = await fetchadvance.json();
+                if (response.result === "ok") {
+                    statusMsg("Aufgabe weitergeleitet: " + response.message);
+                    emptyTask = {};
+                    fillForm(emptyTask);
+                    setTimeout(filterTasks, 200);
+                } else {
+                    if (!response.message) {
+                        response.message = "Unbekannter Fehler beim Weiterleiten.";
                     }
-                };
+                    statusMsg(response.message);
+                }
             }
             
             /**
@@ -168,7 +151,7 @@
              * @@param {type} deferredAdvance advance after save
              * @returns {undefined}
              */
-            function doSave(deferredAdvance) {
+            async function doSave(deferredAdvance) {
                 selectedTask.lId = getValue("tasklid");
                 if (selectedTask.lId === "") {
                     selectedTask.lId = "-1";
@@ -179,34 +162,25 @@
                 selectedTask.interval = getInterval();
                 selectedTask.nextDueDate = getValue("duedate");
                 console.log(selectedTask);
-                status.innerText = "Warte auf Server...";
+                statusMsg("Warte auf Server...");
                 
-                var request = new XMLHttpRequest();
-                request.open("POST", "system/savetask");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send(JSON.stringify(selectedTask));
-                request.overrideMimeType('text/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var status = document.getElementById("status");
-                        var response = JSON.parse(this.responseText);
-                        if (response.result === "ok") {
-                            status.innerText = "Aufgabe gespeichert.";
-                            if (deferredAdvance) {
-                                advanceNow();
-                            } else {
-                                emptyTask = {};
-                                fillForm(emptyTask);
-                                setTimeout(filterTasks, 200);
-                            }
-                        } else {
-                            if (!response.message) {
-                                response.message = "Unbekannter Fehler beim Speichern.";
-                            }
-                            status.innerText = response.message;
-                        }
+                const fetchsave = await fetch("system/savetask", {'method': 'POST', 'body': JSON.stringify(selectedTask)});
+                const response = await fetchsave.json();
+                if (response.result === "ok") {
+                    statusMsg("Aufgabe gespeichert.");
+                    if (deferredAdvance) {
+                        advanceNow();
+                    } else {
+                        emptyTask = {};
+                        fillForm(emptyTask);
+                        setTimeout(filterTasks, 200);
                     }
-                };
+                } else {
+                    if (!response.message) {
+                        response.message = "Unbekannter Fehler beim Speichern.";
+                    }
+                    statusMsg(response.message);
+                }
             }
     
             /**
@@ -214,33 +188,24 @@
              * from the server.
              * @returns {undefined}
              */
-            function filterTasks() {
+            async function filterTasks() {
                 hideDialog();
-                var status = document.getElementById("status");
                 var data = {};
                 data.source = "tasklist";
                 data.filterText = "%" + document.getElementById("filtervalue").value + "%";
                 data.userId = sessionData.user.id;
                 console.log(data);
-                status.innerText = "Warte auf Server...";
+                statusMsg("Warte auf Server...");
                 
-                var request = new XMLHttpRequest();
-                request.open("POST", "system/filtertask");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send(JSON.stringify(data));
-                request.overrideMimeType('text/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var response = JSON.parse(this.responseText);
-                        if (response.result !== "error") {
-                          listTasks(response);
-                          status.innerText = "";
-                          document.getElementById("filtervalue").focus();
-                        } else {
-                          status.innerText = "Unbekannter Fehler beim Suchen.";
-                        }
-                    }
-                };
+                const fetchfilter = await fetch("system/filtertask", {'method': 'POST', 'body': JSON.stringify(data)});
+                const response = await fetchfilter.json();
+                if (response.result !== "error") {
+                  listTasks(response);
+                  statusMsg("");
+                  document.getElementById("filtervalue").focus();
+                } else {
+                  statusMsg("Unbekannter Fehler beim Suchen.");
+                }
             }
             
             /**

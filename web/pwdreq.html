@@ -11,31 +11,22 @@ GNU General Public License v3.0
         <link rel="stylesheet" href="tamm.css">
         <link rel="shortcut icon" href="favicon.ico"/> 
         <script>
-            function doSave() {
-                var status = document.getElementById("status");
+            async function doSave() {
                 var data = {};
                 data.name = document.getElementById("name").value;
                 data.mail = document.getElementById("mail").value;
                 console.log(data);
                 
-                var request = new XMLHttpRequest();
-                status.innerText = "Warte auf Server...";
+                statusMsg("Warte auf Server...");
                 document.getElementById("send").disabled = true;
                 
-                request.open("POST", "system/pwdreq");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send(JSON.stringify(data));
-                request.overrideMimeType('text/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var response = JSON.parse(this.responseText);
-                        status.innerText = response.message;
-                        
-                        if (response.result !== "ok") {
-                            document.getElementById("send").disabled = false;
-                        }
-                    }
-                };
+                const fetchreq = await fetch("system/pwdreq", {'method': 'POST', 'body': JSON.stringify(data)});
+                const response = await fetchreq.json();
+                statusMsg(response.message);
+
+                if (response.result !== "ok") {
+                    document.getElementById("send").disabled = false;
+                }
             }
         </script>
     </head>

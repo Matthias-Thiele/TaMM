@@ -104,7 +104,7 @@ GNU General Public License v3.0
                 }
             }
 
-            function doSave() {
+            async function doSave() {
                 var data = {};
                 data.dburl = getValue("dburl");
                 data.name = getValue("name");
@@ -117,20 +117,11 @@ GNU General Public License v3.0
                 
                 console.log(data);
                 
-                var request = new XMLHttpRequest();
-                request.open("POST", "system/initdata");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send(JSON.stringify(data));
-                request.overrideMimeType('text/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var response = JSON.parse(this.responseText);
-                        if (response.result !== "ok") {
-                          var status = document.getElementById("status");
-                          status.innerText = "Unbekannter Fehler beim Speichern.";
-                        }
-                    }
-                };
+                const response = await fetch("system/initdata", {'method': 'POST', 'body': JSON.stringify(data)});
+                const responseData = await response.json();
+                if (response.result !== "ok") {
+                  statusMsg("Unbekannter Fehler beim Speichern.");
+                }
             }
             
             function createClientList(clientlist) {
@@ -177,7 +168,7 @@ GNU General Public License v3.0
                 setValue("clientmaxuser", selectedClient.maxUser);
             }
             
-            function saveClient() {
+            async function saveClient() {
                 selectedClient.name = getValue("clientname");
                 selectedClient.hostName = getValue("clienthost");
                 selectedClient.hostName2 = getValue("clienthost2");
@@ -185,31 +176,28 @@ GNU General Public License v3.0
                 selectedClient.maxDocMB = getValue("clientmaxmb");
                 selectedClient.maxUser = getValue("clientmaxuser");
                 
-                status = document.getElementById("status");
-                status.innerText = "Wait for server...";
+                statusMsg("Wait for server...");
                 
-                var request = new XMLHttpRequest();
-                request.open("POST", "system/saveclient");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send(JSON.stringify(selectedClient));
-                request.overrideMimeType('text/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var status = document.getElementById("status");
-                        var response = JSON.parse(this.responseText);
-                        if (response.result === "ok") {
-                          status.innerText = "Mandant gespeichert."
-                          emptyUser = {};
-                          fillClient(emptyUser);
-                          loadAdminData();
-                        } else {
-                            if (!response.message) {
-                                response.message = "Unbekannter Fehler beim Speichern.";
-                            }
-                            status.innerText = response.message;
-                        }
+                const response = await fetch("system/saveclient", {'method': 'POST', 'body': JSON.stringify(selectedClient)});
+                const responseData = await response.json();
+                if (responseData.result === "ok") {
+                  statusMsg("Mandant gespeichert.");
+                  emptyUser = {};
+                  fillClient(emptyUser);
+                  loadAdminData();
+                } else {
+                    if (!responseData.message) {
+                        responseData.message = "Unbekannter Fehler beim Speichern.";
                     }
-                };
+                    statusMsg(responseData.message);
+                }
+            }
+            
+            async function cleanTemplates() {
+                const response = await fetch("system/cleantemplates", {'method': 'DELETE'});
+                const responseData = await response.json();
+                console.log(responseData);
+                statusMsg(responseData.message);
             }
         </script>
     </head>
@@ -254,7 +242,7 @@ GNU General Public License v3.0
                 <div id="clientcol">
                     <div>Mandanten<button style="margin-left: 10pt;" onclick="createClient();">Neu</button></div>
                     <div>
-                        
+                        <hr>
                         <div id="clientlist"></div>
                         <hr>
                             <div><label for="clientid">Id</label><input type="text" id="clientid" readonly></div>
@@ -262,14 +250,14 @@ GNU General Public License v3.0
                             <div><label for="clienthost">Hostname</label><input type="text" id="clienthost"></div>
                             <div><label for="clienthost2">Alias 1</label><input type="text" id="clienthost2"></div>
                             <div><label for="clienthost3">Alias 2</label><input type="text" id="clienthost3"></div>
-                            <div><label for="clientmaxmb">Id</label><input type="number" id="clientmaxmb"></div>
-                            <div><label for="clientmaxuser">Id</label><input type="number" id="clientmaxuser"></div>
+                            <div><label for="clientmaxmb">Dokumente MB</label><input type="number" id="clientmaxmb"></div>
+                            <div><label for="clientmaxuser">Anzahl Anwender</label><input type="number" id="clientmaxuser"></div>
                             <button onclick="saveClient();">Mandant speichern</button>
                     </div>
                 </div>
             </div>
             <div class="statusbar" id="statusbar">
-                
+                <Button onclick="cleanTemplates()" style="margin-right:10pt">Vorlagenspeicher neu laden</Button>
                 <span id="status"></span>
             </div>
         </div>

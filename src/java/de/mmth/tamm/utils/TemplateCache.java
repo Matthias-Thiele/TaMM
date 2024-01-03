@@ -24,10 +24,23 @@ public class TemplateCache {
   private final String templateDirName;
   private File templateRoot = null;
   
+  
+  /**
+   * Constructor with the name of the template
+   * directory within the TaMM filesystem storage.
+   * 
+   * @param templateDirName 
+   */
   public TemplateCache(String templateDirName) {
     this.templateDirName = templateDirName;
   }
   
+  /**
+   * Sets the root directory of the TaMM
+   * filesystem storage.
+   * 
+   * @param rootDir 
+   */
   public void setFileRoot(File rootDir) {
     if (rootDir.exists()) {
       templateRoot = new File(rootDir, templateDirName);
@@ -41,10 +54,34 @@ public class TemplateCache {
     }
   }
   
-  public void clear() {
+  /**
+   * Clears the template cache and return the
+   * number of stored entries.
+   * 
+   * @return 
+   */
+  public int clear() {
+    int count = templates.size();
     templates.clear();
+    
+    return count;
   }
   
+  /**
+   * Read one entry from the template cache.
+   * 
+   * If the template is not in the cache, at first
+   * it will search the filesystem.
+   * 
+   * If it is not in the filesystem, second search
+   * in the internal resources.
+   * 
+   * If not found there then throw an exception.
+   * 
+   * @param templateName
+   * @return
+   * @throws TammError 
+   */
   public String getTemplate(String templateName) throws TammError {
     // first try: lookup cache
     String text = templates.get(templateName);
@@ -82,6 +119,14 @@ public class TemplateCache {
     }
   }
   
+  /**
+   * Builds the filesystem path of the
+   * requested item and checks if it
+   * is available.
+   * 
+   * @param templateName
+   * @return 
+   */
   private File lookupTemplateRoot(String templateName) {
     if (templateName.contains("..") || templateName.startsWith(File.separator)) {
       // no directory traversal

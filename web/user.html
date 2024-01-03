@@ -18,38 +18,30 @@ GNU General Public License v3.0
             var userNames;
             var clientNames;
             
-            function loadSessionData() {
+            async function loadSessionData() {
                 initDefaultAction("save", doSave);
                 
-                var request = new XMLHttpRequest();
-                request.open("GET", "system/session");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send();
-                request.overrideMimeType('application/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var response = JSON.parse(this.responseText);
-                        if (response.result === "error") {
-                            window.location = response.nextPage + "?next=user.html";
-                        } else {
-                            sessionData = response.data;
-                            userNames = new Userlist(sessionData.userNames);
-                            userNames.createOptionList("usernames");
-                            clientNames = new Userlist(sessionData.clientList);
-                            clientNames.createOptionList("clientnames");
-                            var clientInput = document.getElementById("client");
-                            clientInput.disabled = !sessionData.user.mainAdmin;
-                            var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
-                            showBlockElement("onlyadmins", sessionData.user.mainAdmin);
-                            if (!someKindOfAdmin) {
-                                window.location = "index.html";
-                            }
-                        }
+                const session = await fetch("system/session", {'method': 'GET'});
+                const response = await session.json();
+                if (response.result === "error") {
+                    window.location = response.nextPage + "?next=user.html";
+                } else {
+                    sessionData = response.data;
+                    userNames = new Userlist(sessionData.userNames);
+                    userNames.createOptionList("usernames");
+                    clientNames = new Userlist(sessionData.clientList);
+                    clientNames.createOptionList("clientnames");
+                    var clientInput = document.getElementById("client");
+                    clientInput.disabled = !sessionData.user.mainAdmin;
+                    var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
+                    showBlockElement("onlyadmins", sessionData.user.mainAdmin);
+                    if (!someKindOfAdmin) {
+                        window.location = "index.html";
                     }
-                };
+                }
             }
             
-            function doSave() {
+            async function doSave() {
                 selectedUser.name = getValue("name");
                 selectedUser.mail = getValue("mail");
                 selectedUser.id = getValue("userid");
@@ -64,33 +56,23 @@ GNU General Public License v3.0
                 }
                 
                 console.log(selectedUser);
-                status.innerText = "Warte auf Server...";
+                statusMsg("Warte auf Server...");
                 
-                var request = new XMLHttpRequest();
-                request.open("POST", "system/saveuser");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send(JSON.stringify(selectedUser));
-                request.overrideMimeType('text/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var status = document.getElementById("status");
-                        var response = JSON.parse(this.responseText);
-                        if (response.result === "ok") {
-                          status.innerText = "Anwenderdaten gespeichert."
-                          emptyUser = {};
-                          fillForm(emptyUser);
-                        } else {
-                            if (!response.message) {
-                                response.message = "Unbekannter Fehler beim Speichern.";
-                            }
-                            status.innerText = response.message;
-                        }
+                const fetchsave = await fetch("system/saveuser", {'method': 'POST', 'body': JSON.stringify(selectedUser)});
+                const response = await fetchsave.json();
+                if (response.result === "ok") {
+                  statusMsg("Anwenderdaten gespeichert.");
+                  emptyUser = {};
+                  fillForm(emptyUser);
+                } else {
+                    if (!response.message) {
+                        response.message = "Unbekannter Fehler beim Speichern.";
                     }
-                };
+                    statusMsg(response.message);
+                }
             }
             
-            function filterUsers() {
-                var status = document.getElementById("status");
+            async function filterUsers() {
                 var data = {};
                 data.source = "userlist";
                 data.filterText = document.getElementById("filtervalue").value;
@@ -99,24 +81,16 @@ GNU General Public License v3.0
                 }
                 data.onlyAdmins = getValue("onlyadmins");
                 console.log(data);
-                status.innerText = "Warte auf Server...";
+                statusMsg("Warte auf Server...");
                 
-                var request = new XMLHttpRequest();
-                request.open("POST", "system/filteruser");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send(JSON.stringify(data));
-                request.overrideMimeType('text/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var response = JSON.parse(this.responseText);
-                        if (response.result !== "error") {
-                          listUsers(response);
-                          status.innerText = "";
-                        } else {
-                          status.innerText = "Unbekannter Fehler beim Suchen.";
-                        }
-                    }
-                };
+                const filter = await fetch("system/filteruser", {'method': 'POST', 'body': JSON.stringify(data)});
+                const response = await filter.json();
+                if (response.result !== "error") {
+                  listUsers(response);
+                  statusMsg("");
+                } else {
+                  statusMsg("Unbekannter Fehler beim Suchen.");
+                }
             }
             
             function listUsers(userlist) {

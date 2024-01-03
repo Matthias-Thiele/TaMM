@@ -11,7 +11,7 @@ GNU General Public License v3.0
         <link rel="stylesheet" href="tamm.css">
         <link rel="shortcut icon" href="favicon.ico"/> 
         <script>
-            function sendPwd() {
+            async function sendPwd() {
                 var loginData = {};
                 loginData.name = document.getElementById("name").value;
                 loginData.pwd = document.getElementById("pwd1").value;
@@ -20,23 +20,14 @@ GNU General Public License v3.0
                 status.innerText = "Warte auf Serverantwort...";
                 console.log(loginData);
                 
-                var request = new XMLHttpRequest();
-                request.open("POST", "system/updatepwd");
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send(JSON.stringify(loginData));
-                request.overrideMimeType('text/json');
-                request.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        var response = JSON.parse(this.responseText);
-                        if (response.result === "ok") {
-                          window.location = response.nextPage;
-                        } else {
-                          var status = document.getElementById("status");
-                          status.innerText = response.message;
-                        }
-                    }
-                };
-            }
+                const fetchupdate = await fetch("system/updatepwd", {'method': 'POST', 'body': JSON.stringify(data)});
+                const response = await fetchupdate.json();
+                if (response.result === "ok") {
+                  window.location = response.nextPage;
+                } else {
+                  statusMsg(response.message);
+                }
+           }
             
             function getUrlParam(name) {
                 var url_string = window.location;
