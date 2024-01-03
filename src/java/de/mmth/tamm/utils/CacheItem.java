@@ -15,5 +15,6 @@ public class CacheItem {
   Date expirationDate;
   String mail;
   String name;
+  String ip;
   int id;
 }

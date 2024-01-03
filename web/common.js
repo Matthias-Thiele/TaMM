@@ -234,3 +234,33 @@ Userlist.prototype.nameFromId = function(userId) {
     return result;
 };
 
+/**
+ * Creates a div tag with label text and input element.
+ * 
+ * @param {type} lineno
+ * @param {type} linename
+ * @param {type} labeltext
+ * @param {type} isNumber
+ * @param {type} text
+ * @returns {createInputLine.outerDiv|HTMLElement}
+ */
+function createInputLine(lineno, linename, labeltext, isNumber, text) {
+    var outerDiv = document.createElement("div");
+    var label = document.createElement("label");
+    label.innerText = labeltext;
+    var id = (lineno >= 0) ? (linename + lineno) : linename;
+    label.for = id;
+
+    var input = document.createElement("input");
+    input.id = id;
+    input.disabled = true;
+    input.value = (text) ? text : "";
+    if (isNumber) {
+        input.type = "number";
+        input.style = "width: 50pt;";
+    }
+
+    outerDiv.appendChild(label);
+    outerDiv.appendChild(input);
+    return outerDiv;
+}

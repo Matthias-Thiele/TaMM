@@ -250,7 +250,7 @@ public class PostProcessor {
         } else {
           var checkUser = application.users.readUser(session.client.id, -1, userData.name);
           if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
-            String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS);
+            String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS, session.clientIp);
             String validUntil = DateUtils.formatD(application.requests.getValidDate(key));
             logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
             if (application.mailer != null) {

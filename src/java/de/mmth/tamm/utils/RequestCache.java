@@ -33,15 +33,17 @@ public class RequestCache {
    * 
    * @param item
    * @param duration expiration time in milliseconds.
+   * @param fromIp
    * @return 
    */
-  public String add(UserData item, long duration) {
+  public String add(UserData item, long duration, String fromIp) {
     String key = generateKey();
     var newEntry = new CacheItem();
     newEntry.key = key;
     newEntry.name = item.name;
     newEntry.mail = item.mail;
     newEntry.id = item.id;
+    newEntry.ip = fromIp;
     newEntry.expirationDate = new Date((new Date()).getTime() + duration);
     
     cache.put(key, newEntry);
@@ -131,7 +133,7 @@ public class RequestCache {
     nextCleanup = new Date((new Date()).getTime() + 60000);
     List<String> forRemoval = new ArrayList<>();
     for (var item: cache.entrySet()) {
-      if (item.getValue().expirationDate.after(now)) {
+      if (item.getValue().expirationDate.before(now)) {
         forRemoval.add(item.getKey());
       }
     }

@@ -11,6 +11,7 @@ import de.mmth.tamm.data.LockData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.DateUtils;
+import de.mmth.tamm.utils.RequestCache;
 import de.mmth.tamm.utils.ServletUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,6 +79,11 @@ public class GetProcessor {
         
       case "locklist":
         processLockList(resultData, session, cmd4);
+        break;
+        
+      case "pwreq":
+        processPasswordRequestList(resultData, session);
+        break;
     }
   }
   
@@ -211,8 +217,35 @@ public class GetProcessor {
    * @throws IOException 
    */
   private void processLockList(OutputStream resultData, SessionData session, String cmd4) throws TammError, IOException {
-    List<LockData> result = application.locks.listLocks(cmd4);
-    ServletUtils.sendResult(resultData, true, "", "", "", result);
+    List<LockData> result = null;
+    String message = "";
+    if ((session.user == null) || !session.user.mainAdmin) {
+      message = "Kein Zugriff.";
+    } else {
+      result = application.locks.listLocks(cmd4);
+    }
+    
+    ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, result);
+  }
+
+  /**
+   * Sends the password request list.
+   * 
+   * @param resultData
+   * @param session
+   * @throws IOException 
+   */
+  private void processPasswordRequestList(OutputStream resultData, SessionData session) throws IOException {
+    String message = "";
+    RequestCache requests = null;
+    
+    if ((session.user == null) || !session.user.mainAdmin) {
+      message = "Kein Zugriff.";
+    } else {
+      requests = application.requests;
+    }
+    
+    ServletUtils.sendResult(resultData, message.isEmpty(), "", "", "", requests);
   }
   
 }

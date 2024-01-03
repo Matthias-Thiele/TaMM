@@ -57,6 +57,10 @@ public class DeleteProcessor {
       case "cleantemplates":
         processCleanTemplates(resultData, session);
         break;
+        
+      case "deletereq":
+        processDeleteRequest(resultData, session, cmd4);
+        break;
     }
   }
   
@@ -117,6 +121,28 @@ public class DeleteProcessor {
     if (isOk) {
       int count = application.templates.clear();
       message = "Anzahl der gelöschten Einträge aus dem Vorlagenspeicher: " + count;
+    } else {
+      message = "Zugriff verweigert.";
+    }
+    
+    ServletUtils.sendResult(resultData, isOk, "", "", message, null);
+  }
+
+  /**
+   * Removes the password request with the given key.
+   * 
+   * @param resultData
+   * @param session
+   * @param cmd4
+   * @throws IOException 
+   */
+  private void processDeleteRequest(OutputStream resultData, SessionData session, String cmd4) throws IOException {
+    boolean isOk = (session.user != null) && session.user.mainAdmin;
+    
+    String message;
+    if (isOk) {
+      application.requests.removeKey(cmd4);
+      message = "Passwortanfrage entfernt: " + cmd4;
     } else {
       message = "Zugriff verweigert.";
     }

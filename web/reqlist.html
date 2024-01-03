@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<!--
+(c) 2023 by Matthias Thiele
+GNU General Public License v3.0
+-->
+<html>
+    <head>
+        <title>TaMM</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="tamm.css">
+        <link rel="stylesheet" href="menu.css">
+        <link rel="shortcut icon" href="favicon.ico"/> 
+        <style>
+            .reqitem {
+                display: inline-block;
+                border: 1px solid silver;
+                border-radius: 5pt;
+                background-color: #f8f8fc;
+                margin: 3pt;
+                padding: 5pt;
+            }
+            
+            .reqitem button {
+                margin-left: 3pt;
+            }
+            
+            #reqlist {
+                min-height: 300pt;
+            }
+        </style>
+        <script src="common.js"></script> 
+        <script>
+            var sessionData;
+            
+            /**
+             * Load user information and other session data.
+             * @returns {undefined}
+             */
+            async function loadSessionData() {
+                const fetchsession = await fetch("system/session", {'method': 'GET'});
+                const response = await fetchsession.json();
+                if (response.result === "error") {
+                    window.location = response.nextPage + "?next=index.html";
+                } else {
+                    sessionData = response.data;
+                    var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
+
+                    if (!someKindOfAdmin) {
+                        showBlockElement("menuuser", false);
+                    }
+
+                    setTimeout(listRequests, 200);
+                }
+            }
+            
+            async function listRequests() {
+                const fetchlist = await fetch("system/pwreq", {'method': 'GET'});
+                const response = await fetchlist.json();
+                if (response.result === "error") {
+                    statusMsg(response.message);
+                } else {
+                    fillRequestList(response.data);
+                }
+            }
+            
+            function fillRequestList(data) {
+                var root = document.getElementById("reqlist");
+                root.innerHTML = "";
+                var line = 1;
+                
+                for(var key in data.cache) {
+                    var item = data.cache[key];
+                    root.appendChild(createReqItem(line++, item));
+                }
+            }
+            
+            function createReqItem(itemNo, item) {
+                var outerDiv = document.createElement("div");
+                outerDiv.className = "reqitem";
+                var mailDiv = createInputLine(itemNo, "mail", "Mail Adresse", false, item.mail);
+                var nameDiv = createInputLine(itemNo, "name", "Name", false, item.name);
+                var dateDiv = createInputLine(itemNo, "reqdate", "Gültig bis", false, item.expirationDate);
+                var ipDiv = createInputLine(itemNo, "ip", "IP Adresse", false, item.ip);
+                var keyDiv = createInputLine(itemNo, "key", "Zugriffsschlüssel", false, item.key);
+                var btDelete = document.createElement("button");
+                btDelete.innerText = "Anfrage löschen";
+                btDelete.onclick = function() { deleteReqItem(outerDiv, item.key); };
+                
+                outerDiv.appendChild(mailDiv);
+                outerDiv.appendChild(nameDiv);
+                outerDiv.appendChild(dateDiv);
+                outerDiv.appendChild(ipDiv);
+                outerDiv.appendChild(keyDiv);
+                outerDiv.appendChild(btDelete);
+                
+                return outerDiv;
+            }
+            
+            /**
+             * Deletes the given request from the request cache.
+             * 
+             * @param {type} blockDiv request block for deletion
+             * @param {type} key
+             * @returns {undefined}
+             */
+            async function deleteReqItem(blockDiv, key) {
+                const response = await fetch("system/deletereq/" + key, {'method': 'DELETE'});
+                const responseData = await response.json();
+                console.log(responseData);
+                statusMsg(responseData.message);
+                if (responseData.result === "ok") {
+                    var root = document.getElementById("reqlist");
+                    root.removeChild(blockDiv);
+                }
+            }
+        </script>
+    </head>
+    <body onload="loadSessionData();">
+        <div class="hamburger-menu">
+            <input id="menu__toggle" type="checkbox" />
+            <label class="menu__btn" for="menu__toggle">
+                <span></span>
+            </label>
+
+            <ul class="menu__box">
+                <li id="menuhome"><a class="menu__item" href="index.html">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html">Passwortanfragen</a></li>
+                <li><a class="menu__item" href="about.html">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();">Logout</a></li>
+            </ul>
+        </div>
+        
+        <div class="bodybox">
+            <div class="header">TaMM Passwortanfragen</div>
+            <div id='reqlist'></div>
+            <div class="statusbar" id="status"></div>
+        </div>
+    </body>
+</html>

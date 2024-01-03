@@ -127,26 +127,6 @@ GNU General Public License v3.0
                 return outerDiv;
             }
             
-            function createInputLine(lineno, linename, labeltext, isNumber, text) {
-                var outerDiv = document.createElement("div");
-                var label = document.createElement("label");
-                label.innerText = labeltext;
-                var id = linename + lineno;
-                label.for = id;
-                
-                var input = document.createElement("input");
-                input.id = id;
-                input.disabled = true;
-                input.value = text;
-                if (isNumber) {
-                    input.type = "number";
-                    input.style = "width: 50pt;";
-                }
-                
-                outerDiv.appendChild(label);
-                outerDiv.appendChild(input);
-                return outerDiv;
-            }
         </script>
     </head>
     <body onload="loadSessionData()">
@@ -161,6 +141,7 @@ GNU General Public License v3.0
                 <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
                 <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
                 <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html">Passwortanfragen</a></li>
                 <li><a class="menu__item" href="about.html">Über das Programm</a></li>
                 <li><a class="menu__item" onclick="logout();">Logout</a></li>
             </ul>

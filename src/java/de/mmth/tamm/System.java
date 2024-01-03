@@ -122,7 +122,7 @@ public class System extends HttpServlet {
         application.tammUrl = url.substring(0, tammPos + 6);
       }
     }
-
+    
     try (InputStream content = request.getInputStream()) {
       SessionData sd = ServletUtils.prepareSession(request);
       ServletOutputStream out = response.getOutputStream();

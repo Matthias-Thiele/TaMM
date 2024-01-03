@@ -40,6 +40,7 @@ public class RequestCacheTest {
   @Test
   public void testAdd() {
     System.out.println("add");
+    String myIp = "192.168.1.1";
     UserData user1 = new UserData();
     user1.id = 123;
     user1.name = "test1";
@@ -52,7 +53,7 @@ public class RequestCacheTest {
     
     long duration = 100000L;
     RequestCache instance = new RequestCache();
-    String key1 = instance.add(user1, duration);
+    String key1 = instance.add(user1, duration, myIp);
     assertFalse(key1.isEmpty());
     
     System.out.println("getUserItem");
@@ -62,7 +63,7 @@ public class RequestCacheTest {
     assertEquals(user1.id, user3id);
     
     System.out.println("save");
-    String key2 = instance.add(user2, duration);
+    String key2 = instance.add(user2, duration, myIp);
     instance.save(savePath);
     
     RequestCache instance2 = new RequestCache();
