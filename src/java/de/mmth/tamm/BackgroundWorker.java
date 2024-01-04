@@ -4,7 +4,6 @@
  */
 package de.mmth.tamm;
 
-import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,9 +24,11 @@ public class BackgroundWorker extends Thread {
     logger.info("Start background worker.");
     while (this.isAlive() && !this.isInterrupted()) {
       application.requests.cleanup();
+      application.accessCache.cleanup();
       try {
         Thread.sleep(10000);
       } catch (InterruptedException ex) {
+        logger.info("Background worker interrupted.");
         break;
       }
     }

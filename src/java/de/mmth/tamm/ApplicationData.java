@@ -16,6 +16,7 @@ import de.mmth.tamm.db.RoleTable;
 import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.progress.SendMail;
+import de.mmth.tamm.utils.InvalidAccessCache;
 import de.mmth.tamm.utils.RequestCache;
 import de.mmth.tamm.utils.TemplateCache;
 import java.io.File;
@@ -42,6 +43,9 @@ public class ApplicationData {
   private static final String MAIL_PWD = "mailpwd";
   private static final String MAIL_REPLY = "mailreply";
   
+  private static final int MAX_RETRIES = 3;
+  private static final long DECAY_INTERVAL = 600000;
+  
   private String schemaName;
   public AdminData adminData = new AdminData();
   
@@ -64,7 +68,7 @@ public class ApplicationData {
   public AttachmentTable attachments;
   public SendMail mailer = null;
   public TemplateCache templates = new TemplateCache("templates");
-  
+  public InvalidAccessCache accessCache = new InvalidAccessCache(MAX_RETRIES, DECAY_INTERVAL);
   /**
    * Reads the database access information from the registry
    * and tries to connect.

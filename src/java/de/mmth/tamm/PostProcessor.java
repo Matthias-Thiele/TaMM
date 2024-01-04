@@ -184,24 +184,34 @@ public class PostProcessor {
     LoginData loginData = new Gson().fromJson(reader, LoginData.class);
     logger.debug("Process login request for user" + loginData.name);
     JsonResult result = new JsonResult();
-    try {
-    var user = application.users.readUser(session.client.id, -1, loginData.name);
-    if (PasswordUtils.comparePassword(user.pwd, loginData.pwd)) {
-      result.result = "ok";
-      result.nextPage = "index.html";
-      session.loginTime = DateUtils.formatZ(null); 
-      session.user = user;
-      session.user.pwd = ""; // do not leak password.
-      application.users.updateLoginDate(session.client.id, user.id, session.loginTime);
+    boolean loginValid = false;
+    if (!application.accessCache.checkAccess(session.clientIp)) {
+      result.result = "error";
+      result.message = "Zu viele Fehlversuche, das System ist für 10 Minuten gesperrt.";
+      result.nextPage = "";
     } else {
-      result.result = "error";
-      result.nextPage = "";
-      result.message = "Unbekannter Anwender oder falsches Passwort.";
-    }
-    } catch( TammError ex) {
-      result.result = "error";
-      result.nextPage = "";
-      result.message = "Unbekannter Anwender oder falsches Passwort.";
+      try {
+        var user = application.users.readUser(session.client.id, -1, loginData.name);
+        if (PasswordUtils.comparePassword(user.pwd, loginData.pwd)) {
+          result.result = "ok";
+          result.nextPage = "index.html";
+          session.loginTime = DateUtils.formatZ(null); 
+          session.user = user;
+          session.user.pwd = ""; // do not leak password.
+          application.users.updateLoginDate(session.client.id, user.id, session.loginTime);
+          loginValid = true;
+        }
+      } catch( TammError ex) {
+        // loginValid stays false
+      }
+
+      if (!loginValid) {
+        result.result = "error";
+        result.nextPage = "";
+        result.message = "Unbekannter Anwender oder falsches Passwort.";
+        application.accessCache.addInvalidAccess(session.clientIp);
+        logger.warn("Invalid access: " + session.clientIp + " - " + loginData.name);
+      }
     }
     
     try (Writer writer = new OutputStreamWriter(resultData)) {
