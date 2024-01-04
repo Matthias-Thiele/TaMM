@@ -92,11 +92,12 @@ public class UserProcessor {
     }
     
     String errorMsg = "";
+    Integer userId = -1;
     if (userData.id == -1) {
       // new user
-     logger.info("Insert user data for user" + userData.name);
+      logger.info("Insert user data for user" + userData.name);
       userData.pwd = PasswordUtils.encodePassword(Long.toHexString((long)(Math.random() * Long.MAX_VALUE)));
-      application.users.writeUser(userData);
+      userId = application.users.writeUser(userData);
     } else {
       // update existing user
       logger.info("Update user data for user" + userData.name);
@@ -117,10 +118,11 @@ public class UserProcessor {
           checkUser.clientId = userData.clientId;
         }
         application.users.writeUser(checkUser);
+        userId = checkUser.id;
       }
     }
     
-    ServletUtils.sendResult(resultData, errorMsg.isBlank(), "", "", errorMsg, null);
+    ServletUtils.sendResult(resultData, errorMsg.isBlank(), "", "", errorMsg, userId);
   }  
   
 }

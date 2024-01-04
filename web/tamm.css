@@ -73,6 +73,25 @@ label {
     cursor: pointer;
 }
 
+.roleitem {
+    margin-top: 4pt;
+    background-color: #f8f8fc;
+    border-radius: 3pt;
+    padding: 3pt;
+    margin: 3pt;
+    cursor: pointer;
+    display: inline-block;
+    width: 130pt;
+}
+
+.roleitem input {
+    width: 100pt;
+}
+
+.roleitem button {
+    float: right;
+}
+
 input[type=radio] {
 display: none;
     & ~ label {
@@ -142,6 +161,33 @@ input[type="radio"]:checked + label {
     .left-sidebar > *:nth-child(2) {
         width:calc(88% / 3 * 2);
     }
+}
+
+.triple-cols {
+    display:flex;
+    flex-wrap:wrap;
+    min-height:0px;
+}
+
+.triple-cols > * {
+    width: 100%;
+    padding: 1rem;
+}
+
+.triple-cols > *:nth-child(1) {
+    width:calc(88% / 3);
+    max-width: 180pt;
+    min-width: 180pt;
+    min-height:0;
+    order:-1;
+}
+
+.triple-cols > *:nth-child(2), 
+.triple-cols > *:nth-child(3) {
+    border-left: 1px solid silver;
+    width:calc(88% / 3);
+    max-width: 300pt;
+    min-width: 200pt;
 }
 
 /* modal dialog box */

@@ -235,6 +235,65 @@ Userlist.prototype.nameFromId = function(userId) {
 };
 
 /**
+ * Helper function for role selection.
+ * @param {type} roles
+ * @returns {Rolelist}
+ */
+function Rolelist(roles) {
+    this.roles = roles;
+}
+
+/**
+ * Creates the options list for the datalist tag.
+ * This will be used by all role input fields.
+ * @param {type} datalistId
+ * @returns {undefined}
+ */
+Rolelist.prototype.createOptionList = function(datalistId) {
+    var list = document.getElementById(datalistId);
+    list.innerHTML = "";
+    this.roles.forEach((role) => {
+        var option = document.createElement("option");
+        option.value = role.name;
+        option.key = role.id;
+        list.appendChild(option);
+    });
+};
+
+/**
+ * Converts an role name into an role id.
+ * @param {type} role name
+ * @returns {Number}
+ */
+Rolelist.prototype.idFromName = function(roleName) {
+    var result = -1;
+    this.roles.forEach((role) => {
+        if (role.name === roleName) {
+            result = role.id;
+        }
+    });
+
+    return result;
+};
+
+/**
+ * Converts an role id into an role name.
+ * @param {type} roleId
+ * @returns {String}
+ */
+Rolelist.prototype.nameFromId = function(roleId) {
+    var result = "";
+    this.roles.forEach((role) => {
+        if (role.id === roleId) {
+            result = role.name;
+        }
+    });
+
+    return result;
+};
+
+
+/**
  * Creates a div tag with label text and input element.
  * 
  * @param {type} lineno

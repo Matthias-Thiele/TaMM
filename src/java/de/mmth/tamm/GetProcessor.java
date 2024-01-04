@@ -8,6 +8,7 @@ import de.mmth.tamm.data.AdminData;
 import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.LockData;
+import de.mmth.tamm.data.RoleAssignmentData;
 import de.mmth.tamm.data.RoleData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.utils.DateUtils;
@@ -87,6 +88,10 @@ public class GetProcessor {
         
       case "roleslist":
         processRolesList(resultData, session, cmd4);
+        break;
+        
+      case "assignmentslist":
+        processAssignmentsList(resultData, session, cmd4);
         break;
     }
   }
@@ -267,11 +272,34 @@ public class GetProcessor {
   private void processRolesList(OutputStream resultData, SessionData session, String cmd4) throws TammError, IOException {
     List<RoleData> result = null;
     String message = "";
-    if ((session.user == null) || !(session.user.mainAdmin || session.user.subAdmin)) {
+    if (session.user == null) {
       message = "Kein Zugriff.";
     } else {
-      int owner = (session.user.mainAdmin && cmd4.equals("all")) ? -1 : session.user.id;
+      int owner = (cmd4.equals("all")) ? -1 : session.user.id;
       result = application.roles.listRoles(session.client.id, owner);
+    }
+    
+    ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, result);
+  }
+
+  /**
+   * Returns the assigned roles of the given user.
+   * 
+   * @param resultData
+   * @param session
+   * @param cmd4 userId as String
+   * @throws TammError
+   * @throws IOException 
+   */
+  private void processAssignmentsList(OutputStream resultData, SessionData session, String cmd4) throws TammError, IOException {
+    RoleAssignmentData result = null;
+    String message = "";
+    if (session.user == null) {
+      message = "Kein Zugriff.";
+    } else {
+      int userId = Integer.parseInt(cmd4);
+      result = application.assignments.listRoleAssignments(userId);
+      result.user = userId;
     }
     
     ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, result);

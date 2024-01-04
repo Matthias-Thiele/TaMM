@@ -167,7 +167,9 @@ public class DeleteProcessor {
     boolean isOk = (session.user != null) && (session.user.mainAdmin || session.user.subAdmin);
     String message;
     if (isOk) {
-      application.roles.removeRole(session.client.id, Integer.parseInt(cmd4));
+      int roleId = Integer.parseInt(cmd4);
+      application.roles.removeRole(session.client.id, roleId);
+      application.assignments.clearRoleAssignments(roleId, false);
       message = "Rolle gelöscht";
     } else {
       message = "Zugriff verweigert.";

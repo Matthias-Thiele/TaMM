@@ -121,7 +121,7 @@ public class UserTable extends DBTable {
    * @param user
    * @throws TammError 
    */
-  public void writeUser(UserData user) throws TammError {
+  public int writeUser(UserData user) throws TammError {
     String cmd;
     if (user.id == -1) {
       cmd = "INSERT INTO " + tableName + " (" + insertNames + ") values " + paramPlaceholders;
@@ -143,11 +143,21 @@ public class UserTable extends DBTable {
         stmt.setString(col++, user.lastLogin);
 
         stmt.execute();
+        }
+
+      if (user.id == -1) {
+        try (var stmt = conn.getConnection().prepareStatement("SELECT LASTVAL()")) {
+          var result = stmt.executeQuery();
+          result.next();
+          user.id = result.getInt(1);
+        }
       }
     } catch (SQLException ex) {
       logger.warn("Error writing user data.", ex);
       throw new TammError("Error writing user data.");
     }
+    
+    return user.id;
   }
   
   /**

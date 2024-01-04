@@ -11,6 +11,7 @@ import de.mmth.tamm.db.AttachmentTable;
 import de.mmth.tamm.db.ClientTable;
 import de.mmth.tamm.db.DBConnect;
 import de.mmth.tamm.db.LockTable;
+import de.mmth.tamm.db.RoleAssignmentTable;
 import de.mmth.tamm.db.RoleTable;
 import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
@@ -51,6 +52,7 @@ public class ApplicationData {
   public ClientTable clients;
   public LockTable locks;
   public RoleTable roles;
+  public RoleAssignmentTable assignments;
   
   public RequestCache requests;
   public String tammUrl;
@@ -96,6 +98,7 @@ public class ApplicationData {
         locks = new LockTable(db, "locklist");
         attachments = new AttachmentTable(db, "attachments");
         roles = new RoleTable(db, "roleslist");
+        assignments = new RoleAssignmentTable(db, "roleassignments");
         
         if (!adminData.mailadminname.isBlank() && !adminData.mailadminpwd.isBlank() && !adminData.mailhost.isBlank()) {
           mailer = new SendMail(adminData.mailhost, adminData.mailadminname, adminData.mailadminpwd);

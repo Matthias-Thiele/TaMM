@@ -41,7 +41,7 @@ public class ClientTableTest {
   @Test
   public void testCheckColumns() {
     String[] cols = ClientTable.TABLE_CONFIG.split("\\R");
-    assertEquals("Number of columns changed", 5, cols.length);
+    assertEquals("Number of columns changed", 7, cols.length);
   }
   
   /**

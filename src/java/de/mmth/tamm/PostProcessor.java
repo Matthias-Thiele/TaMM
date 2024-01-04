@@ -13,6 +13,7 @@ import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.LockData;
+import de.mmth.tamm.data.RoleAssignmentData;
 import de.mmth.tamm.data.RoleData;
 import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.DateUtils;
@@ -119,6 +120,10 @@ public class PostProcessor {
           
         case "saverole":
           processSaveRole(reader, resultData, session);
+          break;
+          
+        case "saveassignments":
+          processSaveUserRoles(reader, resultData, session);
           break;
       }
     }
@@ -411,6 +416,27 @@ public class PostProcessor {
     }
     
     ServletUtils.sendResult(resultData, true, "", "", message, id);
+  }
+
+  /**
+   * Save assigned roles of given user.
+   * 
+   * @param reader
+   * @param resultData
+   * @param session
+   * @throws TammError
+   * @throws IOException 
+   */
+  private void processSaveUserRoles(Reader reader, OutputStream resultData, SessionData session) throws TammError, IOException {
+    String message = "Zugriff verweigert";
+    
+    if (session.user.mainAdmin || session.user.subAdmin) {
+      RoleAssignmentData data = new Gson().fromJson(reader, RoleAssignmentData.class);
+      application.assignments.writeRoleAssignments(data);
+      message = "";
+    }
+    
+    ServletUtils.sendResult(resultData, true, "", "", message, null);
   }
   
 }
