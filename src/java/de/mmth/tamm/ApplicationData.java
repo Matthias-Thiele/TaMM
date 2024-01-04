@@ -17,8 +17,10 @@ import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.progress.SendMail;
 import de.mmth.tamm.utils.InvalidAccessCache;
+import de.mmth.tamm.utils.Placeholder;
 import de.mmth.tamm.utils.RequestCache;
 import de.mmth.tamm.utils.TemplateCache;
+import de.mmth.tamm.utils.Txt;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,7 +39,7 @@ public class ApplicationData {
   private static final String DB_URL = "dburl";
   private static final String DB_NAME = "dbname";
   private static final String DB_PASSWORD = "dbpassword";
-  private static final String FILE_UPLOAD_BASE = "uploadbase";
+  public static final String FILE_UPLOAD_BASE = "uploadbase";
   private static final String MAIL_HOST = "mailhost";
   private static final String MAIL_ADMIN = "mailadmin";
   private static final String MAIL_PWD = "mailpwd";
@@ -69,6 +71,8 @@ public class ApplicationData {
   public SendMail mailer = null;
   public TemplateCache templates = new TemplateCache("templates");
   public InvalidAccessCache accessCache = new InvalidAccessCache(MAX_RETRIES, DECAY_INTERVAL);
+  public Placeholder placeholder = new Placeholder();
+  
   /**
    * Reads the database access information from the registry
    * and tries to connect.
@@ -120,7 +124,6 @@ public class ApplicationData {
           }
           templates.setFileRoot(rootPath);
         }
-    
       }
     }
     

@@ -20,6 +20,7 @@ import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.PasswordUtils;
 import de.mmth.tamm.utils.Placeholder;
 import de.mmth.tamm.utils.ServletUtils;
+import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -163,7 +164,7 @@ public class PostProcessor {
   private void processSaveClient(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     String message = "";
     if ((session.user == null) || !session.user.mainAdmin) {
-      message = "Kein Zugriff.";
+      message = Txt.get(session.lang, "access_denied");
     } else {
       ClientData clientData = new Gson().fromJson(reader, ClientData.class);
       logger.debug("Process login request for user" + clientData.name);
@@ -187,7 +188,7 @@ public class PostProcessor {
     boolean loginValid = false;
     if (!application.accessCache.checkAccess(session.clientIp)) {
       result.result = "error";
-      result.message = "Zu viele Fehlversuche, das System ist für 10 Minuten gesperrt.";
+      result.message = Txt.get(session.lang, "account_locked");
       result.nextPage = "";
     } else {
       try {
@@ -208,7 +209,7 @@ public class PostProcessor {
       if (!loginValid) {
         result.result = "error";
         result.nextPage = "";
-        result.message = "Unbekannter Anwender oder falsches Passwort.";
+        result.message =Txt.get(session.lang, "unknown_user");
         application.accessCache.addInvalidAccess(session.clientIp);
         logger.warn("Invalid access: " + session.clientIp + " - " + loginData.name);
       }
@@ -398,7 +399,7 @@ public class PostProcessor {
       lock.lockIP = "admin";
       application.locks.writeLock(lock);
     } else {
-      message = "Zugriff verweigert.";
+      message = Txt.get(session.lang, "access_denied");
     }
     
     ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, null);
@@ -414,7 +415,7 @@ public class PostProcessor {
    * @throws IOException 
    */
   private void processSaveRole(Reader reader, OutputStream resultData, SessionData session) throws TammError, IOException {
-    String message = "Zugriff verweigert";
+    String message = Txt.get(session.lang, "access_denied");
     Integer id = -1;
     
     if (session.user.mainAdmin || session.user.subAdmin) {
@@ -438,7 +439,7 @@ public class PostProcessor {
    * @throws IOException 
    */
   private void processSaveUserRoles(Reader reader, OutputStream resultData, SessionData session) throws TammError, IOException {
-    String message = "Zugriff verweigert";
+    String message = Txt.get(session.lang, "access_denied");
     
     if (session.user.mainAdmin || session.user.subAdmin) {
       RoleAssignmentData data = new Gson().fromJson(reader, RoleAssignmentData.class);

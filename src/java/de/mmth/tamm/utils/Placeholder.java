@@ -4,6 +4,7 @@
  */
 package de.mmth.tamm.utils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,6 +22,12 @@ import java.util.Map;
  * @author matthias
  */
 public class Placeholder {
+  public String resolve(String source, String name1, String param1) {
+    Map<String, String> placeholderData = new HashMap<>();
+    placeholderData.put(name1, param1);
+    return resolve(source, placeholderData);
+  }
+  
   public String resolve(String source, Map<String, String> placeholderData) {
     StringBuilder buf = new StringBuilder(source.length() * 2);
     

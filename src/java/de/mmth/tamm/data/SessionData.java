@@ -12,6 +12,7 @@ import java.util.List;
  * @author matthias
  */
 public class SessionData {
+  public String lang;
   public String clientIp;
   public String loginTime;
   public UserData user;

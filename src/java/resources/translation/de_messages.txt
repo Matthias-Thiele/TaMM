@@ -1,0 +1,7 @@
+account_locked=Zu viele Fehlversuche, das System ist für 10 Minuten gesperrt.
+unknown_user=Unbekannter Anwender oder falsches Passwort.
+access_denied=Unzureichende Zugriffsrechte oder Bereich gesperrt.
+messages_deleted=Es wurden {[count]} Einträge aus dem Vorlagenspeicher gelöscht.
+pdw_request_deleted=Passwortanfrage entfernt: 
+role_deleted=Rolle gelöscht
+

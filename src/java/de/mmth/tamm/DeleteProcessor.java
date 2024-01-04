@@ -9,6 +9,7 @@ import de.mmth.tamm.data.LockData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.data.TaskData;
 import de.mmth.tamm.utils.ServletUtils;
+import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -112,7 +113,7 @@ public class DeleteProcessor {
       lock.lockDate = cmd5;
       application.locks.removeLock(lock);
     } else {
-      message = "Zugriff verweigert.";
+      message = Txt.get(session.lang, "access_denied");
     }
     
     ServletUtils.sendResult(resultData, isOk, "", "", message, null);
@@ -124,9 +125,9 @@ public class DeleteProcessor {
     String message;
     if (isOk) {
       int count = application.templates.clear();
-      message = "Anzahl der gelöschten Einträge aus dem Vorlagenspeicher: " + count;
+      message = application.placeholder.resolve(Txt.get(session.lang, "messages_deleted"), "count", Integer.toString(count));
     } else {
-      message = "Zugriff verweigert.";
+      message = Txt.get(session.lang, "access_denied");
     }
     
     ServletUtils.sendResult(resultData, isOk, "", "", message, null);
@@ -146,9 +147,9 @@ public class DeleteProcessor {
     String message;
     if (isOk) {
       application.requests.removeKey(cmd4);
-      message = "Passwortanfrage entfernt: " + cmd4;
+      message = Txt.get(session.lang, "pdw_request_deleted") + cmd4;
     } else {
-      message = "Zugriff verweigert.";
+      message = Txt.get(session.lang, "access_denied");
     }
     
     ServletUtils.sendResult(resultData, isOk, "", "", message, null);
@@ -170,9 +171,9 @@ public class DeleteProcessor {
       int roleId = Integer.parseInt(cmd4);
       application.roles.removeRole(session.client.id, roleId);
       application.assignments.clearRoleAssignments(roleId, false);
-      message = "Rolle gelöscht";
+      message = Txt.get(session.lang, "role_deleted");
     } else {
-      message = "Zugriff verweigert.";
+      message = Txt.get(session.lang, "access_denied");
     }
     
     ServletUtils.sendResult(resultData, isOk, "", "", message, null);

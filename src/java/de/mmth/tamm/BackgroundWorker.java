@@ -20,6 +20,7 @@ public class BackgroundWorker extends Thread {
     this.application = application;
   }
   
+  @Override
   public void run() {
     logger.info("Start background worker.");
     while (this.isAlive() && !this.isInterrupted()) {

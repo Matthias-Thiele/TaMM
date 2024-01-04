@@ -14,6 +14,7 @@ import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.RequestCache;
 import de.mmth.tamm.utils.ServletUtils;
+import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -242,7 +243,7 @@ public class GetProcessor {
     List<LockData> result = null;
     String message = "";
     if ((session.user == null) || !session.user.mainAdmin) {
-      message = "Kein Zugriff.";
+      message = Txt.get(session.lang, "access_denied");
     } else {
       result = application.locks.listLocks(cmd4);
     }
@@ -262,7 +263,7 @@ public class GetProcessor {
     RequestCache requests = null;
     
     if ((session.user == null) || !session.user.mainAdmin) {
-      message = "Kein Zugriff.";
+      message = Txt.get(session.lang, "access_denied");
     } else {
       requests = application.requests;
     }
@@ -286,7 +287,7 @@ public class GetProcessor {
     List<RoleData> result = null;
     String message = "";
     if (session.user == null) {
-      message = "Kein Zugriff.";
+      message = Txt.get(session.lang, "access_denied");
     } else {
       int owner = (cmd4.equals("all")) ? -1 : session.user.id;
       result = application.roles.listRoles(session.client.id, owner);
@@ -308,7 +309,7 @@ public class GetProcessor {
     RoleAssignmentData result = null;
     String message = "";
     if (session.user == null) {
-      message = "Kein Zugriff.";
+      message = Txt.get(session.lang, "access_denied");
     } else {
       int userId = Integer.parseInt(cmd4);
       result = application.assignments.listRoleAssignments(userId);

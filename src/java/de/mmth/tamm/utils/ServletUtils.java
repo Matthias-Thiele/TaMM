@@ -20,6 +20,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 
@@ -135,6 +136,16 @@ public class ServletUtils {
       session.setAttribute("TAMM", sd);
       sd.clientIp = ServletUtils.getClientIp(request);
       logger.info("New session from address " + sd.clientIp);
+      
+      sd.lang = Txt.getMainLanguage();
+      var locales = request.getLocales();
+      while (locales.hasMoreElements()) {
+        Locale locale = locales.nextElement();
+        if (Txt.hasLanguage(locale.getLanguage())) {
+          sd.lang = locale.getLanguage().substring(0, 2);
+          break;
+        }
+      }
     }
     
     return sd;

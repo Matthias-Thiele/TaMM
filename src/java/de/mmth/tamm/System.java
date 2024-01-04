@@ -7,6 +7,7 @@ package de.mmth.tamm;
 
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.utils.ServletUtils;
+import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.prefs.Preferences;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,6 +42,13 @@ public class System extends HttpServlet {
     sc.setAttribute("application", application);
     
     backgroundWorker.start();
+          
+    var prefs = Preferences.userRoot().node("Tamm");
+    var uploadbase = prefs.get(ApplicationData.FILE_UPLOAD_BASE, "/var/TaMM/files");
+    if (uploadbase != null && !uploadbase.isBlank()) {
+      File rootFile = new File(uploadbase);
+      Txt.addLanguageText(rootFile, "de en", "messages.txt");
+    }
   }
   
   @Override
