@@ -57,6 +57,7 @@ public class ApplicationData {
   public RequestCache requests;
   public String tammUrl;
   public Map<String, List<KeyValue>> userNamesMap = new HashMap<>();
+  public Map<String, List<KeyValue>> roleNamesMap = new HashMap<>();
   public List<ClientData> clientList;
   public Map<String, ClientData> clientNames;
   public File rootPath;

@@ -16,6 +16,7 @@ public class SessionData {
   public String loginTime;
   public UserData user;
   public List<KeyValue> userNames;
+  public List<KeyValue> roleNames;
   public ClientData client;
   public String clientName;
 

@@ -129,10 +129,11 @@ public class TaskTable extends DBTable {
    * @param clientId
    * @param ownerId optional, -1: all tasks of all users
    * @param filter optional null: no filter
+   * @param withRoleTasks
    * @return
    * @throws TammError 
    */
-  public List<TaskData> listTasks(int clientId, int ownerId, String filter) throws TammError {
+  public List<TaskData> listTasks(int clientId, int ownerId, String filter, boolean withRoleTasks) throws TammError {
     boolean hasId = ownerId != -1;
     boolean hasFilter = filter != null;
     
@@ -145,7 +146,11 @@ public class TaskTable extends DBTable {
     }
     
     if (hasId) {
-      cmd += "owner = ? ";
+      if (withRoleTasks) {
+        cmd += " owner in ( select ? union select roleid from roleassignments r  where r.userid = ? )";
+      } else {
+        cmd += "owner = ? ";
+      }
       if (hasFilter) {
         cmd += "AND ";
       }
@@ -166,6 +171,9 @@ public class TaskTable extends DBTable {
         
         if (hasId) {
           stmt.setInt(paramCol++, ownerId);
+          if (withRoleTasks) {
+            stmt.setInt(paramCol++, ownerId);
+          }
         }
         
         if (hasFilter) {

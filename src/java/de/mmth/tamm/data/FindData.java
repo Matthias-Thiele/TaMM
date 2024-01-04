@@ -14,4 +14,5 @@ public class FindData {
   public String filterText;
   public int userId;
   public boolean onlyAdmins;
+  public boolean withRoleTasks;
 }

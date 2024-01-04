@@ -88,7 +88,7 @@ public class TaskProcessor {
     List<TaskData> searchResult;
     switch (findData.source) {
       case "tasklist":
-        searchResult = application.tasks.listTasks(session.client.id, userId, findData.filterText);
+        searchResult = application.tasks.listTasks(session.client.id, userId, findData.filterText, findData.withRoleTasks);
         break;
     
       case "historylist":

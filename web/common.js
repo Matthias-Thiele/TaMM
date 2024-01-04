@@ -178,10 +178,12 @@ function statusMsg(message) {
 
 /**
  * Helper function for user selection.
+ * @param {type} roles 
  * @param {type} users
  * @returns {Userlist}
  */
-function Userlist(users) {
+function Userlist(roles, users) {
+    this.roles = roles;
     this.users = users;
 }
 
@@ -194,14 +196,19 @@ function Userlist(users) {
 Userlist.prototype.createOptionList = function(datalistId) {
     var list = document.getElementById(datalistId);
     list.innerHTML = "";
-    this.users.forEach((idName) => {
+    this.createPart(list, this.roles);
+    this.createPart(list, this.users);
+};
+
+Userlist.prototype.createPart = function(list, part) {
+    part.forEach((idName) => {
         var option = document.createElement("option");
         option.value = idName.value;
         option.key = idName.key;
         list.appendChild(option);
     });
-};
-
+    
+}
 /**
  * Converts an user id into an user name.
  * @param {type} userName
@@ -214,7 +221,13 @@ Userlist.prototype.idFromName = function(userName) {
             result = idName.key;
         }
     });
-
+    if (result === -1) {
+        this.roles.forEach((idName) => {
+            if (idName.value === userName) {
+                result = idName.key;
+            }
+        });
+    }
     return result;
 };
 
@@ -225,11 +238,19 @@ Userlist.prototype.idFromName = function(userName) {
  */
 Userlist.prototype.nameFromId = function(userId) {
     var result = "";
-    this.users.forEach((idName) => {
-        if (idName.key === userId) {
-            result = idName.value;
-        }
-    });
+    if (userId < 16000000) {
+        this.users.forEach((idName) => {
+            if (idName.key === userId) {
+                result = idName.value;
+            }
+        });
+    } else {
+        this.roles.forEach((idName) => {
+            if (idName.key === userId) {
+                result = idName.value;
+            }
+        });
+    }
 
     return result;
 };

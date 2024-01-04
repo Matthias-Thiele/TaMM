@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -138,6 +139,18 @@ public class GetProcessor {
         application.userNamesMap.put(client.name, clientNames);
       }
       session.userNames = clientNames;
+      
+      List<KeyValue> roleNames = application.roleNamesMap.get(client.name);
+      if (roleNames == null) {
+        roleNames = new ArrayList<>();
+        var roles = application.roles.listRoles(client.id, -1);
+        for (var role: roles) {
+          var kv = new KeyValue(role.id, role.name);
+          roleNames.add(kv);
+        }
+        application.roleNamesMap.put(client.name, roleNames);
+      }
+      session.roleNames = roleNames;
     } else {
       message = "Anmeldung fehlt.";
     }

@@ -76,7 +76,7 @@
                         }
                     }
 
-                    userlist = new Userlist(sessionData.userNames);
+                    userlist = new Userlist(sessionData.roleNames, sessionData.userNames);
                     userlist.createOptionList("userlist");
                     setTimeout(filterTasks, 200);
                 }
@@ -195,6 +195,7 @@
                 data.source = "tasklist";
                 data.filterText = "%" + document.getElementById("filtervalue").value + "%";
                 data.userId = sessionData.user.id;
+                data.withRoleTasks = true;
                 console.log(data);
                 statusMsg("Warte auf Server...");
                 
