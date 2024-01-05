@@ -77,7 +77,7 @@ public class GetProcessor {
         break;
         
       case "lockmail":
-        processLock(resultData, cmd4);
+        processLock(resultData, session, cmd4);
         break;
         
       case "locklist":
@@ -102,7 +102,7 @@ public class GetProcessor {
    * User request to add his mail address to the lock list.
    * @param key 
    */
-  private void processLock(OutputStream resultData, String key) throws TammError, IOException {
+  private void processLock(OutputStream resultData, SessionData session, String key) throws TammError, IOException {
     String message;
     logger.info(key);
     String userMail = application.requests.getUserMail(key);
@@ -112,9 +112,9 @@ public class GetProcessor {
       lock.lockDate = DateUtils.formatZ(null);
       application.locks.writeLock(lock);
       application.requests.removeKey(key);
-      message = "Die Mail Adresse wurde in die Sperrliste aufgenommen.";
+      message = Txt.get(session.lang, "mail_address_locked");
     } else {
-      message = "Der Zugriffsschlüssel ist bereits abgelaufen.";
+      message = Txt.get(session.lang, "pwd_req_expired");
     }
     
     resultData.write(message.getBytes(StandardCharsets.UTF_8));
@@ -153,7 +153,7 @@ public class GetProcessor {
       }
       session.roleNames = roleNames;
     } else {
-      message = "Anmeldung fehlt.";
+      message = Txt.get(session.lang, "missing_login");
     }
     
     ServletUtils.sendResult(resultData, isOk, "", "login.html", message, session);
@@ -187,10 +187,10 @@ public class GetProcessor {
     String errorNext = "";
     if (isUser) {
       if (!session.user.mainAdmin) {
-        message = "Keine Berechtigung.";
+        message = Txt.get(session.lang, "missing_access_rights");
       }
     } else {
-      message = "Keine Anmeldung.";
+      message = Txt.get(session.lang, "missing_login");
       errorNext = "login.html";
     }
     

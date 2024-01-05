@@ -1,7 +1,29 @@
-account_locked=Zu viele Fehlversuche, das System ist für 10 Minuten gesperrt.
-unknown_user=Unbekannter Anwender oder falsches Passwort.
+# general
+missing_login=Sie sind noch nicht angemeldet.
+missing_access_rights=Fehlende oder unzureichende Berechtigung.
 access_denied=Unzureichende Zugriffsrechte oder Bereich gesperrt.
+
+# from DeleteProcessor
 messages_deleted=Es wurden {[count]} Einträge aus dem Vorlagenspeicher gelöscht.
 pdw_request_deleted=Passwortanfrage entfernt: 
 role_deleted=Rolle gelöscht
 
+# from GetProcessor
+mail_address_locked=Die Mail Adresse wurde in die Sperrliste aufgenommen.
+pwd_req_expired=Der Zugriffsschlüssel ist bereits abgelaufen.";
+
+# from PostProcessor
+account_locked=Zu viele Fehlversuche, das System ist für 10 Minuten gesperrt.
+unknown_user=Unbekannter Anwender oder falsches Passwort.
+unknown_user_or_mail=Unbekannter Anwender oder Mailadresse
+error_send_mail=Fehler beim Versenden der Mail.
+missing_mail_config=Fehlende Mail-Konfiguration. Anforderung im Log verzeichnet.
+mail_locked=Diese Mail Adresse ist gesperrt.
+mail_domain_locked=Diese Mail Domäne ist gesperrt.
+pwd_renewal=Passwort erneuern
+req_sent_per_mail=Anforderung per Mail verschickt.
+invalid_key=Ungültiger oder abgelaufener Schlüssel
+role_created=Rolle erstellt mit id:
+
+# from UserProcessor
+wrong_administrator=Es können nur eigene Anwender bearbeitet werden.

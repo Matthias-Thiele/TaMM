@@ -5,12 +5,12 @@
 package de.mmth.tamm;
 
 import com.google.gson.Gson;
-import de.mmth.tamm.data.AttachmentData;
 import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.PasswordUtils;
 import de.mmth.tamm.utils.ServletUtils;
+import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -44,7 +44,8 @@ public class UserProcessor {
    */
   protected void processFilter(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     if (session.user == null) {
-      throw new TammError("Missing login.");
+      String msg = Txt.get(session.lang, "missing_login");
+      throw new TammError(msg);
     }
     
     FindData findData = new Gson().fromJson(reader, FindData.class);
@@ -73,7 +74,8 @@ public class UserProcessor {
    */
   protected void processSaveUser(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     if (session.user == null) {
-      ServletUtils.sendResult(resultData, false, "", "", "Sie sind noch nicht angemeldet.", null);
+      String msg = Txt.get(session.lang, "missing_login");
+      ServletUtils.sendResult(resultData, false, "", "", msg, null);
       return;
     }
     
@@ -107,7 +109,7 @@ public class UserProcessor {
       }
       
       if (checkUser.administratorId != session.user.id) {
-        errorMsg = "Es können nur eigene Anwender bearbeitet werden.";
+        errorMsg = Txt.get(session.lang, "wrong_administrator");
         logger.warn("Invalid user access from " + session.user.name + " to user " + userData.name);
       } else {
         checkUser.name = userData.name;

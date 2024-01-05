@@ -176,7 +176,11 @@ public class Txt {
         if (line == null) {
           break;
         }
-
+        
+        if (line.isBlank() || line.startsWith("#")) {
+          continue;
+        }
+        
         int splitPos = line.indexOf('=');
         if ((splitPos > 0) && (splitPos < (line.length() - 1))) {
           String key = line.substring(0, splitPos);

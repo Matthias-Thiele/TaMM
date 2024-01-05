@@ -141,7 +141,8 @@ public class PostProcessor {
    */
   protected void processSaveUrlAttachment(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     if (session.user == null) {
-      ServletUtils.sendResult(resultData, false, "", "", "Sie sind noch nicht angemeldet.", null);
+      String missingLogin = Txt.get(session.lang, "missing_login");
+      ServletUtils.sendResult(resultData, false, "", "", missingLogin, null);
       return;
     }
     AttachmentData data = new Gson().fromJson(reader, AttachmentData.class);
@@ -254,10 +255,10 @@ public class PostProcessor {
   private void processPasswordRequest(Reader reader, OutputStream resultData, SessionData session) throws IOException {
     UserData userData = new Gson().fromJson(reader, UserData.class);
     logger.debug("Password request for user " + userData.name);
-    String message = "Unbekannter Anwender oder Mailadresse";
+    String message = Txt.get(session.lang, "unknown_user_or_mail");
     boolean isOk = false;
     try {
-      message = checkLocked(userData.mail);
+      message = checkLocked(userData.mail, session.lang);
       var checkUser = application.users.readUser(session.client.id, -1, userData.name);
       if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
         String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS, session.clientIp);
@@ -267,14 +268,14 @@ public class PostProcessor {
           var requestUrl = application.tammUrl + "newpwd.html?key=" + key;
           var lockUrl = application.tammUrl + "system/lockmail/" + key;
           try {
-            message = processMail(requestUrl, lockUrl, userData.mail, validUntil);
+            message = processMail(requestUrl, lockUrl, userData.mail, validUntil, session.lang);
             isOk = true;
           } catch (EmailException ex) {
             logger.warn("Error sending mail.", ex);
-            message = "Fehler beim Versenden der Mail.";
+            message = Txt.get(session.lang, "error_send_mail");
           }
         } else {
-          message = "Fehlende Mail-Konfiguration. Anforderung im Log verzeichnet.";
+          message = Txt.get(session.lang, "missing_mail_config");
         }
       } else {
         logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);
@@ -295,10 +296,10 @@ public class PostProcessor {
    * @return null if ok, otherwiese error message
    * @throws TammError 
    */
-  private String checkLocked(String mail) throws TammError {
+  private String checkLocked(String mail, String lang) throws TammError {
     String message = null;
     if (application.locks.checkLock(mail)) {
-      message = "Diese Mail Adresse ist gesperrt.";
+      message = Txt.get(lang, "mail_locked");
       application.locks.incrementLockCount(mail);
     } else {
       String domain = mail;
@@ -307,32 +308,27 @@ public class PostProcessor {
         domain = domain.substring(pos);
       }
       if (application.locks.checkLock(domain)) {
-        message = "Diese Mail Domäne ist gesperrt.";
+        message = Txt.get(lang, "mail_domain_locked");
         application.locks.incrementLockCount(domain);
       }
     }
     
     return message;
   }
-  
+
   /**
-   * Create the mail body and send it to the given address.
+   * Creates the mail and sends it per SMTP.
    * 
    * @param requestUrl
    * @param lockUrl
    * @param mailAddress
+   * @param linkValidUntil
+   * @param lang
    * @return
-   * @throws EmailException 
-   */  /**
-   * Create the mail body and send it to the given address.
-   * 
-   * @param requestUrl
-   * @param lockUrl
-   * @param mailAddress
-   * @return
-   * @throws EmailException 
+   * @throws EmailException
+   * @throws TammError 
    */
-  private String processMail(String requestUrl, String lockUrl, String mailAddress, String linkValidUntil) throws EmailException, TammError {
+  private String processMail(String requestUrl, String lockUrl, String mailAddress, String linkValidUntil, String lang) throws EmailException, TammError {
     Map<String, String> params = new HashMap<>();
     params.put("pwdrenewal", requestUrl);
     params.put("pwdmaillock", lockUrl);
@@ -344,9 +340,11 @@ public class PostProcessor {
     
     var textmessage = application.templates.getTemplate("mail/mailtemplate.txt");
     textmessage = ph.resolve(textmessage, params);
-    application.mailer.send(application.adminData.mailreply, mailAddress, "Passwort erneuern", textmessage, htmlmessage);
     
-    return "Anforderung per Mail verschickt.";
+    String msg = Txt.get(lang, "pwd_renewal");
+    application.mailer.send(application.adminData.mailreply, mailAddress, msg, textmessage, htmlmessage);
+    
+    return Txt.get(lang, "req_sent_per_mail");
   }
   
   /**
@@ -369,7 +367,7 @@ public class PostProcessor {
       found = true;
       application.requests.removeKey(loginData.key);
     } else {
-      message = "Ungültiger oder abgelaufener Schlüssel";
+      message = Txt.get(session.lang, "invalid_key");
     }
     
     ServletUtils.sendResult(resultData, found, "login.html", "", message, null);
@@ -423,7 +421,7 @@ public class PostProcessor {
       data.clientId = session.client.id;
       data.owner = session.user.id;
       id = application.roles.writeRole(data);
-      message = "Rolle erstellt mit id: " + id;
+      message = Txt.get(session.lang, "role_created");
     }
     
     ServletUtils.sendResult(resultData, true, "", "", message, id);

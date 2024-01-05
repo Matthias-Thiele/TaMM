@@ -13,6 +13,7 @@ import de.mmth.tamm.data.TaskData;
 import de.mmth.tamm.progress.Interval;
 import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.ServletUtils;
+import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -42,7 +43,8 @@ public class TaskProcessor {
   
   protected void processSaveTask(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     if (session.user == null) {
-      ServletUtils.sendResult(resultData, false, "", "", "Sie sind noch nicht angemeldet.", null);
+      String msg = Txt.get(session.lang, "missing_login");
+      ServletUtils.sendResult(resultData, false, "", "", msg, null);
       return;
     }
     
@@ -78,7 +80,8 @@ public class TaskProcessor {
    */
   protected void processFilter(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     if (session.user == null) {
-      throw new TammError("Missing login.");
+      String msg = Txt.get(session.lang, "missing_login");
+      throw new TammError(msg);
     }
     
     FindData findData = gson.fromJson(reader, FindData.class);
@@ -118,7 +121,8 @@ public class TaskProcessor {
    */
   void processAdvance(Reader reader, OutputStream resultData, SessionData session) throws TammError, IOException {
     if (session.user == null) {
-      throw new TammError("Missing login.");
+      String msg = Txt.get(session.lang, "missing_login");
+      throw new TammError(msg);
     }
     
     TaskData advanceTask = gson.fromJson(reader, TaskData.class);
