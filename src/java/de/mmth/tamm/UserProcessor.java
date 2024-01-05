@@ -58,9 +58,7 @@ public class UserProcessor {
       user.pwd = ""; // do not leak user passwords to the outside.
     }
     
-    try (Writer writer = new OutputStreamWriter(resultData)) {
-      new Gson().toJson(searchResult, writer);
-    }
+    ServletUtils.sendResult(resultData, true, "", "", "", searchResult);
   }
   
   /**

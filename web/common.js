@@ -203,8 +203,8 @@ Userlist.prototype.createOptionList = function(datalistId) {
 Userlist.prototype.createPart = function(list, part) {
     part.forEach((idName) => {
         var option = document.createElement("option");
-        option.value = idName.value;
-        option.key = idName.key;
+        option.value = idName.name;
+        option.key = idName.id;
         list.appendChild(option);
     });
     
@@ -216,19 +216,28 @@ Userlist.prototype.createPart = function(list, part) {
  */
 Userlist.prototype.idFromName = function(userName) {
     var result = -1;
+    var partialResult = -1;
+    var lowerName = userName.toLowerCase();
+    
     this.users.forEach((idName) => {
-        if (idName.value === userName) {
-            result = idName.key;
+        var idLowerName = idName.name.toLowerCase();
+        if (idLowerName === lowerName) {
+            result = idName.id;
+        } else if (idLowerName.startsWith(userName) && partialResult === -1) {
+            partialResult = idName.id;
         }
     });
     if (result === -1) {
         this.roles.forEach((idName) => {
-            if (idName.value === userName) {
-                result = idName.key;
-            }
+            var idLowerName = idName.name.toLowerCase();
+            if (idLowerName === lowerName) {
+                result = idName.id;
+            } else if (idLowerName.startsWith(userName) && partialResult === -1) {
+               partialResult = idName.id;
+           }
         });
     }
-    return result;
+    return (result === -1) ? partialResult : result;
 };
 
 /**
@@ -240,14 +249,14 @@ Userlist.prototype.nameFromId = function(userId) {
     var result = "";
     if (userId < 16000000) {
         this.users.forEach((idName) => {
-            if (idName.key === userId) {
-                result = idName.value;
+            if (idName.id === userId) {
+                result = idName.name;
             }
         });
     } else {
         this.roles.forEach((idName) => {
-            if (idName.key === userId) {
-                result = idName.value;
+            if (idName.id === userId) {
+                result = idName.name;
             }
         });
     }
@@ -256,41 +265,62 @@ Userlist.prototype.nameFromId = function(userId) {
 };
 
 /**
- * Helper function for role selection.
- * @param {type} roles
- * @returns {Rolelist}
+ * Helper function for key/value selection.
+ * @param {type} list
+ * @returns {KeyValueList}
  */
-function Rolelist(roles) {
-    this.roles = roles;
+function KeyValueList(list) {
+    this.kvList = list;
 }
 
 /**
  * Creates the options list for the datalist tag.
- * This will be used by all role input fields.
+ * This will be used by many key/value input fields.
  * @param {type} datalistId
  * @returns {undefined}
  */
-Rolelist.prototype.createOptionList = function(datalistId) {
+KeyValueList.prototype.createOptionList = function(datalistId) {
     var list = document.getElementById(datalistId);
     list.innerHTML = "";
-    this.roles.forEach((role) => {
+    this.kvList.forEach((item) => {
         var option = document.createElement("option");
-        option.value = role.name;
-        option.key = role.id;
+        option.value = item.name;
+        option.key = item.id;
         list.appendChild(option);
     });
 };
 
 /**
- * Converts an role name into an role id.
- * @param {type} role name
+ * Converts an name into an id.
+ * @param {type} name
  * @returns {Number}
  */
-Rolelist.prototype.idFromName = function(roleName) {
+KeyValueList.prototype.idFromName = function(name) {
     var result = -1;
-    this.roles.forEach((role) => {
-        if (role.name === roleName) {
-            result = role.id;
+    var partialResult = -1;
+    var lowerName = name.toLowerCase();
+    this.kvList.forEach((item) => {
+        var lowerItemName = item.name.toLowerCase();
+        if (lowerItemName === lowerName) {
+            result = item.id;
+        } else if (lowerItemName.startsWith(lowerName) && partialResult === -1) {
+            partialResult = item.id;
+        }
+    });
+
+    return (result === -1) ? partialResult : result;
+};
+
+/**
+ * Converts an id into an name.
+ * @param {type} itemId
+ * @returns {String}
+ */
+KeyValueList.prototype.nameFromId = function(itemId) {
+    var result = "";
+    this.kvList.forEach((item) => {
+        if (item.id === itemId) {
+            result = item.name;
         }
     });
 
@@ -298,21 +328,21 @@ Rolelist.prototype.idFromName = function(roleName) {
 };
 
 /**
- * Converts an role id into an role name.
- * @param {type} roleId
- * @returns {String}
- */
-Rolelist.prototype.nameFromId = function(roleId) {
-    var result = "";
-    this.roles.forEach((role) => {
-        if (role.id === roleId) {
-            result = role.name;
-        }
-    });
-
-    return result;
-};
-
+ * Called from onchange event of list input element.
+ * 
+ * If the user has entered a partial name, then
+ * search for the first matching name in the list.
+ * 
+ * @param {type} event
+ * @param {type} namesList
+ * @returns {undefined}
+ */            
+function updateListInput(event, namesList) {
+    var node = event.srcElement;
+    var id = namesList.idFromName(node.value);
+    var name = namesList.nameFromId(id);
+    node.value = name;
+}
 
 /**
  * Creates a div tag with label text and input element.

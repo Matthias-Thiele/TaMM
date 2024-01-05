@@ -57,8 +57,6 @@
              * @returns {undefined}
              */
             async function loadSessionData() {
-                initDefaultAction("save", doSave);
-                
                 const fetchsession = await fetch("system/session", {'method': 'GET'});
                 const response = await fetchsession.json();
                 if (response.result === "error") {
@@ -153,6 +151,10 @@
              * @returns {undefined}
              */
             async function doSave(deferredAdvance) {
+                if (!selectedTask) {
+                    return;
+                }
+                
                 selectedTask.lId = getValue("tasklid");
                 if (selectedTask.lId === "") {
                     selectedTask.lId = "-1";
@@ -254,6 +256,7 @@
                 filelist.appendChild(anchor);
                 saveUrlAttachment(name, url, anchor);
             }
+            
         </script>
     </head>
     <body onload="loadSessionData();">
@@ -319,7 +322,7 @@
                     <div><label for="description">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
                     <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
                     <div><label for="lastchanged">Geändert am</label><input id="lastchanged" readonly></div>
-                    <div><label for="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed()"></div>
+                    <div><label for="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed(); updateListInput(event, userlist)"></div>
                     <div><label for="duedate">Nächster Start</label><input id="duedate" type="date" onchange="changed()"></div>
                     <hr>
                     <div class="flex-container">

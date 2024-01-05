@@ -3,7 +3,13 @@
  * GNU General Public License v3.0
  */
 
-            
+var TxtDe = {};
+TxtDe.username = "Anwendername";
+TxtDe.pasword = "Passwort";
+TxtDe.pwdreq = "Passwort vergessen?";
+TxtDe.wait = "Warte auf Serverantwort...";
+TxtDe.dologin = "Anmelden";
+
 var TxtFr = {};
 TxtFr.username = "Nom d'utilisateur" ;
 TxtFr.password = "Mot de passe" ;
@@ -18,18 +24,20 @@ TxtEn.pwdreq = "Password forgotten?";
 TxtEn.wait = "Wait for server response...";
 TxtEn.dologin = "Login";
 
+var Txt;
 
 function translateForm() {
-    var userLang = navigator.language || navigator.userLanguage; userLang = "fr";
+    var userLang = navigator.language || navigator.userLanguage;
+    switch (userLang) {
+        case "de": Txt = TxtDe; break;
+        case "fr": Txt = TxtFr; break;
+        default: Txt = TxtEn;
+    }
+    
     if (userLang === "de") {
         return;
     }
     
-    var Txt;
-    switch (userLang) {
-        case "fr": Txt = TxtFr; break;
-        default: Txt = TxtEn;
-    }
     var textElems = document.querySelectorAll("[data-key]");
     textElems.forEach((elem) => {
         var key = elem.getAttribute("data-key");

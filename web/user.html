@@ -27,17 +27,15 @@ GNU General Public License v3.0
              * @returns {undefined}
              */
             async function loadSessionData() {
-                initDefaultAction("save", doSave);
-                
                 const session = await fetch("system/session", {'method': 'GET'});
                 const response = await session.json();
                 if (response.result === "error") {
                     window.location = response.nextPage + "?next=user.html";
                 } else {
                     sessionData = response.data;
-                    userNames = new Userlist(sessionData.userNames);
+                    userNames = new Userlist(sessionData.roleNames, sessionData.userNames);
                     userNames.createOptionList("usernames");
-                    clientNames = new Userlist(sessionData.clientList);
+                    clientNames = new KeyValueList(sessionData.clientList);
                     clientNames.createOptionList("clientnames");
                     var clientInput = document.getElementById("client");
                     clientInput.disabled = !sessionData.user.mainAdmin;
@@ -50,6 +48,8 @@ GNU General Public License v3.0
                 }
                 
                 loadRoles();
+                emptyUser = {};
+                fillForm(emptyUser);
             }
             
             /**
@@ -58,6 +58,10 @@ GNU General Public License v3.0
              * @returns {undefined}
              */
             async function doSave() {
+                if (!selectedUser) {
+                    return;
+                }
+                
                 selectedUser.name = getValue("name");
                 selectedUser.mail = getValue("mail");
                 selectedUser.id = getValue("userid");
@@ -133,7 +137,7 @@ GNU General Public License v3.0
                 const filter = await fetch("system/filteruser", {'method': 'POST', 'body': JSON.stringify(data)});
                 const response = await filter.json();
                 if (response.result !== "error") {
-                  listUsers(response);
+                  listUsers(response.data);
                   statusMsg("");
                 } else {
                   statusMsg("Unbekannter Fehler beim Suchen.");
@@ -230,7 +234,7 @@ GNU General Public License v3.0
              */
             function insertRoleNames(roles) {
                 console.log(roles);
-                roleNames = new Rolelist(roles);
+                roleNames = new KeyValueList(roles);
                 roleNames.createOptionList("rolenames");
             }
             
@@ -255,6 +259,8 @@ GNU General Public License v3.0
                     var id = roleNames.idFromName(source.value);
                     if (id < 1) {
                         source.value = "";
+                    } else {
+                        source.value = roleNames.nameFromId(id);
                     }
                     
                     source.parentNode.roleId = id;
@@ -344,10 +350,10 @@ GNU General Public License v3.0
                 <div class="">
                     <div><label for="name">Anwendername</label><input onchange="changed()" type="text" id="name"></div>
                     <div><label for="mail">EMail</label><input onchange="changed()" type="text" id="mail"></div>
-                    <div><label for="supervisor">Vorgesetzter</label><input id="supervisor" list="usernames" onchange="changed()"></div>
+                    <div><label for="supervisor">Vorgesetzter</label><input id="supervisor" list="usernames" onchange="changed(); updateListInput(event, userNames)"></div>
                     <div><label for="sysadmin">Systemadministrator</label><input onchange="changed()" type="checkbox" id="sysadmin"></div>
                     <div><label for="sysadmin">Anwenderverwaltung</label><input onchange="changed()" type="checkbox" id="subadmin"></div>
-                    <div><label for="client">Mandant</label><input type="text" id="client" list="clientnames" onchange="changed()"></div>
+                    <div><label for="client">Mandant</label><input type="text" id="client" list="clientnames" onchange="changed(); updateListInput(event, clientNames)"></div>
                     <hr>
                     <div><label for="lastlogin">Letzte Anmeldung</label><input id="lastlogin" readonly></div>
                     <div><label for="administrator">Administrator</label><input id="administrator" list="usernames" onchange="changed()" readonly></div>

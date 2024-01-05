@@ -10,10 +10,10 @@ package de.mmth.tamm.data;
  */
 public class KeyValue {
   public KeyValue(int key, String value) {
-    this.key = key;
-    this.value = value;
+    this.id = key;
+    this.name = value;
   }
   
-  public int key;
-  public String value;
+  public int id;
+  public String name;
 }
