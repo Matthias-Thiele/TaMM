@@ -31,14 +31,40 @@ public class Txt {
   private String mainLanguage = null;
   private final Set<String> languages = new HashSet<>();
   
+  /**
+   * Get a translated text from the given key.
+   * 
+   * @param language
+   * @param key
+   * @return 
+   */
   public static String get(String language, String key) {
     return instance.getFromKey(language, key);
   }
   
+  /**
+   * Add a number of translation lines from the InputStream
+   * into the key directory.
+   * 
+   * @param language
+   * @param is
+   * @throws IOException 
+   */
   public static void addLanguageText(String language, InputStream is) throws IOException {
     instance.add(language, is);
   }
  
+  /**
+   * Add the given file or resource into the key directory.
+   * 
+   * Load the internal resource first, then look for the
+   * external file. This file can be partial and overwrites
+   * only parts of the key set.
+   * 
+   * @param rootDirectory
+   * @param languages
+   * @param fileName 
+   */
   public static void addLanguageText(File rootDirectory, String languages, String fileName) {
     try {
       instance.addLanguageTextFiles(rootDirectory, languages, fileName);
@@ -47,14 +73,28 @@ public class Txt {
     }
   }
   
+  /**
+   * Checks if the given language is available in the translation directory.
+   * 
+   * @param language
+   * @return 
+   */
   public static boolean hasLanguage(String language) {
     return instance.checkLanguage(language);
   }
   
+  /**
+   * Returns the fall back language if not fit can be found.
+   * 
+   * @return 
+   */
   public static String getMainLanguage() {
     return instance.mainLanguage();
   }
   
+  /**
+   * Made private to ensure that there is only one Store.
+   */
   private Txt() {
   }
 
@@ -89,19 +129,21 @@ public class Txt {
     fileName = language + "_" + fileName;
     languages.add(language);
     
+    // first load internal resources
+    try (InputStream stream = getClass().getClassLoader().getResourceAsStream("resources/translation/" + fileName)) {
+      if (stream == null) {
+        throw new TammError("Translation not found: " + language + " - " + fileName);
+      }
+
+      instance.add(language, stream);
+    }
+    
+    // second - check for external file and overwrite internal data if available.
+    // The extarnal file can be a partial file and change only a few lines.
     File file = new File(translateDir, fileName);
     if (file.exists()) {
       // if translation file exists - use this one
       try (InputStream stream = new FileInputStream(file)) {
-        instance.add(language, stream);
-      }
-    } else {
-      // check for internal resource
-      try (InputStream stream = getClass().getClassLoader().getResourceAsStream("resources/translation/" + fileName)) {
-        if (stream == null) {
-          throw new TammError("Translation not found: " + language + " - " + fileName);
-        }
-        
         instance.add(language, stream);
       }
     }
