@@ -17,12 +17,14 @@ import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.progress.SendMail;
 import de.mmth.tamm.utils.InvalidAccessCache;
+import de.mmth.tamm.utils.Obfuscator;
 import de.mmth.tamm.utils.Placeholder;
 import de.mmth.tamm.utils.RequestCache;
 import de.mmth.tamm.utils.TemplateCache;
-import de.mmth.tamm.utils.Txt;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +51,8 @@ public class ApplicationData {
   private static final long DECAY_INTERVAL = 600000;
   
   private String schemaName;
+  private String hostName;
+  private String obfuscatorKey;
   public AdminData adminData = new AdminData();
   
   public DBConnect db;
@@ -93,6 +97,11 @@ public class ApplicationData {
     adminData.mailadminpwd = prefs.get(MAIL_PWD, "");
     adminData.mailhost = prefs.get(MAIL_HOST, "");
     adminData.mailreply = prefs.get(MAIL_REPLY, "");
+    
+    var obf = prepareObfuscator();
+    adminData.password = obf.decrypt(obfuscatorKey, hostName, adminData.password);
+    adminData.mailadminpwd = obf.decrypt(obfuscatorKey, hostName, adminData.mailadminpwd);
+    obfuscatorKey = "";
     
     if (!adminData.dburl.isBlank() && !adminData.name.isBlank() && !adminData.password.isBlank()) {
       DBConnect con = new DBConnect(adminData.dburl, schemaName, adminData.name, adminData.password);
@@ -149,6 +158,20 @@ public class ApplicationData {
     }
   }
   
+  private Obfuscator prepareObfuscator() {
+    byte[] iv = {(byte)0x53, (byte)0xaa, (byte)0x67, (byte)0x31, (byte)0x5a, (byte)0x1d, (byte)0x25, (byte)0x77,
+                 (byte)0x79, (byte)0x40, (byte)0x36, (byte)0x01, (byte)0x2c, (byte)0x55, (byte)0x6f, (byte)0x18};
+    obfuscatorKey = new String(iv);
+    
+    try {
+      hostName = InetAddress.getLocalHost().getHostName();
+    } catch (UnknownHostException ex) {
+      hostName = "Unknown host name.";
+    }
+    
+    return new Obfuscator();
+  }
+  
   /**
    * Creates a map with all client names as key.
    * 
@@ -179,12 +202,15 @@ public class ApplicationData {
   /**
    * Stores the database access information into the registry.
    * 
-   * TODO: encrypt password.
-   * 
    * @param data 
    */
   public void setAdminData(AdminData data) {
     adminData = data;
+    
+    var obf = prepareObfuscator();
+    adminData.password = obf.encrypt(obfuscatorKey, hostName, adminData.password);
+    adminData.mailadminpwd = obf.encrypt(obfuscatorKey, hostName, adminData.mailadminpwd);
+    obfuscatorKey = "";
     
     var prefs = Preferences.userRoot().node("Tamm");
     prefs.put(DB_URL, data.dburl);

@@ -156,7 +156,8 @@ public class GetProcessor {
       message = Txt.get(session.lang, "missing_login");
     }
     
-    ServletUtils.sendResult(resultData, isOk, "", "login.html", message, session);
+    String errorPage = application.db.isValid() ? "login.html" : "admin.html";
+    ServletUtils.sendResult(resultData, isOk, "", errorPage, message, session);
   }
   
   /**

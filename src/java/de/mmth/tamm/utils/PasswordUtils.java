@@ -68,10 +68,6 @@ public class PasswordUtils {
    * @return 
    */
   public static boolean comparePassword(String storedPassword, String queryPassword) {
-    if (storedPassword.isBlank() && queryPassword.isBlank()) {
-      return true; // TODO remove later, don't allow empty passwords
-    }
-    
     String[] parts = storedPassword.split("Z");
     String salt = parts[0];
     String encodedQuery = salt + "Z" + hashPassword(salt, queryPassword);

@@ -199,7 +199,7 @@ public class PostProcessor {
           result.nextPage = "index.html";
           session.loginTime = DateUtils.formatZ(null); 
           session.user = user;
-          session.user.pwd = ""; // do not leak password.
+          session.user.pwd = ""; // do not leak password hash to the outer world.
           application.users.updateLoginDate(session.client.id, user.id, session.loginTime);
           loginValid = true;
         }
