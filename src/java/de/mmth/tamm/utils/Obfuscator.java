@@ -5,14 +5,10 @@
 package de.mmth.tamm.utils;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
@@ -44,6 +40,15 @@ public class Obfuscator {
     return key;
   }
   
+  /**
+   * Encrypt the given text with password and salt.
+   * Returns a Base64 encoded String.
+   * 
+   * @param password
+   * @param salt
+   * @param text
+   * @return 
+   */
   public String encrypt(String password, String salt, String text) {
     try {
       SecretKey key = getAesKeyFromPassword(password, salt);
@@ -65,6 +70,14 @@ public class Obfuscator {
     }
   }
   
+  /**
+   * Decrypt the given Base64 Text with password and salt.
+   * 
+   * @param password
+   * @param salt
+   * @param text
+   * @return 
+   */
   public String decrypt(String password, String salt, String text) {
     try {
       byte[] encryptedData = Base64.getDecoder().decode(text);

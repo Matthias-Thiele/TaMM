@@ -16,10 +16,17 @@ public class BackgroundWorker extends Thread {
 
   private final ApplicationData application;
   
+  /**
+   * Constructor with dependency injection of the application object.
+   * @param application 
+   */
   public BackgroundWorker(ApplicationData application) {
     this.application = application;
   }
   
+  /**
+   * Processes background cleanup tasks.
+   */
   @Override
   public void run() {
     logger.info("Start background worker.");

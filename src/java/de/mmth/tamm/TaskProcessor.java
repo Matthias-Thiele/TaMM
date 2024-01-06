@@ -34,6 +34,11 @@ public class TaskProcessor {
   private final ApplicationData application;
   private final Gson gson;
   
+  /**
+   * Create and initialize Gson, dependency injection of the application object.
+   * 
+   * @param application 
+   */
   public TaskProcessor(ApplicationData application) {
     this.application = application;
     GsonBuilder gsonBuilder = new GsonBuilder();
@@ -41,6 +46,15 @@ public class TaskProcessor {
     gson = gsonBuilder.create();
   }
   
+  /**
+   * Stores the task data from the task.html form into the database.
+   * 
+   * @param reader
+   * @param resultData
+   * @param session
+   * @throws IOException
+   * @throws TammError 
+   */
   protected void processSaveTask(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     if (session.user == null) {
       String msg = Txt.get(session.lang, "missing_login");

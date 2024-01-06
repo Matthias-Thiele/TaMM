@@ -13,9 +13,7 @@ import de.mmth.tamm.utils.ServletUtils;
 import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.Writer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +26,10 @@ public class UserProcessor {
 
   private final ApplicationData application;
   
+  /**
+   * Receives and stores the application object.
+   * @param application 
+   */
   public UserProcessor(ApplicationData application) {
     this.application = application;
   }

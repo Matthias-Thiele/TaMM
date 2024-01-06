@@ -15,8 +15,19 @@ public enum Repeat {
   MONTHLY("monthly"),
   YEARLY("yearly");
   
+  /**
+   * returns the label of a Repeat object.
+   * Used in the toString method.
+   */
   public final String label;
   
+  /**
+   * Returns the Repeat object assigned to the given label.
+   * Needed by the fromString method.
+   * 
+   * @param label
+   * @return 
+   */
   public static Repeat fromLabel(String label) {
     for (Repeat r: values()) {
       if (r.label.equals(label)) {

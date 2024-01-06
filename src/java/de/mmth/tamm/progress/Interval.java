@@ -37,6 +37,12 @@ public class Interval {
     }
   }
   
+  /**
+   * Returns the next invocation date after the givven date.
+   * 
+   * @param afterThisDate
+   * @return 
+   */
   public String nextDate(String afterThisDate) {
     if (isoDates == null || isoDates.length == 0) {
       // no dates available

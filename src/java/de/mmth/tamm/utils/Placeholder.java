@@ -22,12 +22,26 @@ import java.util.Map;
  * @author matthias
  */
 public class Placeholder {
+  
+  /**
+   * Resolves text with a single placeholder parameter.
+   * @param source
+   * @param name1
+   * @param param1
+   * @return 
+   */
   public String resolve(String source, String name1, String param1) {
     Map<String, String> placeholderData = new HashMap<>();
     placeholderData.put(name1, param1);
     return resolve(source, placeholderData);
   }
   
+  /**
+   * Resolves text with a map of placeholders.
+   * @param source
+   * @param placeholderData
+   * @return 
+   */
   public String resolve(String source, Map<String, String> placeholderData) {
     StringBuilder buf = new StringBuilder(source.length() * 2);
     

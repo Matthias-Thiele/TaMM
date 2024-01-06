@@ -50,6 +50,16 @@ public class ServletUtils {
     return remoteAddr;
   }
 
+  /**
+   * Check if the current session has an assigned client.
+   * On first access get the client form the host name
+   * and the client configuration.
+   * 
+   * @param request
+   * @param session
+   * @param application
+   * @return 
+   */
   public static boolean checkClientId(HttpServletRequest request, SessionData session, ApplicationData application) {
     Map<String, ClientData> clients = application.clientNames;
     String hostName = request.getHeader("host");
@@ -166,6 +176,14 @@ public class ServletUtils {
     }
   }
   
+  /**
+   * Calculates and prepares the directory path for an attachment file.
+   * 
+   * @param fileRoot
+   * @param data
+   * @return
+   * @throws IOException 
+   */
   public static File prepareDestinationPath(File fileRoot, AttachmentData data) throws IOException {
     File clientDir = new File(fileRoot, "Client_" + data.clientId);
     File scatterDir = new File(clientDir, "Guid_" + data.guid.substring(0, 2));

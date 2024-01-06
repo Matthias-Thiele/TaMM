@@ -35,6 +35,10 @@ public class System extends HttpServlet {
   private final DeleteProcessor deleteProcessor = new DeleteProcessor(application);
   private final BackgroundWorker backgroundWorker = new BackgroundWorker(application);
   
+  /**
+   * Initializes servlet and application.
+   * Starts background worker thread.
+   */
   @Override
   public void init() {
     application.setSchema("tamm");
@@ -51,6 +55,10 @@ public class System extends HttpServlet {
     }
   }
   
+  /**
+   * Stops background worker thread.
+   * Persists password recovery keys from requestCache.
+   */
   @Override
   public void destroy() {
     logger.info("Stop background worker.");

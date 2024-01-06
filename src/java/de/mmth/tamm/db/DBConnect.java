@@ -53,6 +53,9 @@ public class DBConnect {
     }    
   }
   
+  /**
+   * Closes the database connection.
+   */
   public void close() {
     if (conn != null) {
       try {
@@ -62,8 +65,9 @@ public class DBConnect {
       }
     }
   }
+  
   /**
-   * Indicates if the connections has been established.
+   * Indicates if the connection has been established.
    * 
    * @return 
    */

@@ -19,12 +19,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -137,6 +135,13 @@ public class Upload extends HttpServlet {
     ServletUtils.sendResult(response.getOutputStream(), message.isBlank(), "", "", message, result);
   }
 
+  /**
+   * Deletes an AttachmentData item from the database.
+   * @param request
+   * @param response
+   * @throws ServletException
+   * @throws IOException 
+   */
   @Override
   public void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     SessionData sd = ServletUtils.prepareSession(request);

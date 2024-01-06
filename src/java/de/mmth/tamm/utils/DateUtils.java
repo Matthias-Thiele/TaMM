@@ -4,7 +4,6 @@
  */
 package de.mmth.tamm.utils;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -63,14 +62,28 @@ public class DateUtils {
     return date.format(dateformatter);
   }
   
+  /**
+   * Returns a ZonedDateTime object of the current day and time.
+   * @return 
+   */
   public static ZonedDateTime now() {
     return ZonedDateTime.now();
   }
   
+  /**
+   * Returns an ISO String of the current day.
+   * 
+   * @return 
+   */
   public static String toDay() {
     return formatL(LocalDate.now());
   }
   
+  /**
+   * Converts an ISO String into a LocalDate object.
+   * @param isoDate
+   * @return 
+   */
   public static LocalDate fromIso(String isoDate) {
     if ((isoDate == null) || (isoDate.length() != 10)) {
       throw new DateTimeException("Invalid ISO Date length.");
