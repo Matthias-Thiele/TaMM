@@ -29,6 +29,7 @@ GNU General Public License v3.0
                 min-height: 300pt;
             }
         </style>
+        <script src="translations.js"></script> 
         <script src="common.js"></script> 
         <script>
             var sessionData;
@@ -78,13 +79,13 @@ GNU General Public License v3.0
             function createReqItem(itemNo, item) {
                 var outerDiv = document.createElement("div");
                 outerDiv.className = "reqitem";
-                var mailDiv = createInputLine(itemNo, "mail", "Mail Adresse", false, item.mail);
-                var nameDiv = createInputLine(itemNo, "name", "Name", false, item.name);
-                var dateDiv = createInputLine(itemNo, "reqdate", "Gültig bis", false, item.expirationDate);
-                var ipDiv = createInputLine(itemNo, "ip", "IP Adresse", false, item.ip);
-                var keyDiv = createInputLine(itemNo, "key", "Zugriffsschlüssel", false, item.key);
+                var mailDiv = createInputLine(itemNo, "mail", Txt.mailaddr, false, item.mail);
+                var nameDiv = createInputLine(itemNo, "name", Txt.username, false, item.name);
+                var dateDiv = createInputLine(itemNo, "reqdate", Txt.validthru, false, item.expirationDate);
+                var ipDiv = createInputLine(itemNo, "ip", Txt.ipaddress, false, item.ip);
+                var keyDiv = createInputLine(itemNo, "key", Txt.accesskey, false, item.key);
                 var btDelete = document.createElement("button");
-                btDelete.innerText = "Anfrage löschen";
+                btDelete.innerText = Txt.clearrequest;
                 btDelete.onclick = function() { deleteReqItem(outerDiv, item.key); };
                 
                 outerDiv.appendChild(mailDiv);
@@ -124,20 +125,23 @@ GNU General Public License v3.0
             </label>
 
             <ul class="menu__box">
-                <li id="menuhome"><a class="menu__item" href="index.html">Home</a></li>
-                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
-                <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
-                <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
-                <li id="menupwd"><a class="menu__item" href="reqlist.html">Passwortanfragen</a></li>
-                <li><a class="menu__item" href="about.html">Über das Programm</a></li>
-                <li><a class="menu__item" onclick="logout();">Logout</a></li>
+                <li id="menuhome"><a class="menu__item" href="index.html" data-key="home">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html" data-key="editusers">Anwenderverwaltung</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html" data-key="editsystem">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html" data-key="editlocks">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html" data-key="editpwreq">Passwortanfragen</a></li>
+                <li><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();" data-key="logout">Abmelden</a></li>
             </ul>
         </div>
         
         <div class="bodybox">
-            <div class="header">TaMM Passwortanfragen</div>
+            <div class="header" data-key="reqlistheader">TaMM Passwortanfragen</div>
             <div id='reqlist'></div>
             <div class="statusbar" id="status"></div>
         </div>
+        <script>
+            translateForm();
+        </script>
     </body>
 </html>

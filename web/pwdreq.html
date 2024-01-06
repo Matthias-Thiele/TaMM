@@ -11,6 +11,7 @@ GNU General Public License v3.0
         <link rel="stylesheet" href="tamm.css">
         <link rel="shortcut icon" href="favicon.ico"/> 
         <script src="common.js"></script> 
+        <script src="translations.js"></script> 
         <script>
             async function doSave() {
                 var data = {};
@@ -18,7 +19,7 @@ GNU General Public License v3.0
                 data.mail = document.getElementById("mail").value;
                 console.log(data);
                 
-                statusMsg("Warte auf Server...");
+                statusMsg(Txt.wait);
                 document.getElementById("send").disabled = true;
                 
                 const fetchreq = await fetch("system/pwdreq", {'method': 'POST', 'body': JSON.stringify(data)});
@@ -33,17 +34,20 @@ GNU General Public License v3.0
     </head>
     <body>
         <div class="dialogbox">
-            <div class="header">Passwort anfordern</div>
+            <div class="header" data-key="pwdreqheader">Passwort anfordern</div>
             <div class="message">
-                <h4>Über diesen Dialog können Sie ein neues Passwort anfordern.</h4>
-                Der Name und die registrierte Mailadresse müssen korrekt eingetragen
+                <h4 data-key="pwdreqmessagehdr">Über diesen Dialog können Sie ein neues Passwort anfordern.</h4>
+                <p data-key="pwdreqmessage">Der Name und die registrierte Mailadresse müssen korrekt eingetragen
                 werden. Sie erhalten dann per EMail einen Link zur Eingabe eines
-                neuen Passworts.
+                neuen Passworts.</p>
             </div>
-            <div><label>Anwendername</label><input type="text" id="name"></div>
-            <div><label>Mailadresse</label><input type="text" id="mail"></div>
-            <div><button id="send" onclick="doSave();">Anfordern</button></div>
+            <div><label data-key="username">Anwendername</label><input type="text" id="name"></div>
+            <div><label data-key="mailaddr">Mailadresse</label><input type="text" id="mail"></div>
+            <div><button id="send" onclick="doSave();" data-key="sendreq">Anfordern</button></div>
             <div class="statusbar" id="status"></div>
         </div>
+        <script>
+            translateForm();
+        </script>
     </body>
 </html>

@@ -10,6 +10,7 @@ GNU General Public License v3.0
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
         <link rel="shortcut icon" href="favicon.ico"/> 
+        <script src="translations.js"></script> 
         <script>
             async function sendPwd() {
                 var loginData = {};
@@ -17,7 +18,7 @@ GNU General Public License v3.0
                 loginData.pwd = document.getElementById("pwd1").value;
                 loginData.key = document.getElementById("key").value;
                 var status = document.getElementById("status");
-                status.innerText = "Warte auf Serverantwort...";
+                status.innerText = Txt.wait;
                 console.log(loginData);
                 
                 const fetchupdate = await fetch("system/updatepwd", {'method': 'POST', 'body': JSON.stringify(data)});
@@ -52,7 +53,7 @@ GNU General Public License v3.0
                     status.innerText = "";
                     button.disabled = false;
                 } else {
-                    status.innerText = "Passwortwiederholung nicht identisch.";
+                    status.innerText = Txt.pwdnotequal;
                     button.disabled = true;
                 }
             }
@@ -60,14 +61,17 @@ GNU General Public License v3.0
     </head>
     <body onload="initKey();">
         <div class="dialogbox">
-            <div class="header">TaMM - Neues Passwort vergeben</div>
-            <div><label>Anwendername</label><input type="text" id="name"></div>
-            <div><label>Passwort neu</label><input type="password" id="pwd1" onkeyup="comparePwd()"></div>
-            <div><label>Passwort neu</label><input type="password" id="pwd2" onkeyup="comparePwd()"></div>
-            <div><label>Request key</label><input type="text" id="key"></div>
+            <div class="header" data-key="pwdupdateheader">TaMM - Neues Passwort vergeben</div>
+            <div><label data-key="username">Anwendername</label><input type="text" id="name"></div>
+            <div><label data-key="newpwd">Passwort neu</label><input type="password" id="pwd1" onkeyup="comparePwd()"></div>
+            <div><label data-key="pwdagain">Passwort neu</label><input type="password" id="pwd2" onkeyup="comparePwd()"></div>
+            <div><label data-key="pwdrequestkey">Request key</label><input type="text" id="key"></div>
             
-            <div><button id="send" onclick="sendPwd();" disabled>Absenden</button></div>
+            <div><button id="send" onclick="sendPwd();" disabled data-key="pwdsend">Absenden</button></div>
             <div class="statusbar" id="status"></div>
         </div>
+        <script>
+            translateForm();
+        </script>
     </body>
 </html>
