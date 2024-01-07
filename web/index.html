@@ -7,7 +7,7 @@
 -->
 <html>
     <head>
-        <title>TaMM Aufgaben</title>
+        <title>TaMM</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
@@ -46,6 +46,7 @@
                 border: 1px solid #c0c0f0;
             }
         </style>
+        <script src="translations.js"></script> 
         <script src="common.js"></script> 
         <script src="task.js"></script> 
         <script>
@@ -127,18 +128,18 @@
                 taskData.lId = selectedTask.lId;
                 
                 console.log(taskData);
-                status.innerText = "Warte auf Server...";
+                status.innerText = Txt.wait;
                 
                 const fetchadvance = await fetch("system/advancetask", {'method': 'POST', 'body': JSON.stringify(taskData)});
                 const response = await fetchadvance.json();
                 if (response.result === "ok") {
-                    statusMsg("Aufgabe weitergeleitet: " + response.message);
+                    statusMsg(Txt.taskforwarded + response.message);
                     emptyTask = {};
                     fillForm(emptyTask);
                     setTimeout(filterTasks, 200);
                 } else {
                     if (!response.message) {
-                        response.message = "Unbekannter Fehler beim Weiterleiten.";
+                        response.message = Txt.errorforward;
                     }
                     statusMsg(response.message);
                 }
@@ -165,12 +166,12 @@
                 selectedTask.interval = getInterval();
                 selectedTask.nextDueDate = getValue("duedate");
                 console.log(selectedTask);
-                statusMsg("Warte auf Server...");
+                statusMsg(Txt.wait);
                 
                 const fetchsave = await fetch("system/savetask", {'method': 'POST', 'body': JSON.stringify(selectedTask)});
                 const response = await fetchsave.json();
                 if (response.result === "ok") {
-                    statusMsg("Aufgabe gespeichert.");
+                    statusMsg(Txt.tasksaved);
                     if (deferredAdvance) {
                         advanceNow();
                     } else {
@@ -180,7 +181,7 @@
                     }
                 } else {
                     if (!response.message) {
-                        response.message = "Unbekannter Fehler beim Speichern.";
+                        response.message = Txt.erroronsave;
                     }
                     statusMsg(response.message);
                 }
@@ -199,7 +200,7 @@
                 data.userId = sessionData.user.id;
                 data.withRoleTasks = true;
                 console.log(data);
-                statusMsg("Warte auf Server...");
+                statusMsg(Txt.wait);
                 
                 const fetchfilter = await fetch("system/filtertask", {'method': 'POST', 'body': JSON.stringify(data)});
                 const response = await fetchfilter.json();
@@ -208,7 +209,7 @@
                   statusMsg("");
                   document.getElementById("filtervalue").focus();
                 } else {
-                  statusMsg("Unbekannter Fehler beim Suchen.");
+                  statusMsg(Txt.errorsearch);
                 }
             }
             
@@ -267,13 +268,14 @@
             </label>
 
             <ul class="menu__box">
-                <li><a class="menu__item" href="index.html">Home</a></li>
-                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
-                <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
-                <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
-                <li id="menupwd"><a class="menu__item" href="reqlist.html">Passwortanfragen</a></li>
-                <li><a class="menu__item" href="about.html">Über das Programm</a></li>
-                <li><a class="menu__item" onclick="logout();">Logout</a></li>
+                <li id="menuhome"><a class="menu__item" href="index.html" data-key="home">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html" data-key="editusers">Anwenderverwaltung</a></li>
+                <li id="menuroles"><a class="menu__item" href="role.html" data-key="editroles">Rollen verwalten</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html" data-key="editsystem">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html" data-key="editlocks">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html" data-key="editpwreq">Passwortanfragen</a></li>
+                <li><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();" data-key="logout">Abmelden</a></li>
             </ul>
 
         </div>
@@ -308,55 +310,58 @@
             </div>
         </div>
         <div class="bodybox">
-            <div class="header">TaMM Aufgaben</div>
+            <div class="header" data-key="tasks">TaMM Aufgaben</div>
             <div class="left-sidebar">
                 <div class="">
                     <input id="filtervalue" size="12">
-                    <button onclick="filterTasks();">Suchen</button>
-                    <button onclick="addTask();">Neu</button>
+                    <button onclick="filterTasks();" data-key="search">Suchen</button>
+                    <button onclick="addTask();" data-key="new">Neu</button>
                     <div id="tasklist" class="selectlist"></div>
                 </div>
                 <div class="">
-                    <div class="subheader">Aufgabenbeschreibung</div>
-                    <div><label for="name">Bezeichnung</label><input onchange="changed()" size="50" type="text" id="name"><input type="text" id="tasklid" readonly hidden></div>
-                    <div><label for="description">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
-                    <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
-                    <div><label for="lastchanged">Geändert am</label><input id="lastchanged" readonly></div>
-                    <div><label for="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed(); updateListInput(event, userlist)"></div>
-                    <div><label for="duedate">Nächster Start</label><input id="duedate" type="date" onchange="changed()"></div>
+                    <div class="subheader" data-key="taskinfo">Aufgabenbeschreibung</div>
+                    <div><label for="name" data-key="taskname">Bezeichnung</label><input onchange="changed()" size="50" type="text" id="name"><input type="text" id="tasklid" readonly hidden></div>
+                    <div><label for="description" data-key="taskdesc">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description"></textarea></div>
+                    <div><label for="createdate" data-key="created">Erzeugt am</label><input id="createdate" readonly></div>
+                    <div><label for="lastchanged" data-key="changed">Geändert am</label><input id="lastchanged" readonly></div>
+                    <div><label for="owner" data-key="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed(); updateListInput(event, userlist)"></div>
+                    <div><label for="duedate" data-key="nextdue">Nächster Start</label><input id="duedate" type="date" onchange="changed()"></div>
                     <hr>
                     <div class="flex-container">
                         <div>
-                            <div class="subheader">Intervall</div>
-                            <input type="radio" name="interval" id="single" value="single" onchange="changed()" checked> <label for="single">Einmal</label><br>
-                            <input type="radio" name="interval" id="daily" value="daily" onchange="changed()"> <label for="daily">Täglich</label><br>
-                            <input type="radio" name="interval" id="weekly" value="weekly" onchange="changed()"> <label for="weekly">Wöchentlich</label><br>
-                            <input type="radio" name="interval" id="monthly" value="monthly" onchange="changed()"> <label for="monthly">Monatlich</label><br>
-                            <input type="radio" name="interval" id="yearly" value="yearly" onchange="changed()"> <label for="yearly">Jährlich</label><br>
+                            <div class="subheader" data-key="interval">Intervall</div>
+                            <input type="radio" name="interval" id="single" value="single" onchange="changed()" checked> <label for="single" data-key="intsingle">Einmal</label><br>
+                            <input type="radio" name="interval" id="daily" value="daily" onchange="changed()"> <label for="daily" data-key="intdaily">Täglich</label><br>
+                            <input type="radio" name="interval" id="weekly" value="weekly" onchange="changed()"> <label for="weekly" data-key="intweekly">Wöchentlich</label><br>
+                            <input type="radio" name="interval" id="monthly" value="monthly" onchange="changed()"> <label for="monthly" data-key="intmonthly">Monatlich</label><br>
+                            <input type="radio" name="interval" id="yearly" value="yearly" onchange="changed()"> <label for="yearly" data-key="intyearly">Jährlich</label><br>
                         </div>
                         <div>
-                            <div class="subheader">Startdatum</div>
-                            <div>Teiler <input type="number" id="divider" style="width: 40pt; margin-bottom: 6pt;" value="1" min="1" max="9999" onchange="changed()"></div>
-                            <div><button id="dateadd" onclick="addDateField();">+ Datum hinzufügen</button></div>
+                            <div class="subheader" data-key="startdate">Startdatum</div>
+                            <div data-key="divider">Teiler <input type="number" id="divider" style="width: 40pt; margin-bottom: 6pt;" value="1" min="1" max="9999" onchange="changed()"></div>
+                            <div><button id="dateadd" onclick="addDateField();" data-key="adddate">+ Datum hinzufügen</button></div>
                             <div id="datelist" class="datelist"><input name="startdate" type="date" style="margin-right: 5pt" onchange="changed()"></div>
                         </div>
                         <div>
-                            <div class="subheader">Dateianbindungen</div>
+                            <div class="subheader" data-key="attachments">Dateianbindungen</div>
                             <button onclick="showUrlDialog()">URL</button><input id="uploadfile" autocomplete="off" type="file" multiple onchange="uploadFile()" style="max-width: 300pt;"/>
                             <div id="filelist" style="margin-top: 5pt;">
                             </div>
                         </div>
                     </div>
                     <div>
-                        <button id="save" disabled onclick="doSave();" style="margin-right: 5pt;">Speichern</button>
-                        <button id="advance" disabled onclick="doAdvance();" style="margin-right: 5pt;">Erledigt</button>
-                        <button id="history" onclick="doHistory();" style="margin-right: 5pt;" disabled>History</button>
-                        <button id="remove" onclick="doRemove();" style="margin-right: 5pt;" disabled>Löschen</button>
+                        <button id="save" disabled onclick="doSave();" style="margin-right: 5pt;" data-key="save">Speichern</button>
+                        <button id="advance" disabled onclick="doAdvance();" style="margin-right: 5pt;" data-key="done">Erledigt</button>
+                        <button id="history" onclick="doHistory();" style="margin-right: 5pt;" disabled data-key="history">History</button>
+                        <button id="remove" onclick="doRemove();" style="margin-right: 5pt;" disabled data-key="delete">Löschen</button>
                     </div>
                 </div>
             </div>
             <div class="statusbar" id="status"></div>
         </div>
         <datalist id="userlist"></datalist>
+        <script>
+            translateForm();
+        </script>
     </body>
 </html>

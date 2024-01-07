@@ -360,7 +360,7 @@ function createInputLine(lineno, linename, labeltext, isNumber, text, enabled) {
     var label = document.createElement("label");
     label.innerText = labeltext;
     var id = (lineno >= 0) ? (linename + lineno) : linename;
-    label.for = id;
+    label.htmlFor = id;
 
     var input = document.createElement("input");
     input.id = id;

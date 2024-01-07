@@ -19,10 +19,15 @@ GNU General Public License v3.0
                 background-color: #f8f8fc;
                 margin: 3pt;
                 padding: 5pt;
+                width: 180pt;
             }
             
             .roleitem button {
                 margin-left: 3pt;
+            }
+            
+            .roleitem label {
+                width: 50pt;
             }
             
             #rolelist {
@@ -30,6 +35,7 @@ GNU General Public License v3.0
             }
             
         </style>
+        <script src="translations.js"></script> 
         <script src="common.js"></script> 
         <script>
             var sessionData;
@@ -84,15 +90,17 @@ GNU General Public License v3.0
                 outerDiv.className = "roleitem";
                 var idDiv = createInputLine(itemNo, "roleid", "Id", true, item.id);
                 var nameDiv = createInputLine(itemNo, "rolename", "Name", false, item.name, true);
+                var hr = document.createElement("hr");
                 var btDelete = document.createElement("button");
-                btDelete.innerText = "Rolle löschen";
+                btDelete.innerText = Txt.deleteRole;
                 btDelete.onclick = function() { deleteRoleItem(outerDiv, item.id); };
                 var btSave = document.createElement("button");
-                btSave.innerText = "Rolle speichern";
+                btSave.innerText = Txt.saverole;
                 btSave.onclick = function() { saveRoleItem(outerDiv, itemNo); };
                 
                 outerDiv.appendChild(idDiv);
                 outerDiv.appendChild(nameDiv);
+                outerDiv.appendChild(hr);
                 outerDiv.appendChild(btDelete);
                 outerDiv.appendChild(btSave);
                 
@@ -123,10 +131,10 @@ GNU General Public License v3.0
                 const response = await saverole.json();
                 if (response.result === "ok") {
                     var newId = response.data;
-                    statusMsg("Rolle geschrieben: " + newId);
+                    statusMsg(Txt.rolewritten + newId);
                     document.getElementById("roleid" + line).value = newId;
                 } else {
-                  statusMsg("Unbekannter Fehler beim Speichern.");
+                  statusMsg(Txt.erroronsave);
                 }
             }
         </script>
@@ -139,22 +147,26 @@ GNU General Public License v3.0
             </label>
 
             <ul class="menu__box">
-                <li id="menuhome"><a class="menu__item" href="index.html">Home</a></li>
-                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
-                <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
-                <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
-                <li id="menupwd"><a class="menu__item" href="reqlist.html">Passwortanfragen</a></li>
-                <li><a class="menu__item" href="about.html">Über das Programm</a></li>
-                <li><a class="menu__item" onclick="logout();">Logout</a></li>
+                <li id="menuhome"><a class="menu__item" href="index.html" data-key="home">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html" data-key="editusers">Anwenderverwaltung</a></li>
+                <li id="menuroles"><a class="menu__item" href="role.html" data-key="editroles">Rollen verwalten</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html" data-key="editsystem">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html" data-key="editlocks">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html" data-key="editpwreq">Passwortanfragen</a></li>
+                <li><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();" data-key="logout">Abmelden</a></li>
             </ul>
         </div>
         
         <div class="bodybox">
-            <div class="header">TaMM Passwortanfragen</div>
-            <div><button onclick="addRole()" style="margin: 3pt;">Neue Rolle erstellen</button></div>
+            <div class="header" data-key="pwdrequests">TaMM Passwortanfragen</div>
+            <div><button onclick="addRole()" style="margin: 3pt;" data-key="createrole">Neue Rolle erstellen</button></div>
             <hr>
             <div id='rolelist'></div>
             <div class="statusbar" id="status"></div>
         </div>
+        <script>
+            translateForm();
+        </script>
     </body>
 </html>

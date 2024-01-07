@@ -5,7 +5,7 @@ GNU General Public License v3.0
 -->
 <html>
     <head>
-        <title>TaMM Gesperrte Mail Adressen</title>
+        <title>TaMM</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
@@ -29,6 +29,7 @@ GNU General Public License v3.0
                 min-height: 300pt;
             }
         </style>
+        <script src="translations.js"></script> 
         <script src="common.js"></script> 
         <script>
             var sessionData;
@@ -64,7 +65,7 @@ GNU General Public License v3.0
                     stausMsg(responseData.message);
                 } else {
                     var lines = displayResult(responseData.data) - 1;
-                    statusMsg("Sperreinträge: " + lines);
+                    statusMsg(Txt.lockeditems + lines);
                 }
             }
             
@@ -109,16 +110,16 @@ GNU General Public License v3.0
             function createLockItem(itemNo, item) {
                 var outerDiv = document.createElement("div");
                 outerDiv.className = "lockitem";
-                var mailDiv = createInputLine(itemNo, "mail", "Mail Adresse", false, item.mailAddress);
-                var dateDiv = createInputLine(itemNo, "lockdate", "Gesperrt seit", false, item.lockDate);
-                var ipDiv = createInputLine(itemNo, "ip", "IP Adresse", false, item.lockIP);
-                var count = createInputLine(itemNo, "lockcount", "Anzahl Zugriffsversuche", true, item.lockCounter);
+                var mailDiv = createInputLine(itemNo, "mail", Txt.mailaddr, false, item.mailAddress);
+                var dateDiv = createInputLine(itemNo, "lockdate", Txt.lockedsince, false, item.lockDate);
+                var ipDiv = createInputLine(itemNo, "ip", Txt.ipaddress, false, item.lockIP);
+                var count = createInputLine(itemNo, "lockcount", Txt.accessretries, true, item.lockCounter);
                 var btDelete = document.createElement("button");
-                btDelete.innerText = "Sperre löschen";
+                btDelete.innerText = Txt.removelock;
                 btDelete.onclick = function() { deleteLockItem(item.mailAddress, item.lockDate); };
                 var btDomain = document.createElement("button");
                 btDomain.onclick = function() { addDomainLock(item.mailAddress); };
-                btDomain.innerText = "Domäne sperren";
+                btDomain.innerText = Txt.lockdomain;
                 
                 outerDiv.appendChild(mailDiv);
                 outerDiv.appendChild(dateDiv);
@@ -140,25 +141,29 @@ GNU General Public License v3.0
             </label>
 
             <ul class="menu__box">
-                <li id="menuhome"><a class="menu__item" href="index.html">Home</a></li>
-                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
-                <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
-                <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
-                <li id="menupwd"><a class="menu__item" href="reqlist.html">Passwortanfragen</a></li>
-                <li><a class="menu__item" href="about.html">Über das Programm</a></li>
-                <li><a class="menu__item" onclick="logout();">Logout</a></li>
+                <li id="menuhome"><a class="menu__item" href="index.html" data-key="home">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html" data-key="editusers">Anwenderverwaltung</a></li>
+                <li id="menuroles"><a class="menu__item" href="role.html" data-key="editroles">Rollen verwalten</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html" data-key="editsystem">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html" data-key="editlocks">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html" data-key="editpwreq">Passwortanfragen</a></li>
+                <li><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();" data-key="logout">Abmelden</a></li>
             </ul>
 
         </div>
         
         <div class="bodybox">
-            <div class="header">Tamm Gesperrte Mail Adressen</div>
+            <div class="header" data-key="lockedmail">Tamm Gesperrte Mail Adressen</div>
             <div>
-                <label for="filter">Mail Adresse</label><input id="filter"><button onclick="doFilter()">Suchen</button>
+                <label for="filter" data-key="mailaddr">Mail Adresse</label><input id="filter"><button onclick="doFilter()" data-key="search">Suchen</button>
             </div>
             <hr>
-            <div id="locklist">Tragen Sie einen Filtertext ein und klicken auf "Suchen".</div>
+            <div id="locklist" data-key="enterfilter">Tragen Sie einen Filtertext ein und klicken auf "Suchen".</div>
             <div class="statusbar" id="status"></div>
         </div>
+        <script>
+            translateForm();
+        </script>
     </body>
 </html>

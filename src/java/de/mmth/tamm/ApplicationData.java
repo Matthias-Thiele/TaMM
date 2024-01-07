@@ -208,8 +208,8 @@ public class ApplicationData {
     adminData = data;
     
     var obf = prepareObfuscator();
-    adminData.password = obf.encrypt(obfuscatorKey, hostName, adminData.password);
-    adminData.mailadminpwd = obf.encrypt(obfuscatorKey, hostName, adminData.mailadminpwd);
+    data.password = obf.encrypt(obfuscatorKey, hostName, adminData.password);
+    data.mailadminpwd = obf.encrypt(obfuscatorKey, hostName, adminData.mailadminpwd);
     obfuscatorKey = "";
     
     var prefs = Preferences.userRoot().node("Tamm");

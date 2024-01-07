@@ -194,7 +194,7 @@ async function saveUrlAttachment(name, url, newElementNode) {
 
 function msgMissingSelection() {
     if (!selectedTask || selectedTask.lId === "-1") {
-        statusMsg("Wählen Sie zuerst eine Aufgabe aus.");
+        statusMsg(Txt.selecttask);
         return true;
     }
 

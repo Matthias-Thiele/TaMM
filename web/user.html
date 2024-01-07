@@ -11,6 +11,7 @@ GNU General Public License v3.0
         <link rel="shortcut icon" href="favicon.ico"/> 
         <link rel="stylesheet" href="tamm.css">
         <link rel="stylesheet" href="menu.css">
+        <script src="translations.js"></script> 
         <script src="common.js"></script> 
         <script>
             var selectedUser;
@@ -76,18 +77,18 @@ GNU General Public License v3.0
                 }
                 
                 console.log(selectedUser);
-                statusMsg("Warte auf Server...");
+                statusMsg(Txt.wait);
                 
                 const fetchsave = await fetch("system/saveuser", {'method': 'POST', 'body': JSON.stringify(selectedUser)});
                 const response = await fetchsave.json();
                 if (response.result === "ok") {
-                  statusMsg("Anwenderdaten gespeichert, id: " + response.data);
+                  statusMsg(Txt.usersaved + response.data);
                   checkSaveRoleAssignments(response.data);
                   emptyUser = {};
                   fillForm(emptyUser);
                 } else {
                     if (!response.message) {
-                        response.message = "Unbekannter Fehler beim Speichern.";
+                        response.message = Txt.erroronsave;
                     }
                     statusMsg(response.message);
                 }
@@ -140,7 +141,7 @@ GNU General Public License v3.0
                   listUsers(response.data);
                   statusMsg("");
                 } else {
-                  statusMsg("Unbekannter Fehler beim Suchen.");
+                  statusMsg(Txt.errorsearch);
                 }
             }
             
@@ -222,7 +223,7 @@ GNU General Public License v3.0
                 if (response.result !== "error") {
                   insertRoleNames(response.data);
                 } else {
-                  statusMsg("Liste der Rollen konnte nicht geladen werden.");
+                  statusMsg(Txt.errorloadingroles);
                 }
             }
             
@@ -311,7 +312,7 @@ GNU General Public License v3.0
                       response.data.roles.forEach((id) => {addRole(id);});
                       rolesChanged = false;
                     } else {
-                      statusMsg("Liste der Rollen konnte nicht geladen werden.");
+                      statusMsg(Txt.errorloadingroles);
                     }
                 }
             }
@@ -325,44 +326,45 @@ GNU General Public License v3.0
             </label>
 
             <ul class="menu__box">
-                <li><a class="menu__item" href="index.html">Home</a></li>
-                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
-                <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
-                <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
-                <li id="menupwd"><a class="menu__item" href="reqlist.html">Passwortanfragen</a></li>
-                <li><a class="menu__item" href="about.html">Über das Programm</a></li>
-                <li><a class="menu__item" onclick="logout();">Logout</a></li>
+                <li id="menuhome"><a class="menu__item" href="index.html" data-key="home">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html" data-key="editusers">Anwenderverwaltung</a></li>
+                <li id="menuroles"><a class="menu__item" href="role.html" data-key="editroles">Rollen verwalten</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html" data-key="editsystem">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html" data-key="editlocks">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html" data-key="editpwreq">Passwortanfragen</a></li>
+                <li><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();" data-key="logout">Abmelden</a></li>
             </ul>
 
         </div>
         
         <div class="bodybox">
-            <div class="header">User Administration</div>
+            <div class="header" data-key="editusers">Anwenderverwaltung</div>
             <div class="triple-cols">
                 <div class="">
                     <input id="filtervalue" size="12">
-                    <button onclick="filterUsers();">Suchen</button>
-                    <button onclick="addUser();">Neu</button>
-                    <div id="admindiv"><label for="onlyadmins">Nur Administratoren</label><input type="checkbox" id="onlyadmins"></div>
+                    <button onclick="filterUsers();" data-key="search">Suchen</button>
+                    <button onclick="addUser();" data-key="new">Neu</button>
+                    <div id="admindiv"><label for="onlyadmins" data-key="onlyadmins">Nur Administratoren</label><input type="checkbox" id="onlyadmins"></div>
                     <hr>
                     <div id="userlist" class="selectlist"></div>
                 </div>
                 <div class="">
-                    <div><label for="name">Anwendername</label><input onchange="changed()" type="text" id="name"></div>
-                    <div><label for="mail">EMail</label><input onchange="changed()" type="text" id="mail"></div>
-                    <div><label for="supervisor">Vorgesetzter</label><input id="supervisor" list="usernames" onchange="changed(); updateListInput(event, userNames)"></div>
-                    <div><label for="sysadmin">Systemadministrator</label><input onchange="changed()" type="checkbox" id="sysadmin"></div>
-                    <div><label for="sysadmin">Anwenderverwaltung</label><input onchange="changed()" type="checkbox" id="subadmin"></div>
-                    <div><label for="client">Mandant</label><input type="text" id="client" list="clientnames" onchange="changed(); updateListInput(event, clientNames)"></div>
+                    <div><label for="name" data-key="username">Anwendername</label><input onchange="changed()" type="text" id="name"></div>
+                    <div><label for="mail" data-key="mailaddr">EMail</label><input onchange="changed()" type="text" id="mail"></div>
+                    <div><label for="supervisor" data-key="supervisor">Vorgesetzter</label><input id="supervisor" list="usernames" onchange="changed(); updateListInput(event, userNames)"></div>
+                    <div><label for="sysadmin" data-key="sysadmin">Systemadministrator</label><input onchange="changed()" type="checkbox" id="sysadmin"></div>
+                    <div><label for="sysadmin" data-key="editusers">Anwenderverwaltung</label><input onchange="changed()" type="checkbox" id="subadmin"></div>
+                    <div><label for="client" data-key="client">Mandant</label><input type="text" id="client" list="clientnames" onchange="changed(); updateListInput(event, clientNames)"></div>
                     <hr>
-                    <div><label for="lastlogin">Letzte Anmeldung</label><input id="lastlogin" readonly></div>
-                    <div><label for="administrator">Administrator</label><input id="administrator" list="usernames" onchange="changed()" readonly></div>
-                    <div><label for="userid">Id</label><input type="text" id="userid" readonly></div>
-                    <div><button id="save" disabled onclick="doSave();">Speichern</button></div>
+                    <div><label for="lastlogin" data-key="lastlogin">Letzte Anmeldung</label><input id="lastlogin" readonly></div>
+                    <div><label for="administrator" data-key="admin">Administrator</label><input id="administrator" list="usernames" onchange="changed()" readonly></div>
+                    <div><label for="userid" data-key="id">Id</label><input type="text" id="userid" readonly></div>
+                    <div><button id="save" disabled onclick="doSave();" data-key="save">Speichern</button></div>
                 </div>
                 <div>
                     <div>Zugeordnete Rollen</div>
-                    <div><button onclick="addRole()">Neue Rolle hinzufügen</button></div>
+                    <div><button onclick="addRole()" data-key="addrole">Neue Rolle hinzufügen</button></div>
                     <hr>
                     <div id="roleitems"></div>
                 </div>
@@ -372,5 +374,8 @@ GNU General Public License v3.0
         <datalist id="usernames"></datalist>
         <datalist id="clientnames"></datalist>
         <datalist id="rolenames"></datalist>
+        <script>
+            translateForm();
+        </script>
     </body>
 </html>

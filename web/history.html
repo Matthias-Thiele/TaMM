@@ -5,7 +5,7 @@ GNU General Public License v3.0
 -->
 <html>
     <head>
-        <title>TaMM Erledigte Aufgaben</title>
+        <title>TaMM</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
@@ -24,6 +24,7 @@ GNU General Public License v3.0
                 color: #c00040;
             }
         </style>
+        <script src="translations.js"></script> 
         <script src="common.js"></script> 
         <script src="task.js"></script> 
         <script>
@@ -59,7 +60,7 @@ GNU General Public License v3.0
                 data.filterText = getUrlParam("taskid");
                 data.userId = sessionData.user.id;
                 console.log(data);
-                status.innerText = "Warte auf Server...";
+                status.innerText = Txt.wait;
                 
                 const fetchfilter = await fetch("system/filtertask", {'method': 'POST', 'body': JSON.stringify(data)});
                 const response = await fetchfilter.json();
@@ -67,7 +68,7 @@ GNU General Public License v3.0
                   listTasks(response);
                   statusMsg("");
                 } else {
-                  statusMsg("Unbekannter Fehler beim Suchen.");
+                  statusMsg(Txt.errorsearch);
                 }
             }
             
@@ -78,30 +79,49 @@ GNU General Public License v3.0
             
     </head>
     <body onload="loadSessionData();">
+        <div class="hamburger-menu">
+            <input id="menu__toggle" type="checkbox" />
+            <label class="menu__btn" for="menu__toggle">
+                <span></span>
+            </label>
+
+            <ul class="menu__box">
+                <li id="menuhome"><a class="menu__item" href="index.html" data-key="home">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html" data-key="editusers">Anwenderverwaltung</a></li>
+                <li id="menuroles"><a class="menu__item" href="role.html" data-key="editroles">Rollen verwalten</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html" data-key="editsystem">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html" data-key="editlocks">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html" data-key="editpwreq">Passwortanfragen</a></li>
+                <li><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();" data-key="logout">Abmelden</a></li>
+            </ul>
+
+        </div>
+        
         <div class="bodybox">
-            <div class="header">TaMM Erledigte Aufgaben</div>
+            <div class="header" data-key="historyview">TaMM Erledigte Aufgaben</div>
             <div class="left-sidebar">
                 <div id="tasklist" class="selectlist" style="overflow-y: auto; max-height:700px;"></div>
                 <div>
-                    <div><label for="tasklid">Id</label><input type="text" id="tasklid" readonly></div>
-                    <div><label for="name">Bezeichnung</label><input onchange="changed()" size="30" type="text" id="name" readonly></div>
-                    <div><label for="description">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description" readonly></textarea></div>
-                    <div><label for="createdate">Erzeugt am</label><input id="createdate" readonly></div>
-                    <div><label for="lastchanged">Erledigt am</label><input id="lastchanged" readonly></div>
-                    <div><label for="owner">Eigentümer</label><input id="owner" readonly></div>
-                    <div><label for="duedate">Nächster Start</label><input id="duedate" type="date" readonly></div>
+                    <div><label for="tasklid" data-key="id">Id</label><input type="text" id="tasklid" readonly></div>
+                    <div><label for="name" data-key="taskname">Bezeichnung</label><input onchange="changed()" size="30" type="text" id="name" readonly></div>
+                    <div><label for="description" data-key="taskdesc">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description" readonly></textarea></div>
+                    <div><label for="createdate" data-key="created">Erzeugt am</label><input id="createdate" readonly></div>
+                    <div><label for="lastchanged" data-key="finished">Erledigt am</label><input id="lastchanged" readonly></div>
+                    <div><label for="owner" data-key="owner">Eigentümer</label><input id="owner" readonly></div>
+                    <div><label for="duedate" data-key="nextdue">Nächster Start</label><input id="duedate" type="date" readonly></div>
                     <hr>
                     Intervall<br>
                     <div class="flex-container">
                         <div style="min-height:0;">
-                            <input type="radio" name="interval" id="single" value="single" checked disabled> <label for="single">Einmal</label><br>
-                            <input type="radio" name="interval" id="daily" value="daily" disabled> <label for="daily">Täglich</label><br>
-                            <input type="radio" name="interval" id="weekly" value="weekly" disabled> <label for="weekly">Wöchentlich</label><br>
-                            <input type="radio" name="interval" id="monthly" value="monthly" disabled> <label for="monthly">Monatlich</label><br>
-                            <input type="radio" name="interval" id="yearly" value="yearly" disabled> <label for="yearly">Jährlich</label><br>
+                            <input type="radio" name="interval" id="single" value="single" checked disabled> <label for="single" data-key="intsingle">Einmal</label><br>
+                            <input type="radio" name="interval" id="daily" value="daily" disabled> <label for="daily" data-key="intdaily">Täglich</label><br>
+                            <input type="radio" name="interval" id="weekly" value="weekly" disabled> <label for="weekly" data-key="intweekly">Wöchentlich</label><br>
+                            <input type="radio" name="interval" id="monthly" value="monthly" disabled> <label for="monthly" data-key="intmonthly">Monatlich</label><br>
+                            <input type="radio" name="interval" id="yearly" value="yearly" disabled> <label for="yearly" data-key="intyearly">Jährlich</label><br>
                         </div>
                         <div style="min-height:0;">
-                            <div>Teiler <input type="number" id="divider" style="width: 40pt" value="1" min="1" max="9999" readonly>
+                            <div data-key="nextdue">Teiler <input type="number" id="divider" style="width: 40pt" value="1" min="1" max="9999" readonly>
                             </div>
                             <div id="datelist" class="datelist"></div>
                         </div>
@@ -111,5 +131,8 @@ GNU General Public License v3.0
             </div>
             <div class="statusbar" id="status"></div>
         </div>
+        <script>
+            translateForm();
+        </script>
     </body>
 </html>

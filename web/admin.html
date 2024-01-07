@@ -5,7 +5,7 @@ GNU General Public License v3.0
 -->
 <html>
     <head>
-        <title>System Administration</title>
+        <title>TaMM</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="tamm.css">
@@ -48,6 +48,7 @@ GNU General Public License v3.0
             
         </style>
         
+        <script src="translations.js"></script> 
         <script src="common.js"></script> 
         <script>
             var clientlist;
@@ -120,7 +121,7 @@ GNU General Public License v3.0
                 const initdata = await fetch("system/initdata", {'method': 'POST', 'body': JSON.stringify(data)});
                 const response = await initdata.json();
                 if (response.result !== "ok") {
-                  statusMsg("Unbekannter Fehler beim Speichern.");
+                  statusMsg(Txt.erroronsave);
                 }
             }
             
@@ -176,18 +177,18 @@ GNU General Public License v3.0
                 selectedClient.maxDocMB = getValue("clientmaxmb");
                 selectedClient.maxUser = getValue("clientmaxuser");
                 
-                statusMsg("Wait for server...");
+                statusMsg(Txt.wait);
                 
                 const response = await fetch("system/saveclient", {'method': 'POST', 'body': JSON.stringify(selectedClient)});
                 const responseData = await response.json();
                 if (responseData.result === "ok") {
-                  statusMsg("Mandant gespeichert.");
+                  statusMsg(Txt.clientsaved);
                   emptyUser = {};
                   fillClient(emptyUser);
                   loadAdminData();
                 } else {
                     if (!responseData.message) {
-                        responseData.message = "Unbekannter Fehler beim Speichern.";
+                        responseData.message = Txt.erroronsave;
                     }
                     statusMsg(responseData.message);
                 }
@@ -209,59 +210,63 @@ GNU General Public License v3.0
             </label>
 
             <ul class="menu__box">
-                <li id="menuhome"><a class="menu__item" href="index.html">Home</a></li>
-                <li id="menuuser"><a class="menu__item" href="user.html">Anwenderverwaltung</a></li>
-                <li id="menuadmin"><a class="menu__item" href="admin.html">Systemeinstellungen</a></li>
-                <li id="menulock"><a class="menu__item" href="lock.html">Sperrliste verwalten</a></li>
-                <li id="menupwd"><a class="menu__item" href="reqlist.html">Passwortanfragen</a></li>
-                <li><a class="menu__item" href="about.html">Über das Programm</a></li>
-                <li><a class="menu__item" onclick="logout();">Logout</a></li>
+                <li id="menuhome"><a class="menu__item" href="index.html" data-key="home">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html" data-key="editusers">Anwenderverwaltung</a></li>
+                <li id="menuroles"><a class="menu__item" href="role.html" data-key="editroles">Rollen verwalten</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html" data-key="editsystem">Systemeinstellungen</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html" data-key="editlocks">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html" data-key="editpwreq">Passwortanfragen</a></li>
+                <li><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
+                <li><a class="menu__item" onclick="logout();" data-key="logout">Abmelden</a></li>
             </ul>
 
         </div>
         
         <div class="bodybox">
-            <div class="header">System Administration</div>
+            <div class="header" data-key="systemadministration">System Administration</div>
             <div class="admin-sidebar">
                 <div>
-                    <h4>Datenbankverbindung</h4>
-                    <div><label>Database URL</label><input type="text" id="dburl"></div>
-                    <div><label>DB Admin Name</label><input type="text" id="name"></div>
-                    <div><label>DB Password</label><input type="password" id="password"></div>
-                    <h4>Dateisystem</h4>
-                    <div><label>Dokumentenspeicher</label><input type="text" id="uploadbase"></div>
+                    <h4 data-key="dbconnect">Datenbankverbindung</h4>
+                    <div><label data-key="dburl">Database URL</label><input type="text" id="dburl"></div>
+                    <div><label data-key="dbadminname">DB Admin Name</label><input type="text" id="name"></div>
+                    <div><label data-key="dbadminpwd">DB Password</label><input type="password" id="password"></div>
+                    <h4 data-key="files">Dateisystem</h4>
+                    <div><label data-key="storage">Dokumentenspeicher</label><input type="text" id="uploadbase"></div>
                 </div>
                 <div>
-                    <div>Mailserver</div>
-                    <div><label for="mailadminname">Name Mailkonto</label><input type="text" id="mailadminname"></div>
-                    <div><label for="mailadminpwd">Passwort Mailkonto</label><input type="password" id="mailadminpwd"></div>
-                    <div><label for="mailhost">Hostname</label><input type="text" id="mailhost"></div>
-                    <div><label for="mailreply">Reply-To Name</label><input type="text" id="mailreply"></div>
+                    <div data-key="mailserver">Mailserver</div>
+                    <div><label for="mailadminname" data-key="mailadmname">Name Mailkonto</label><input type="text" id="mailadminname"></div>
+                    <div><label for="mailadminpwd" data-key="mailadmpwd">Passwort Mailkonto</label><input type="password" id="mailadminpwd"></div>
+                    <div><label for="mailhost" data-key="mailhost">Hostname</label><input type="text" id="mailhost"></div>
+                    <div><label for="mailreply" data-key="mailreplyto">Reply-To Name</label><input type="text" id="mailreply"></div>
                     <hr>
-                    <div><button id="save" onclick="doSave();">Speichern</button></div>
+                    <div><button id="save" onclick="doSave();" data-key="save">Speichern</button></div>
                 </div>
                 <div id="clientcol">
-                    <div>Mandanten<button style="margin-left: 10pt;" onclick="createClient();">Neu</button></div>
+                    <div><span data-key="clients">Mandanten</span><button style="margin-left: 10pt;" onclick="createClient();" data-key="new">Neu</button></div>
                     <div>
                         <hr>
                         <div id="clientlist"></div>
                         <hr>
-                            <div><label for="clientid">Id</label><input type="text" id="clientid" readonly></div>
-                            <div><label for="clientname">Mandantenname</label><input type="text" id="clientname"></div>
-                            <div><label for="clienthost">Hostname</label><input type="text" id="clienthost"></div>
-                            <div><label for="clienthost2">Alias 1</label><input type="text" id="clienthost2"></div>
-                            <div><label for="clienthost3">Alias 2</label><input type="text" id="clienthost3"></div>
-                            <div><label for="clientmaxmb">Dokumente MB</label><input type="number" id="clientmaxmb"></div>
-                            <div><label for="clientmaxuser">Anzahl Anwender</label><input type="number" id="clientmaxuser"></div>
-                            <button onclick="saveClient();">Mandant speichern</button>
+                            <div><label for="clientid" data-key="id">Id</label><input type="text" id="clientid" readonly></div>
+                            <div><label for="clientname" data-key="clientname">Mandantenname</label><input type="text" id="clientname"></div>
+                            <div><label for="clienthost" data-key="hostname">Hostname</label><input type="text" id="clienthost"></div>
+                            <div><label for="clienthost2" data-key="alias">Alias</label><input type="text" id="clienthost2"></div>
+                            <div><label for="clienthost3" data-key="alias">Alias</label><input type="text" id="clienthost3"></div>
+                            <div><label for="clientmaxmb" data-key="docsmb">Dokumente MB</label><input type="number" id="clientmaxmb"></div>
+                            <div><label for="clientmaxuser" data-key="usercount">Anzahl Anwender</label><input type="number" id="clientmaxuser"></div>
+                            <button onclick="saveClient();" data-key="saveclient">Mandant speichern</button>
                     </div>
                 </div>
             </div>
             <div class="statusbar" id="statusbar">
-                <Button onclick="cleanTemplates()" style="margin-right:10pt">Vorlagenspeicher neu laden</Button>
+                <Button onclick="cleanTemplates()" style="margin-right:10pt" data-key="reloadtempl">Vorlagenspeicher neu laden</Button>
                 <span id="status"></span>
             </div>
         </div>
         <datalist id="clientnames"></datalist>
+        <script>
+            translateForm();
+        </script>
     </body>
 </html>
