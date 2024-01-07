@@ -119,6 +119,7 @@ TxtDe.dlgattp1 = "Tragen Sie hier den Namen und die URL für eine Anzeige aus de
 TxtDe.dlgattp2 = "Bezeichnung";
 TxtDe.dlgattp3 = "URL";
 TxtDe.dlgattcreate = "Anlegen";
+TxtDe.alltasks = "Alle Aufgaben";
 
 var TxtFr = {};
 TxtFr.home = "Liste des tâches" ;

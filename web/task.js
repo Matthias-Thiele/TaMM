@@ -290,7 +290,7 @@ function fillInterval(intervalData) {
  * @param {type} tasklist
  * @returns {undefined}
  */
-function listTasks(tasklist) {
+function listTasks(tasklist, isHistoryList) {
     var list = document.getElementById("tasklist");
     list.innerHTML = "";
     var td = toDay();
@@ -307,26 +307,28 @@ function listTasks(tasklist) {
         var dueDate = document.createElement("div");
         dueDate.innerText = task.nextDueDate;
         dueDate.className = "duedate";
-        if (task.nextDueDate < td) {
-            dueDate.classList.add("escalated");
-            insertEscalationBar = true;
-        } else if (insertEscalationBar) {
-            insertEscalationBar = false;
-            bar = document.createElement("div");
-            bar.style = "height: 10pt;";
-            list.appendChild(bar);
-        }
-        if (task.nextDueDate > nextWeek) {
-            newItem.classList.add("futuretask");
-            dueDate.classList.add("futuretask");
-            if (!futureBarInserted) {
-                futureBarInserted = true;
+        if (!isHistoryList) {
+            if (task.nextDueDate < td) {
+                dueDate.classList.add("escalated");
+                insertEscalationBar = true;
+            } else if (insertEscalationBar) {
+                insertEscalationBar = false;
                 bar = document.createElement("div");
                 bar.style = "height: 10pt;";
                 list.appendChild(bar);
             }
+            if (task.nextDueDate > nextWeek) {
+                newItem.classList.add("futuretask");
+                dueDate.classList.add("futuretask");
+                if (!futureBarInserted) {
+                    futureBarInserted = true;
+                    bar = document.createElement("div");
+                    bar.style = "height: 10pt;";
+                    list.appendChild(bar);
+                }
+            }
         }
-
+        
         newItem.appendChild(taskName);
         newItem.appendChild(dueDate);
         newItem.userData = task;

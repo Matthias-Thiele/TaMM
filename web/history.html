@@ -21,7 +21,7 @@ GNU General Public License v3.0
             }
             
             .escalated {
-                color: #c00040;
+                color: #000;
             }
         </style>
         <script src="translations.js"></script> 
@@ -53,11 +53,15 @@ GNU General Public License v3.0
                 }
             }
             
-            async function listHistory() {
+            function listHistory() {
+                listHistoryId(getUrlParam("taskid"));
+            }
+            
+            async function listHistoryId(taskId) {
                 var status = document.getElementById("status");
                 var data = {};
                 data.source = "historylist";
-                data.filterText = getUrlParam("taskid");
+                data.filterText = taskId; 
                 data.userId = sessionData.user.id;
                 console.log(data);
                 status.innerText = Txt.wait;
@@ -65,16 +69,19 @@ GNU General Public License v3.0
                 const fetchfilter = await fetch("system/filtertask", {'method': 'POST', 'body': JSON.stringify(data)});
                 const response = await fetchfilter.json();
                 if (response.result !== "error") {
-                  listTasks(response);
+                  listTasks(response, true);
                   statusMsg("");
                 } else {
                   statusMsg(Txt.errorsearch);
                 }
             }
             
-            function hideDialog() {
-                
+            function allItems() {
+                listHistoryId("");
+                document.getElementById("allitems").style = "display:none";
             }
+            
+            function hideDialog() {};
         </script>
             
     </head>
@@ -101,7 +108,13 @@ GNU General Public License v3.0
         <div class="bodybox">
             <div class="header" data-key="historyview">TaMM Erledigte Aufgaben</div>
             <div class="left-sidebar">
-                <div id="tasklist" class="selectlist" style="overflow-y: auto; max-height:700px;"></div>
+                <div>
+                    <div id="allitems">
+                        <button onclick="allItems()" data-key="alltasks">Alle Aufgaben</button>
+                        <hr>
+                    </div>
+                    <div id="tasklist" class="selectlist" style="overflow-y: auto; max-height:700px;"></div>
+                </div>
                 <div>
                     <div><label for="tasklid" data-key="id">Id</label><input type="text" id="tasklid" readonly></div>
                     <div><label for="name" data-key="taskname">Bezeichnung</label><input onchange="changed()" size="30" type="text" id="name" readonly></div>

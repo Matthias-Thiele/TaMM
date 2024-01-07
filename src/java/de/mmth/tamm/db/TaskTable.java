@@ -210,7 +210,7 @@ public class TaskTable extends DBTable {
       cmd += "AND lid = ? ";
     }
     
-    cmd += "ORDER BY startdate desc, createdate LIMIT 100";
+    cmd += "ORDER BY lastchanged desc, createdate LIMIT 100";
     
     logger.debug("SQL: " + cmd);
     
