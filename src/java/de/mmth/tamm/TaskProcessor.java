@@ -109,7 +109,7 @@ public class TaskProcessor {
         break;
     
       case "historylist":
-        long taskId = Long.parseLong(findData.filterText); 
+        long taskId = findData.filterText.isBlank() ? -1 : Long.parseLong(findData.filterText); 
         searchResult = application.history.listTasks(session.client.id, taskId);
         break;
         
@@ -156,6 +156,7 @@ public class TaskProcessor {
     
     // create history data record
     taskData.startDate = rememberNextDueDate;
+    taskData.lastChanged = DateUtils.formatZ(null);
     application.history.writeTask(taskData, true);
     
     ServletUtils.sendResult(resultData, true, "", "", next, null);

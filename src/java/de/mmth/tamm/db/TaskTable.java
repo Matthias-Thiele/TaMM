@@ -205,7 +205,12 @@ public class TaskTable extends DBTable {
   public List<TaskData> listTasks(int clientId, long taskId) throws TammError {
     List<TaskData> result = new ArrayList<>();
     
-    var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE clientid = ? and lid = ? ORDER BY startdate desc, createdate";
+    var cmd = "SELECT " + this.selectNames + " FROM " + tableName + " WHERE clientid = ? ";
+    if (taskId > 0) {
+      cmd += "AND lid = ? ";
+    }
+    
+    cmd += "ORDER BY startdate desc, createdate LIMIT 100";
     
     logger.debug("SQL: " + cmd);
     
@@ -213,7 +218,9 @@ public class TaskTable extends DBTable {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
         int paramCol = 1;
         stmt.setInt(paramCol++, clientId);
-        stmt.setLong(paramCol++, taskId);
+        if (taskId > 0) {
+          stmt.setLong(paramCol++, taskId);
+        }
         
         var taskRows = stmt.executeQuery();
         while (taskRows.next()) {

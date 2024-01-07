@@ -48,7 +48,7 @@ GNU General Public License v3.0
                         showBlockElement("menuuser", false);
                     }
 
-                    userlist = new Userlist(sessionData.userNames);
+                    userlist = new Userlist(sessionData.roleNames, sessionData.userNames);
                     setTimeout(listHistory, 200);
                 }
             }

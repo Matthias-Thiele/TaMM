@@ -282,31 +282,31 @@
         
         <div id="queryadvance" class="modal-content" style="width:400pt">
             <div class="modal-header">
-                <h2>Aufgabe vor Ablauf erledigt</h2>
+                <h2 data-key="dlgdonehdr">Aufgabe vor Ablauf erledigt</h2>
             </div>
             <div class="modal-body">
-                <p style="font-size: 125%;">Die Aufgabe wäre erst zum <span id="showduedate"></span> fällig</p>
-                <p>Wenn Sie jetzt weiterleiten, wird der nächste Fälligkeitstermin
-                    nach diesem Datum und nicht zum <span id="showtoday"></span> errechnet.</p>
+                <p style="font-size: 125%;"><span data-key="dlgdonep1">Die Aufgabe wäre erst zum </span><span id="showduedate"></span><span data-key="dlgdonep2"> fällig</span></p>
+                <p><span data-key="dlgdonep3">Wenn Sie jetzt weiterleiten, wird der nächste Fälligkeitstermin
+                        nach diesem Datum und nicht zum </span><span id="showtoday"></span><span data-key="dlgdonep4"> errechnet.</span></p>
             </div>
             <div class="modal-footer">
-                <button onclick="hideDialog();doAdvance(true)">Erledigt</button><button onclick="hideDialog()">Abbruch</button>
+                <button onclick="hideDialog();doAdvance(true)" data-key="done">Erledigt</button><button onclick="hideDialog()" data-key="abort">Abbruch</button>
             </div>
         </div>
 
         <div id="urlattachment" class="modal-content" style="width: 600pt">
             <div class="modal-header">
-                <h2>URL Dateianbindung eintragen</h2>
+                <h2 data-key="dlgatthdr">URL Dateianbindung eintragen</h2>
             </div>
             <div class="modal-body">
-                <p>Tragen Sie hier den Namen und die URL für eine Anzeige aus dem Internet ein.</p>
+                <p data-key="dlgattp1">Tragen Sie hier den Namen und die URL für eine Anzeige aus dem Internet ein.</p>
                 <div>
-                    <label for="urlname">Bezeichnung</label><input type="text" id="urlname" style="display: inline-block; width: 400pt"></div>
-                <div><label for="urlurl">URL</label><input type="text" id="urlurl" style="display: inline-block; width: 400pt">
+                    <label for="urlname" data-key="dlgattp2">Bezeichnung</label><input type="text" id="urlname" style="display: inline-block; width: 400pt"></div>
+                <div><label for="urlurl" data-key="dlgattp3">URL</label><input type="text" id="urlurl" style="display: inline-block; width: 400pt">
                 </div>
             </div>
             <div class="modal-footer">
-                <button onclick="hideDialog();doCreateUrlAttachment()">Anlegen</button><button onclick="hideDialog()">Abbruch</button>
+                <button onclick="hideDialog();doCreateUrlAttachment()" data-key="dlgattcreate">Anlegen</button><button onclick="hideDialog()" data-key="abort">Abbruch</button>
             </div>
         </div>
         <div class="bodybox">
@@ -338,7 +338,7 @@
                         </div>
                         <div>
                             <div class="subheader" data-key="startdate">Startdatum</div>
-                            <div data-key="divider">Teiler <input type="number" id="divider" style="width: 40pt; margin-bottom: 6pt;" value="1" min="1" max="9999" onchange="changed()"></div>
+                            <div><span data-key="divider">Teiler</span> <input type="number" id="divider" style="width: 40pt; margin-bottom: 6pt;" value="1" min="1" max="9999" onchange="changed()"></div>
                             <div><button id="dateadd" onclick="addDateField();" data-key="adddate">+ Datum hinzufügen</button></div>
                             <div id="datelist" class="datelist"><input name="startdate" type="date" style="margin-right: 5pt" onchange="changed()"></div>
                         </div>
