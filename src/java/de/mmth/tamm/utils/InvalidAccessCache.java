@@ -4,8 +4,11 @@
  */
 package de.mmth.tamm.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Limit brute force attacks by restricting
@@ -68,6 +71,19 @@ public class InvalidAccessCache {
   }
   
   /**
+   * Clears the access counter cache and
+   * returns the number of former entries.
+   * 
+   * @return 
+   */
+  public int clear() {
+    int locks = accessCounter.size();
+    accessCounter.clear();
+    
+    return locks;
+  }
+  
+  /**
    * Check decay of invalid access memory.
    * 
    * After the defined time period all
@@ -79,11 +95,24 @@ public class InvalidAccessCache {
     if (now > nextCleanup) {
       nextCleanup = now + delayMillis;
       synchronized (accessCounter) {
+        List<String> forRemoval = null;
         for (var item: accessCounter.entrySet()) {
           int count = item.getValue();
           if (count > 0) {
             count--;
             accessCounter.replace(item.getKey(), count);
+          } else {
+            if (forRemoval == null) {
+              forRemoval = new ArrayList<>();
+            }
+            
+            forRemoval.add(item.getKey());
+          }
+        }
+        
+        if (forRemoval != null) {
+          for (var key: forRemoval) {
+            accessCounter.remove(key);
           }
         }
       }

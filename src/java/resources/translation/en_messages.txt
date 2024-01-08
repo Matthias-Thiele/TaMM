@@ -1,0 +1,30 @@
+# general
+missing_login=You are not logged in yet.
+missing_access_rights=Missing or insufficient permissions.
+access_denied=Insufficient access rights or area blocked.
+
+# from DeleteProcessor
+messages_deleted={[count]} entries have been deleted from the template store.
+iplocks_deleted={[count]} entries have been deleted from the IP blocks.
+pdw_request_deleted=Password request removed:
+role_deleted=Role deleted
+
+# from GetProcessor
+mail_address_locked=The email address has been added to the blocked list.
+pwd_req_expired=The access key has already expired.";
+
+# from PostProcessor
+account_locked=Too many failed attempts, the system is locked for 10 minutes.
+unknown_user=Unknown user or incorrect password.
+unknown_user_or_mail=Unknown user or email address
+error_send_mail=Error sending email.
+missing_mail_config=Missing mail configuration. Request recorded in log.
+mail_locked=This email address is blocked.
+mail_domain_locked=This mail domain is locked.
+pwd_renewal=Renew password
+req_sent_per_mail=Request sent by email.
+invalid_key=Invalid or expired key
+role_created=Role created with id:
+
+# from UserProcessor
+wrong_administrator=Only your own users can be edited.

@@ -115,10 +115,11 @@ GNU General Public License v3.0
                 data.mailadminpwd = getValue("mailadminpwd");
                 data.mailhost = getValue("mailhost");
                 data.mailreply = getValue("mailreply");
-                
+                var permanent = document.getElementById("savepermanently").checked ? "/permanent" : "";
+               
                 console.log(data);
                 
-                const initdata = await fetch("system/initdata", {'method': 'POST', 'body': JSON.stringify(data)});
+                const initdata = await fetch("system/initdata" + permanent, {'method': 'POST', 'body': JSON.stringify(data)});
                 const response = await initdata.json();
                 if (response.result !== "ok") {
                   statusMsg(Txt.erroronsave);
@@ -138,10 +139,6 @@ GNU General Public License v3.0
                     list.appendChild(client);
                 });
             };
-            
-            function changed() {
-                document.getElementById("saveclient").disabled = false;
-            }
             
             function selectClient() {
                 selectedClient = this.source.key;
@@ -176,7 +173,6 @@ GNU General Public License v3.0
                 selectedClient.hostName3 = getValue("clienthost3");
                 selectedClient.maxDocMB = getValue("clientmaxmb");
                 selectedClient.maxUser = getValue("clientmaxuser");
-                
                 statusMsg(Txt.wait);
                 
                 const response = await fetch("system/saveclient", {'method': 'POST', 'body': JSON.stringify(selectedClient)});
@@ -200,7 +196,48 @@ GNU General Public License v3.0
                 console.log(responseData);
                 statusMsg(responseData.message);
             }
-        </script>
+            
+            async function cleanIPlocks() {
+                const response = await fetch("system/cleaniplocks", {'method': 'DELETE'});
+                const responseData = await response.json();
+                console.log(responseData);
+                statusMsg(responseData.message);
+            }
+            
+            function openFile(event) {
+                var input = event.target;
+
+                var reader = new FileReader();
+                reader.onload = function() {
+                    var inputs = document.getElementsByTagName("input");
+                    var text = reader.result;
+                    console.log(text);
+                    var lines = text.split(/[\r\n]/);
+                    lines.forEach((line) => {
+                        if (line.length > 5 && !line.startsWith('#')) {
+                            console.log(line);
+                            var splitPos = line.indexOf('=');
+                            if (splitPos > 0) {
+                                var parts = [line.slice(0,splitPos), line.slice(splitPos+1)];
+                                console.log(parts[0]);
+                                console.log(parts[1]);
+                                if (inputs[parts[0]]) {
+                                    inputs[parts[0]].value = parts[1];
+                                }
+                            }
+                        }
+                    });
+                };
+                reader.readAsText(input.files[0]);
+            };
+            
+            function doClear() {
+                var inputs = document.getElementsByTagName("input");
+                for (var i = 0; i < inputs.length; i++) {
+                    inputs[i].value = "";
+                };
+            }
+    </script>
     </head>
     <body onload="loadAdminData()">
         <div class="hamburger-menu">
@@ -234,16 +271,23 @@ GNU General Public License v3.0
                     <div><label data-key="storage">Dokumentenspeicher</label><input type="text" id="uploadbase"></div>
                 </div>
                 <div>
-                    <div data-key="mailserver">Mailserver</div>
+                    <h4 data-key="mailserver">Mailserver</h4>
                     <div><label for="mailadminname" data-key="mailadmname">Name Mailkonto</label><input type="text" id="mailadminname"></div>
                     <div><label for="mailadminpwd" data-key="mailadmpwd">Passwort Mailkonto</label><input type="password" id="mailadminpwd"></div>
                     <div><label for="mailhost" data-key="mailhost">Hostname</label><input type="text" id="mailhost"></div>
                     <div><label for="mailreply" data-key="mailreplyto">Reply-To Name</label><input type="text" id="mailreply"></div>
                     <hr>
-                    <div><button id="save" onclick="doSave();" data-key="save">Speichern</button></div>
+                    <div><label for="savepermanently" data-key="savepermanently">Parameter dauerhaft speichern</label><input type="checkbox" id="savepermanently"></div>
+                    <div>
+                        <span data-key="loadparams">Parameterliste laden</span>
+                        <input type='file' accept='text/plain' onchange='openFile(event)' >
+                        <hr>
+                        <button id="save" onclick="doSave();" data-key="saveparams">Parameter speichern</button>
+                        <button id="clear" onclick="doClear()" data-key="clear">Anzeige leeren</button>
+                    </div>
                 </div>
                 <div id="clientcol">
-                    <div><span data-key="clients">Mandanten</span><button style="margin-left: 10pt;" onclick="createClient();" data-key="new">Neu</button></div>
+                    <h4><span data-key="clients">Mandanten</span><button style="margin-left: 10pt;" onclick="createClient();" data-key="new">Neu</button></h4>
                     <div>
                         <hr>
                         <div id="clientlist"></div>
@@ -261,6 +305,7 @@ GNU General Public License v3.0
             </div>
             <div class="statusbar" id="statusbar">
                 <Button onclick="cleanTemplates()" style="margin-right:10pt" data-key="reloadtempl">Vorlagenspeicher neu laden</Button>
+                <Button onclick="cleanIPlocks()" style="margin-right:10pt" data-key="cleaniplocks">IP Anmeldesperren löschen</Button>
                 <span id="status"></span>
             </div>
         </div>

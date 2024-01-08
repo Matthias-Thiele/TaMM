@@ -5,6 +5,7 @@ access_denied=Unzureichende Zugriffsrechte oder Bereich gesperrt.
 
 # from DeleteProcessor
 messages_deleted=Es wurden {[count]} Einträge aus dem Vorlagenspeicher gelöscht.
+iplocks_deleted=Es wurden {[count]} Einträge aus den IP Sperren gelöscht.
 pdw_request_deleted=Passwortanfrage entfernt: 
 role_deleted=Rolle gelöscht
 

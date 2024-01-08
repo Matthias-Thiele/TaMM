@@ -68,7 +68,7 @@ public class PostProcessor {
    * @throws IOException 
    * @throws de.mmth.tamm.TammError 
    */
-  public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData) throws IOException, TammError {
+  public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData, String cmd4) throws IOException, TammError {
     try (Reader reader = new InputStreamReader(sourceData)) {
       switch (cmd) {
         case "login":
@@ -76,7 +76,7 @@ public class PostProcessor {
           break;
           
         case "initdata":
-          processInitdata(reader, resultData, session);
+          processInitdata(reader, resultData, session, cmd4);
           break;
           
         case "filteruser":
@@ -228,7 +228,7 @@ public class PostProcessor {
    * @param resultData
    * @throws IOException 
    */
-  private void processInitdata(Reader reader, OutputStream resultData, SessionData session) throws IOException {
+  private void processInitdata(Reader reader, OutputStream resultData, SessionData session, String cmd4) throws IOException {
     AdminData adminData = new Gson().fromJson(reader, AdminData.class);
     boolean isMainAdmin = (session.user != null) && session.user.mainAdmin;
     boolean ok;
@@ -236,8 +236,13 @@ public class PostProcessor {
       logger.warn("Invalid application data write attempt ignored from " + session.clientIp);
       ok = false;
     } else {
-      logger.warn("Servlet Initdata written " + adminData.dburl);
-      application.setAdminData(adminData);
+      if (cmd4.equals("permanent")) {
+        logger.warn("Servlet Initdata written " + adminData.dburl);
+        application.setAdminData(adminData);
+      } else {
+        logger.warn("Servlet Initdata only locally changed.");
+      }
+      
       ok = application.checkInit();
     }
     

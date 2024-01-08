@@ -120,6 +120,10 @@ TxtDe.dlgattp2 = "Bezeichnung";
 TxtDe.dlgattp3 = "URL";
 TxtDe.dlgattcreate = "Anlegen";
 TxtDe.alltasks = "Alle Aufgaben";
+TxtDe.saveparams = "Parameter speicher";
+TxtDe.clear = "Anzeige leeren";
+TxtDe.loadparams = "Parameterliste laden";
+TxtDe.savepermanently = "Parameter dauerhaft speichern";
 
 var TxtFr = {};
 TxtFr.home = "Liste des tâches" ;
@@ -237,6 +241,10 @@ TxtFr.dlgattp1 = "Saisissez ici le nom et l'URL d'une annonce provenant d'Intern
 TxtFr.dlgattp2 = "Désignation" ;
 TxtFr.dlgattp3 = "URL" ;
 TxtFr.dlgattcreate = "Créer" ;
+TxtFr.saveparams = "Enregistrer des paramètres";
+TxtFr.clear = "Effacer l'affichage";
+TxtFr.loadparams = "Charger la liste des paramètres";
+TxtFr.savepermanently = "Enregistrer les paramètres de manière permanente";
 
 var TxtEn = {};
 TxtEn.home = "Task List";
@@ -354,12 +362,16 @@ TxtEn.dlgattp1 = "Enter the name and URL for an ad from the Internet here.";
 TxtEn.dlgattp2 = "Designation";
 TxtEn.dlgattp3 = "URL";
 TxtEn.dlgattcreate = "Create";
+TxtEn.saveparams = "Save parameter";
+TxtEn.clear = "Clear display";
+TxtEn.loadparams = "Load parameter list";
+TxtEn.savepermanently = "Save parameters permanently";
 
 var Txt;
 
 function translateForm() {
     var userLang = navigator.language || navigator.userLanguage;
-userLang = "en";
+
     switch (userLang) {
         case "de": Txt = TxtDe; break;
         case "fr": Txt = TxtFr; break;

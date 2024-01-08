@@ -68,6 +68,10 @@ public class DeleteProcessor {
       case "deleterole":
         processDeleteRole(resultData, session, cmd4);
         break;
+        
+      case "cleaniplocks":
+        processCleanIpLocks(resultData, session);
+        break;
     }
   }
   
@@ -174,6 +178,27 @@ public class DeleteProcessor {
       application.roles.removeRole(session.client.id, roleId);
       application.assignments.clearRoleAssignments(roleId, false);
       message = Txt.get(session.lang, "role_deleted");
+    } else {
+      message = Txt.get(session.lang, "access_denied");
+    }
+    
+    ServletUtils.sendResult(resultData, isOk, "", "", message, null);
+  }
+
+  /**
+   * Deletes all IP address locks.
+   * 
+   * @param resultData
+   * @param session
+   * @throws IOException 
+   */
+  private void processCleanIpLocks(OutputStream resultData, SessionData session) throws IOException {
+    boolean isOk = (session.user != null) && session.user.mainAdmin;
+    
+    String message;
+    if (isOk) {
+      int count = application.accessCache.clear();
+      message = application.placeholder.resolve(Txt.get(session.lang, "iplocks_deleted"), "count", Integer.toString(count));
     } else {
       message = Txt.get(session.lang, "access_denied");
     }

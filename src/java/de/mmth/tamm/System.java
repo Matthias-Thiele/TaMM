@@ -154,11 +154,13 @@ public class System extends HttpServlet {
           return;
         }
 
+        String cmd4 = (uriParts.length > 4) ? uriParts[4] : "";
+        
         if (!ServletUtils.checkClientId(request, sd, application)) {
           throw new TammError("Invalid client access.");
         }
 
-        postProcessor.process(sd, cmd, content, out);
+        postProcessor.process(sd, cmd, content, out, cmd4);
         out.flush();
       } catch(TammError te) {
         ServletUtils.sendResult(out, false, "", "", te.getMessage(), null);

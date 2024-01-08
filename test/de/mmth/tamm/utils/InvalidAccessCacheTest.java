@@ -46,6 +46,8 @@ public class InvalidAccessCacheTest {
     result = instance.checkAccess(ip);
     assertFalse("new invalid access, access should be locked", result);
     
+    var count = instance.clear();
+    assertEquals("exactly one ip has been observed.", 1, count);
   }
   
 }

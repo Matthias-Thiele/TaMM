@@ -1,0 +1,30 @@
+# général
+Missing_login=Vous n'êtes pas encore connecté.
+Missing_access_rights=Autorisations manquantes ou insuffisantes.
+access_denied=Droits d'accès insuffisants ou zone bloquée.
+
+# de SupprimerProcesseur
+messages_deleted={[count]} entrées ont été supprimées du magasin de modèles.
+iplocks_deleted={[count]} entrées ont été supprimées des blocs IP.
+pdw_request_deleted=Demande de mot de passe supprimée :
+role_deleted=Rôle supprimé
+
+# de GetProcessor
+mail_address_locked=L'adresse e-mail a été ajoutée à la liste des personnes bloquées.
+pwd_req_expired=La clé d'accès a déjà expiré.";
+
+# du postprocesseur
+account_locked=Trop de tentatives infructueuses, le système est verrouillé pendant 10 minutes.
+unknown_user=Utilisateur inconnu ou mot de passe incorrect.
+unknown_user_or_mail=Utilisateur ou adresse e-mail inconnu
+error_send_mail=Erreur lors de l'envoi de l'e-mail.
+missing_mail_config=Configuration de messagerie manquante. Demande enregistrée dans le journal.
+mail_locked=Cette adresse email est bloquée.
+mail_domain_locked=Ce domaine de messagerie est verrouillé.
+pwd_renewal=Renouveller le mot de passe
+req_sent_per_mail=Demande envoyée par email.
+invalid_key=Clé invalide ou expirée
+role_created=Rôle créé avec l'identifiant :
+
+# depuis le processeur utilisateur
+wrong_administrator=Seuls vos propres utilisateurs peuvent être modifiés.
