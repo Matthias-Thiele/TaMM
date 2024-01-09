@@ -8,6 +8,7 @@ messages_deleted={[count]} entrées ont été supprimées du magasin de modèles
 iplocks_deleted={[count]} entrées ont été supprimées des blocs IP.
 pdw_request_deleted=Demande de mot de passe supprimée :
 role_deleted=Rôle supprimé
+maillocks_deleted={[count]} e-mails ont été envoyés.
 
 # de GetProcessor
 mail_address_locked=L'adresse e-mail a été ajoutée à la liste des personnes bloquées.
@@ -25,6 +26,7 @@ pwd_renewal=Renouveller le mot de passe
 req_sent_per_mail=Demande envoyée par email.
 invalid_key=Clé invalide ou expirée
 role_created=Rôle créé avec l'identifiant :
+total_mail_limit_reached=La limite d'e-mails a été atteinte et le système est bloqué pendant 10 minutes.
 
 # depuis le processeur utilisateur
 wrong_administrator=Seuls vos propres utilisateurs peuvent être modifiés.

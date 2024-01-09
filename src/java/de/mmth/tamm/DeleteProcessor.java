@@ -8,6 +8,7 @@ import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.LockData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.data.TaskData;
+import de.mmth.tamm.utils.CleanType;
 import de.mmth.tamm.utils.ServletUtils;
 import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
@@ -70,7 +71,11 @@ public class DeleteProcessor {
         break;
         
       case "cleaniplocks":
-        processCleanIpLocks(resultData, session);
+        processCleanLocks(resultData, session, CleanType.IP_LOCKS);
+        break;
+        
+      case "cleanmaillocks":
+        processCleanLocks(resultData, session, CleanType.MAIL_LOCKS);
         break;
     }
   }
@@ -192,13 +197,22 @@ public class DeleteProcessor {
    * @param session
    * @throws IOException 
    */
-  private void processCleanIpLocks(OutputStream resultData, SessionData session) throws IOException {
+  private void processCleanLocks(OutputStream resultData, SessionData session, CleanType kind) throws IOException {
     boolean isOk = (session.user != null) && session.user.mainAdmin;
     
-    String message;
+    String message = "";
     if (isOk) {
-      int count = application.accessCache.clear();
-      message = application.placeholder.resolve(Txt.get(session.lang, "iplocks_deleted"), "count", Integer.toString(count));
+      switch (kind) {
+        case IP_LOCKS:
+          int count = application.accessCache.clear();
+          message = application.placeholder.resolve(Txt.get(session.lang, "iplocks_deleted"), "count", Integer.toString(count));
+          break;
+          
+        case MAIL_LOCKS:
+          int mailcount = application.mailCounter.cleanup();
+          message = application.placeholder.resolve(Txt.get(session.lang, "maillocks_deleted"), "count", Integer.toString(mailcount));
+          break;
+      }
     } else {
       message = Txt.get(session.lang, "access_denied");
     }

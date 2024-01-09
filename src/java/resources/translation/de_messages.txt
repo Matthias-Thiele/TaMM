@@ -8,6 +8,7 @@ messages_deleted=Es wurden {[count]} Einträge aus dem Vorlagenspeicher gelösch
 iplocks_deleted=Es wurden {[count]} Einträge aus den IP Sperren gelöscht.
 pdw_request_deleted=Passwortanfrage entfernt: 
 role_deleted=Rolle gelöscht
+maillocks_deleted=Es wurden {[count]} Mails versendet.
 
 # from GetProcessor
 mail_address_locked=Die Mail Adresse wurde in die Sperrliste aufgenommen.
@@ -25,6 +26,7 @@ pwd_renewal=Passwort erneuern
 req_sent_per_mail=Anforderung per Mail verschickt.
 invalid_key=Ungültiger oder abgelaufener Schlüssel
 role_created=Rolle erstellt mit id:
+total_mail_limit_reached=Das EMail Limit wurde erreicht, das System ist für 10 Minuten gesperrt.
 
 # from UserProcessor
 wrong_administrator=Es können nur eigene Anwender bearbeitet werden.

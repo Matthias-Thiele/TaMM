@@ -33,6 +33,7 @@ public class BackgroundWorker extends Thread {
     while (this.isAlive() && !this.isInterrupted()) {
       application.requests.cleanup();
       application.accessCache.cleanup();
+      application.mailCounter.cleanup();
       try {
         Thread.sleep(10000);
       } catch (InterruptedException ex) {

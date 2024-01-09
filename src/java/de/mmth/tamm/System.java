@@ -156,7 +156,7 @@ public class System extends HttpServlet {
 
         String cmd4 = (uriParts.length > 4) ? uriParts[4] : "";
         
-        if (!ServletUtils.checkClientId(request, sd, application)) {
+        if (!cmd.equals("initdata") && !ServletUtils.checkClientId(request, sd, application)) {
           throw new TammError("Invalid client access.");
         }
 

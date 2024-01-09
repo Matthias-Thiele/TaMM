@@ -8,6 +8,7 @@ messages_deleted={[count]} entries have been deleted from the template store.
 iplocks_deleted={[count]} entries have been deleted from the IP blocks.
 pdw_request_deleted=Password request removed:
 role_deleted=Role deleted
+maillocks_deleted={[count]} emails have been sent.
 
 # from GetProcessor
 mail_address_locked=The email address has been added to the blocked list.
@@ -25,6 +26,7 @@ pwd_renewal=Renew password
 req_sent_per_mail=Request sent by email.
 invalid_key=Invalid or expired key
 role_created=Role created with id:
+total_mail_limit_reached=The email limit has been reached and the system is blocked for 10 minutes.
 
 # from UserProcessor
 wrong_administrator=Only your own users can be edited.

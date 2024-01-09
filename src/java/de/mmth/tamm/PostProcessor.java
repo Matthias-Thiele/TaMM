@@ -232,7 +232,7 @@ public class PostProcessor {
     AdminData adminData = new Gson().fromJson(reader, AdminData.class);
     boolean isMainAdmin = (session.user != null) && session.user.mainAdmin;
     boolean ok;
-    if (application.db.isValid() && !isMainAdmin) {
+    if ((application.db != null) && application.db.isValid() && !isMainAdmin) {
       logger.warn("Invalid application data write attempt ignored from " + session.clientIp);
       ok = false;
     } else {
@@ -264,26 +264,28 @@ public class PostProcessor {
     boolean isOk = false;
     try {
       message = checkLocked(userData.mail, session.lang);
-      var checkUser = application.users.readUser(session.client.id, -1, userData.name);
-      if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
-        String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS, session.clientIp);
-        String validUntil = DateUtils.formatD(application.requests.getValidDate(key));
-        logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
-        if (application.mailer != null) {
-          var requestUrl = application.tammUrl + "newpwd.html?key=" + key;
-          var lockUrl = application.tammUrl + "system/lockmail/" + key;
-          try {
-            message = processMail(requestUrl, lockUrl, userData.mail, validUntil, session.lang);
-            isOk = true;
-          } catch (EmailException ex) {
-            logger.warn("Error sending mail.", ex);
-            message = Txt.get(session.lang, "error_send_mail");
+      if (message == null) {
+        var checkUser = application.users.readUser(session.client.id, -1, userData.name);
+        if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
+          String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS, session.clientIp);
+          String validUntil = DateUtils.formatD(application.requests.getValidDate(key));
+          logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
+          if (application.mailer != null) {
+            var requestUrl = application.tammUrl + "newpwd.html?key=" + key;
+            var lockUrl = application.tammUrl + "system/lockmail/" + key;
+            try {
+              message = processMail(requestUrl, lockUrl, userData.mail, validUntil, session.lang);
+              isOk = true;
+            } catch (EmailException ex) {
+              logger.warn("Error sending mail.", ex);
+              message = Txt.get(session.lang, "error_send_mail");
+            }
+          } else {
+            message = Txt.get(session.lang, "missing_mail_config");
           }
         } else {
-          message = Txt.get(session.lang, "missing_mail_config");
+          logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);
         }
-      } else {
-        logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);
       }
     } catch(TammError ex) {
       logger.debug("Invalid password request for " + userData.name);
@@ -315,6 +317,8 @@ public class PostProcessor {
       if (application.locks.checkLock(domain)) {
         message = Txt.get(lang, "mail_domain_locked");
         application.locks.incrementLockCount(domain);
+      } else if (!application.mailCounter.checkMaySend(domain)) {
+        message = Txt.get(lang, "total_mail_limit_reached");
       }
     }
     

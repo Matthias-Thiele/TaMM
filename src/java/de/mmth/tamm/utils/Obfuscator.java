@@ -96,7 +96,7 @@ public class Obfuscator {
       return new String(decryptedText, "UTF-8");
     } catch (Exception ex) {
       logger.warn("Obfuscation error.", ex);
-      return null;
+      return "";
     }
     
   }

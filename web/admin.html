@@ -191,14 +191,19 @@ GNU General Public License v3.0
             }
             
             async function cleanTemplates() {
-                const response = await fetch("system/cleantemplates", {'method': 'DELETE'});
-                const responseData = await response.json();
-                console.log(responseData);
-                statusMsg(responseData.message);
+                deleteCall("cleantemplates");
             }
             
             async function cleanIPlocks() {
-                const response = await fetch("system/cleaniplocks", {'method': 'DELETE'});
+                deleteCall("cleaniplocks");
+            }
+            
+            async function cleanMaillocks() {
+                deleteCall("cleanmaillocks");
+            }
+            
+            async function deleteCall(command) {
+                const response = await fetch("system/" + command, {'method': 'DELETE'});
                 const responseData = await response.json();
                 console.log(responseData);
                 statusMsg(responseData.message);
@@ -306,6 +311,7 @@ GNU General Public License v3.0
             <div class="statusbar" id="statusbar">
                 <Button onclick="cleanTemplates()" style="margin-right:10pt" data-key="reloadtempl">Vorlagenspeicher neu laden</Button>
                 <Button onclick="cleanIPlocks()" style="margin-right:10pt" data-key="cleaniplocks">IP Anmeldesperren löschen</Button>
+                <Button onclick="cleanMaillocks()" style="margin-right:10pt" data-key="cleanmaillocks">Mail Versendezähler löschen</Button>
                 <span id="status"></span>
             </div>
         </div>

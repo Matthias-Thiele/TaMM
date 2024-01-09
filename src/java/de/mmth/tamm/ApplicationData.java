@@ -17,6 +17,7 @@ import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.progress.SendMail;
 import de.mmth.tamm.utils.InvalidAccessCache;
+import de.mmth.tamm.utils.LimitSentMails;
 import de.mmth.tamm.utils.Obfuscator;
 import de.mmth.tamm.utils.Placeholder;
 import de.mmth.tamm.utils.RequestCache;
@@ -49,6 +50,9 @@ public class ApplicationData {
   
   private static final int MAX_RETRIES = 3;
   private static final long DECAY_INTERVAL = 600000;
+  private static final int MAX_MAILS_PER_PERIOD = 100;
+  private static final int MAX_MAILS_PER_DOMAIN_PER_PERIOD = 20;
+  private static final int CLEAR_MAIL_COUNTER_PERIOD = 600000;
   
   private String schemaName;
   private String hostName;
@@ -75,6 +79,7 @@ public class ApplicationData {
   public SendMail mailer = null;
   public TemplateCache templates = new TemplateCache("templates");
   public InvalidAccessCache accessCache = new InvalidAccessCache(MAX_RETRIES, DECAY_INTERVAL);
+  public LimitSentMails mailCounter = new LimitSentMails(MAX_MAILS_PER_PERIOD, MAX_MAILS_PER_DOMAIN_PER_PERIOD, CLEAR_MAIL_COUNTER_PERIOD);
   public Placeholder placeholder = new Placeholder();
   
   /**
