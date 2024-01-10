@@ -51,20 +51,22 @@ public class Obfuscator {
    */
   public String encrypt(String password, String salt, String text) {
     try {
+      logger.info("Encrypt " + text);
       SecretKey key = getAesKeyFromPassword(password, salt);
       SecretKeySpec secretKeySpec = new SecretKeySpec(key.getEncoded(), "AES");
       
-          
+      logger.info("Prepare Iv.");
       var ivspec = new IvParameterSpec(iv);
       Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
       cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivspec);
       
+      logger.info("doFinal");
       byte[] cipherText = cipher.doFinal(text.getBytes("UTF-8"));
       byte[] encryptedData = new byte[iv.length + cipherText.length];
       System.arraycopy(iv, 0, encryptedData, 0, iv.length);
       System.arraycopy(cipherText, 0, encryptedData, iv.length, cipherText.length);
       return Base64.getEncoder().encodeToString(encryptedData);
-    } catch (Exception ex) {
+    } catch (Throwable ex) {
       logger.warn("Obfuscation error.", ex);
       return null;
     }
@@ -79,6 +81,11 @@ public class Obfuscator {
    * @return 
    */
   public String decrypt(String password, String salt, String text) {
+    if (text == null || text.isBlank()) {
+      logger.warn("Nothing to decrypt.");
+      return "";
+    }
+    
     try {
       byte[] encryptedData = Base64.getDecoder().decode(text);
       IvParameterSpec ivspec = new IvParameterSpec(iv);

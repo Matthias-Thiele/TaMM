@@ -8,6 +8,7 @@ package de.mmth.tamm.db;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.Level;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,9 +37,16 @@ public class DBConnect {
     try {
       logger.info("Start connecting to database " + dbName);
       try {
+        Class.forName("org.postgresql.Driver");
+      } catch (ClassNotFoundException ex) {
+        logger.warn("Cannot load postgres driver.", ex);
+      }
+      
+      try {
         conn = DriverManager.getConnection(url, userName, password);
       } catch(SQLException ex2) {
         // for some reason the first try always fails in Tomcat.
+        logger.warn("First driver manager connect failed, try again.");
         conn = DriverManager.getConnection(url, userName, password);        
       }
       this.dbName = dbName;

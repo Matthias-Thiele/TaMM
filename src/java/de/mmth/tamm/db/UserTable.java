@@ -8,6 +8,7 @@ package de.mmth.tamm.db;
 import de.mmth.tamm.TammError;
 import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.UserData;
+import de.mmth.tamm.utils.PasswordUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class UserTable extends DBTable {
     if (isNewTable) {
       UserData admin = new UserData();
       admin.name = "admin";
-      admin.pwd = "tamm279";
+      admin.pwd = PasswordUtils.encodePassword("tamm279");
       admin.clientId = 1;
       admin.mainAdmin = true;
       admin.subAdmin = true;
@@ -119,6 +120,7 @@ public class UserTable extends DBTable {
    * Create a new User with user.id == -1
    * 
    * @param user
+   * @return 
    * @throws TammError 
    */
   public int writeUser(UserData user) throws TammError {

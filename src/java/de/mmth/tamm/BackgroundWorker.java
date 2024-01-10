@@ -31,9 +31,18 @@ public class BackgroundWorker extends Thread {
   public void run() {
     logger.info("Start background worker.");
     while (this.isAlive() && !this.isInterrupted()) {
-      application.requests.cleanup();
-      application.accessCache.cleanup();
-      application.mailCounter.cleanup();
+      if (application.requests != null) {
+        application.requests.cleanup();
+      }
+      
+      if (application.accessCache != null) {
+        application.accessCache.cleanup();
+      }
+      
+      if (application.mailCounter != null) {
+        application.mailCounter.cleanup();
+      }
+      
       try {
         Thread.sleep(10000);
       } catch (InterruptedException ex) {

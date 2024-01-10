@@ -68,12 +68,15 @@ public class ServletUtils {
     if (clients.isEmpty() && (session.client == null)) {
       session.client = new ClientData();
       session.client.id = 1;
-      session.client.hostName = "TAMM";
+      session.client.name = "TaMM";
+      session.client.hostName = hostName;
+      session.clientName = hostName;
+      clients.put(hostName, session.client);
       logger.info("New session with default client TAMM, 1.");
       result = true;
     } else {    
       var client = clients.get(hostName);
-      logger.info("Post request from " + session.clientName + " as " + hostName);
+      logger.info("Post request from " + session.clientName + " as " + hostName + ((client == null) ? " not found" : client.name));
 
       if ((session.client == null) && (client != null)) {
         // init client on first access
@@ -82,6 +85,7 @@ public class ServletUtils {
         logger.debug("Initialize new session to client " + client.name);
       }
       
+      logger.debug("session.client " + ((session.client == null) ? "null" : (session.clientName + ", sc.id " + session.client.id + ", c.id " + client.id)));
       result = (client == null) ? false : ((session.client != null) ? session.client.id == client.id : true);
       
       if (!result) {
