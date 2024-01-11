@@ -81,6 +81,7 @@ public class ApplicationData {
   public InvalidAccessCache accessCache = new InvalidAccessCache(MAX_RETRIES, DECAY_INTERVAL);
   public LimitSentMails mailCounter = new LimitSentMails(MAX_MAILS_PER_PERIOD, MAX_MAILS_PER_DOMAIN_PER_PERIOD, CLEAR_MAIL_COUNTER_PERIOD);
   public Placeholder placeholder = new Placeholder();
+  private ClientData defaultClient = null;
   
   /**
    * Reads the database access information from the registry
@@ -114,7 +115,6 @@ public class ApplicationData {
         db = con;
         
         users = new UserTable(db, "userlist");
-        users.assureAdminUser();
         tasks = new TaskTable(db, "tasklist");
         history = new TaskTable(db, "taskhistory");
         clients = new ClientTable(db, "clientlist");
@@ -178,6 +178,23 @@ public class ApplicationData {
   }
   
   /**
+   * Returns the client associated with the host name.
+   * If not found, use default client.
+   * If no default client exists, return null.
+   * 
+   * @param hostName
+   * @return 
+   */
+  public ClientData getClient(String hostName) {
+    ClientData client = clientNames.get(hostName);
+    if (client == null) {
+      client = defaultClient;
+    }
+    
+    return client;
+  }
+  
+  /**
    * Creates a map with all client names as key.
    * 
    * A client can have up to three host names and can
@@ -195,8 +212,16 @@ public class ApplicationData {
         if ((c.hostName3 != null) && !c.hostName3.isBlank()) {
           localClientNames.put(c.hostName3, c);
         }
+        
+        if (c.hostName.equals("*") ||c.hostName2.equals("*") ||c.hostName3.equals("*")) {
+          if (defaultClient != null) {
+            logger.warn("More than one catch-all client defined: " + c.name + " - " + defaultClient.name);
+          } else {
+            defaultClient = c;
+          }
+        }
       }
-      
+
       clientNames = localClientNames;
     } catch(TammError ex) {
       logger.warn("Cannot read client list.");

@@ -7,7 +7,6 @@ package de.mmth.tamm.utils;
 import com.google.gson.Gson;
 import de.mmth.tamm.ApplicationData;
 import de.mmth.tamm.data.AttachmentData;
-import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.SessionData;
@@ -21,7 +20,6 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -61,42 +59,29 @@ public class ServletUtils {
    * @return 
    */
   public static boolean checkClientId(HttpServletRequest request, SessionData session, ApplicationData application) {
-    Map<String, ClientData> clients = application.clientNames;
     String hostName = request.getHeader("host");
     boolean result;
     
-    if (clients.isEmpty() && (session.client == null)) {
-      session.client = new ClientData();
-      session.client.id = 1;
-      session.client.name = "TaMM";
-      session.client.hostName = hostName;
-      session.clientName = hostName;
-      clients.put(hostName, session.client);
-      logger.info("New session with default client TAMM, 1.");
-      result = true;
-    } else {    
-      var client = clients.get(hostName);
-      logger.info("Post request from " + session.clientName + " as " + hostName + ((client == null) ? " not found" : client.name));
+    var client = application.getClient(hostName);
+    logger.debug("Servlet request from " + session.clientName + " as " + hostName + ((client == null) ? " not found" : client.name));
 
-      if ((session.client == null) && (client != null)) {
-        // init client on first access
-        session.client = client;
-        session.clientName = hostName;
-        logger.debug("Initialize new session to client " + client.name);
-      }
-      
-      logger.debug("session.client " + ((session.client == null) ? "null" : (session.clientName + ", sc.id " + session.client.id + ", c.id " + client.id)));
-      result = (client == null) ? false : ((session.client != null) ? session.client.id == client.id : true);
-      
-      if (!result) {
-        logger.warn("Invalid client access " + ((client == null) ? "null" : client.name) + " of " + session.clientName);
-      }
+    if ((session.client == null) && (client != null)) {
+      // init client on first access
+      session.client = client;
+      session.clientName = hostName;
+      logger.debug("Initialize new session to client " + client.name);
+    }
+
+    result = (client == null) ? false : ((session.client != null) ? session.client.id == client.id : true);
+
+    if (!result) {
+      logger.warn("Invalid client access " + ((client == null) ? "null" : client.name) + " of " + session.clientName);
     }
     
     if ((session.user != null) && session.user.mainAdmin) {
       session.clientList = new ArrayList<>(application.clientList.size()); 
-      for (var client: application.clientList) {
-        session.clientList.add(new KeyValue(client.id, client.name));
+      for (var cl: application.clientList) {
+        session.clientList.add(new KeyValue(cl.id, cl.name));
       }
     }
     

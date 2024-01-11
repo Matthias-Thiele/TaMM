@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
  *
  * @author matthias
  */
-public class ClientTable extends DBTable {
+public final class ClientTable extends DBTable {
   private static final Logger logger = LogManager.getLogger(ClientTable.class);
   
   protected static final String TABLE_CONFIG = 
@@ -39,6 +39,22 @@ public class ClientTable extends DBTable {
    */
   public ClientTable(DBConnect conn, String tableName) {
     super(conn, tableName, TABLE_CONFIG);
+    assureMainClient();
+  }
+  
+  private void assureMainClient() {
+    if (isNewTable) {
+      ClientData defaultClient = new ClientData();
+      defaultClient.name = "TaMM";
+      defaultClient.hostName = "*";
+      defaultClient.maxDocMB = 100;
+      defaultClient.maxUser = 100;
+      try {
+        writeClient(defaultClient);
+      } catch (TammError ex) {
+        logger.warn("Cannot create default client.", ex);
+      }
+    }
   }
   
   /**

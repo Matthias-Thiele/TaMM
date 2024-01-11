@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
  * 
  * @author matthias
  */
-public class UserTable extends DBTable {
+public final class UserTable extends DBTable {
   private static final Logger logger = LogManager.getLogger(UserTable.class);
   
   protected static final String TABLE_CONFIG = 
@@ -45,13 +45,14 @@ public class UserTable extends DBTable {
    */
   public UserTable(DBConnect conn, String tableName) {
     super(conn, tableName, TABLE_CONFIG);
+    assureAdminUser();
   }
   
   /**
    * Make sure that a new table at least contains
    * the default admin user.
    */
-  public void assureAdminUser() {
+  private void assureAdminUser() {
     if (isNewTable) {
       UserData admin = new UserData();
       admin.name = "admin";

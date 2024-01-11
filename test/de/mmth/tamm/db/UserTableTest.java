@@ -54,10 +54,7 @@ public class UserTableTest {
     System.out.println("writeReadUser");
     int clientId = 1;
     UserTable instance = new UserTable(con, "testusers");
-    List<UserData> users0before = instance.listUsers(clientId, -1, null, false);
-    assertEquals("No users expected.", 0, users0before.size());
     
-    instance.assureAdminUser();
     // admin user with id=1 automatically created
     List<UserData> users0after = instance.listUsers(clientId, -1, null, false);
     assertEquals("Just the default admin user expected.", 1, users0after.size());
