@@ -47,12 +47,14 @@ public class DBTable {
     
     String checkCmd = "SELECT relname FROM pg_catalog.pg_class WHERE relname = '" + tableName + "' AND relkind = 'r'";
     String createCmd = "CREATE TABLE " + tableName + "()";
+    logger.info("Check table cmd: " + checkCmd);
     
     try {
       try (java.sql.PreparedStatement tableInfo = conn.getConnection().prepareStatement(checkCmd)) {
         var result = tableInfo.executeQuery();
         if (!result.next()) {
           // table does not exist, create it now
+          logger.warn("Table does not exist, create now: " + createCmd);
           try (java.sql.PreparedStatement createStmt = conn.getConnection().prepareStatement(createCmd)) {
             createStmt.execute();
             isNewTable = true;
@@ -183,6 +185,8 @@ public class DBTable {
     }
     
     String cmd = "ALTER TABLE " + tableName + " ADD COLUMN " + name + " " + sqlType;
+    logger.info("Add column cmd: " + cmd);
+    
     try {
       try (java.sql.Statement stmt = conn.getConnection().createStatement()) {
         stmt.execute(cmd);

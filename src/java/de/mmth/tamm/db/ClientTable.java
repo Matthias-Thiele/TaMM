@@ -45,6 +45,7 @@ public final class ClientTable extends DBTable {
   private void assureMainClient() {
     if (isNewTable) {
       ClientData defaultClient = new ClientData();
+      defaultClient.id = -1;
       defaultClient.name = "TaMM";
       defaultClient.hostName = "*";
       defaultClient.maxDocMB = 100;
