@@ -3,76 +3,105 @@
 GNU General Public License v3.0
 */
 /* 
-    Created on : 21.12.2023, 15:34:49
-    Author     : https://alvarotrigo.com/blog/hamburger-menu-css/
+    Created on    : 21.12.2023, 15:34:49
+    Idea based on : https://alvarotrigo.com/blog/hamburger-menu-css/
 */
+
 .hamburger-menu {
-    
+  display: block;
+  position: relative;
+  height: 35pt;
+  transition: transform 0.4s ease-in-out;
 }
 
-#menu__toggle {
+.hamburger-menu .checkbox {
+  position: absolute;
+  display: block;
+  height: 30pt;
+  width: 33pt;
+  top: 3pt;
+  left: 17pt;
+  z-index: 5;
   opacity: 0;
+  cursor: pointer;
+  caret-color: transparent;
 }
-#menu__toggle:checked + .menu__btn > span {
-  transform: rotate(45deg);
+
+.hamburger-menu .hamburger-lines {
+  display: block;
+  height: 20pt;
+  width: 32pt;
+  position: absolute;
+  top: 10pt;
+  left: 20pt;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-#menu__toggle:checked + .menu__btn > span::before {
-  top: 0;
-  transform: rotate(0deg);
+
+.hamburger-menu .hamburger-lines .line {
+  display: block;
+  height: 4pt;
+  width: 100%;
+  border-radius: 10px;
+  background: #0e2431;
 }
-#menu__toggle:checked + .menu__btn > span::after {
-  top: 0;
-  transform: rotate(90deg);
+
+.hamburger-menu .hamburger-lines .line1 {
+  transform-origin: 0% 0%;
+  transition: transform 0.4s ease-in-out;
+  background-color: red;
 }
-#menu__toggle:checked ~ .menu__box {
+
+.hamburger-menu .hamburger-lines .line2 {
+  transition: transform 0.2s ease-in-out;
+  background-color: green;
+}
+
+.hamburger-menu .hamburger-lines .line3 {
+  transform-origin: 0% 100%;
+  transition: transform 0.4s ease-in-out;
+  background-color: blue;
+}
+
+.hamburger-menu input[type="checkbox"]:checked ~ .menu__box {
   left: 0 !important;
 }
-.menu__btn {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-  z-index: 1;
+
+.hamburger-menu input[type="checkbox"]:checked ~ .hamburger-lines .line1 {
+  transform: rotate(31deg);
+  background-color: black;
 }
-.menu__btn > span,
-.menu__btn > span::before,
-.menu__btn > span::after {
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background-color: #616161;
-  transition-duration: .25s;
+
+.hamburger-menu input[type="checkbox"]:checked ~ .hamburger-lines .line2 {
+  transform: scaleY(0);
 }
-.menu__btn > span::before {
-  content: '';
-  top: -8px;
+
+.hamburger-menu input[type="checkbox"]:checked ~ .hamburger-lines .line3 {
+  transform: rotate(-31deg);
+  background-color: black;
 }
-.menu__btn > span::after {
-  content: '';
-  top: 8px;
-}
+
 .menu__box {
+  cursor: pointer;
   display: block;
   position: fixed;
   top: 0;
-  left: -100%;
-  width: 300px;
+  left: -210pt;
+  width: 200pt;
   height: 100%;
   margin: 0;
   padding: 80px 0;
   list-style: none;
   background-color: #ECEFF1;
   box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
-  transition-duration: .25s;
+  transition-duration: 0.65s;
 }
 .menu__item {
   display: block;
   padding: 12px 24px;
   color: #333;
-  font-family: 'Roboto', sans-serif;
   font-size: 20px;
   font-weight: 600;
   text-decoration: none;

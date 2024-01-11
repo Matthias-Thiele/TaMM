@@ -320,10 +320,12 @@ GNU General Public License v3.0
     </head>
     <body onload="loadSessionData();">
         <div class="hamburger-menu">
-            <input id="menu__toggle" type="checkbox" />
-            <label class="menu__btn" for="menu__toggle">
-                <span></span>
-            </label>
+            <input class="checkbox" type="checkbox" id="menu_toggle"/>
+            <div class="hamburger-lines">
+              <span class="line line1"></span>
+              <span class="line line2"></span>
+              <span class="line line3"></span>
+            </div>  
 
             <ul class="menu__box">
                 <li id="menuhome"><a class="menu__item" href="index.html" data-key="home">Home</a></li>
@@ -332,10 +334,9 @@ GNU General Public License v3.0
                 <li id="menuadmin"><a class="menu__item" href="admin.html" data-key="editsystem">Systemeinstellungen</a></li>
                 <li id="menulock"><a class="menu__item" href="lock.html" data-key="editlocks">Sperrliste verwalten</a></li>
                 <li id="menupwd"><a class="menu__item" href="reqlist.html" data-key="editpwreq">Passwortanfragen</a></li>
-                <li><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
-                <li><a class="menu__item" onclick="logout();" data-key="logout">Abmelden</a></li>
+                <li id="menuabout"><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
+                <li id="menulogout"><a class="menu__item" onclick="logout();" data-key="logout">Abmelden</a></li>
             </ul>
-
         </div>
         
         <div class="bodybox">
