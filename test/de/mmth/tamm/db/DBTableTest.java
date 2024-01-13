@@ -37,16 +37,18 @@ public class DBTableTest {
   @Test
   public void testTableCreation() throws SQLException {
     String tableDefinition = "col1 V 20\ncol2 I\ncol3 B";
-    DBTable table1 = new DBTable(con, "testtable", tableDefinition);
+    String indexDefinition = "create index ixtest on {[tablename]} (col1)";
+    
+    DBTable table1 = new DBTable(con, "testtable", tableDefinition, "");
     assertNotNull(table1);
     assertTrue("Table should be new.", table1.isNewTable());
     
-    DBTable table2 = new DBTable(con, "testtable", tableDefinition);
+    DBTable table2 = new DBTable(con, "testtable", tableDefinition, "");
     assertNotNull(table2);
     assertFalse("Table should exist.", table2.isNewTable());
     
     String extendedDefinition = tableDefinition + "\ncol4 V 200";
-    DBTable table3 = new DBTable(con, "testtable", extendedDefinition);
+    DBTable table3 = new DBTable(con, "testtable", extendedDefinition, "");
     assertNotNull(table3);
     assertFalse("Table should exist.", table3.isNewTable());
     
@@ -59,6 +61,13 @@ public class DBTableTest {
     } catch(SQLException ex) {
       // ok, exception was expected.
     }
+    
+    DBTable table4 = new DBTable(con, "testtable", tableDefinition, indexDefinition);
+    String check = "SELECT 1 FROM   pg_class c JOIN   pg_namespace n ON n.oid = c.relnamespace " +
+      "WHERE  c.relname = 'ixtest'";
+    var ixResult = DBHelper.readLine(con.getConnection(), check);
+    assertTrue(ixResult.next());
+    assertEquals("1", ixResult.getString(1));
   }
   
 }

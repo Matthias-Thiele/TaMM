@@ -31,6 +31,11 @@ public final class ClientTable extends DBTable {
     maxuser I
     """;
   
+  protected static final String INDEX_CONFIG = 
+    """
+    create unique index if not exists ixclientids on {[tablename]} (id);
+    """;
+  
   /**
    * Open the clients table and create it if needed.
    * 
@@ -38,7 +43,7 @@ public final class ClientTable extends DBTable {
    * @param tableName 
    */
   public ClientTable(DBConnect conn, String tableName) {
-    super(conn, tableName, TABLE_CONFIG);
+    super(conn, tableName, TABLE_CONFIG, INDEX_CONFIG);
     assureMainClient();
   }
   

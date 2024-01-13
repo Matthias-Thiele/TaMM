@@ -37,6 +37,12 @@ public final class UserTable extends DBTable {
     lastlogin V 20
     """;
   
+  protected static final String INDEX_CONFIG = 
+    """
+    create unique index if not exists ixuserids on {[tablename]} (id);
+    create index if not exists ixclientid on {[tablename]} (clientid);
+    """;
+  
   /**
    * Open and create if needed the user table
    * 
@@ -44,7 +50,7 @@ public final class UserTable extends DBTable {
    * @param tableName 
    */
   public UserTable(DBConnect conn, String tableName) {
-    super(conn, tableName, TABLE_CONFIG);
+    super(conn, tableName, TABLE_CONFIG, INDEX_CONFIG);
     assureAdminUser();
   }
   

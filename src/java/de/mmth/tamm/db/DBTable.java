@@ -40,8 +40,9 @@ public class DBTable {
    * @param conn
    * @param tableName 
    * @param columns 
+   * @param postprocessing 
    */
-  public DBTable(DBConnect conn, String tableName, String columns) {
+  public DBTable(DBConnect conn, String tableName, String columns, String postprocessing) {
     this.conn = conn;
     this.tableName = tableName;
     
@@ -63,6 +64,8 @@ public class DBTable {
       }
       
       buildColumns(columns);
+      buildIndexes(postprocessing);
+      
     } catch (SQLException ex) {
       logger.warn("Error opening table.", ex);
     }
@@ -217,5 +220,23 @@ public class DBTable {
     }
     
     return result;
+  }
+
+  private void buildIndexes(String postprocessing) {
+    if (postprocessing.isEmpty()) {
+      logger.debug("No index information supplied, nothing to do.");
+      return;
+    }
+    
+    postprocessing = postprocessing.replace("{[tablename]}", tableName);
+    logger.info("buildIndexes cmd: " + postprocessing);
+    
+    try {
+      try (java.sql.Statement stmt = conn.getConnection().createStatement()) {
+        stmt.execute(postprocessing);
+      }
+    } catch (SQLException ex) {
+      logger.warn("Cannot add indexes.", ex);
+    }
   }
 }

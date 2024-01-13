@@ -51,6 +51,8 @@ public class ClientTableTest {
   public void testWriteReadClient() throws TammError {
     System.out.println("writeReadListClient");
     ClientTable instance = new ClientTable(con, "testclients");
+    List<ClientData> clients = instance.listClients();
+    assertEquals("Default client expected.", 1, clients.size());
     
     ClientData client = new ClientData();
     client.id = -1;
@@ -61,9 +63,9 @@ public class ClientTableTest {
     
     instance.writeClient(client);
     
-    List<ClientData> clients = instance.listClients();
-    assertEquals("One client expected.", 1, clients.size());
-    int id = clients.get(0).id;
+    clients = instance.listClients();
+    assertEquals("Two clients expected, default client and written client.", 2, clients.size());
+    int id = 2;
     
     ClientData client2 = instance.readClient(id);
     
@@ -81,18 +83,19 @@ public class ClientTableTest {
     instance.writeClient(client3);
     
     clients = instance.listClients(); // order by name
-    assertEquals("Two clients expected.", 2, clients.size());
-    assertEquals("First client host name mismatch", "testc1", clients.get(0).hostName);
-    assertEquals("Second client host name mismatch", "testc2", clients.get(1).hostName);
+    assertEquals("Three clients expected.", 3, clients.size());
+    assertEquals("First client host name mismatch", "*", clients.get(0).hostName);
+    assertEquals("Second client host name mismatch", "testc1", clients.get(1).hostName);
+    assertEquals("Third client host name mismatch", "testc2", clients.get(2).hostName);
     
     client.id = id;
     client.name = "ZTest client 1";
     instance.writeClient(client);
     
     clients = instance.listClients(); // order by name
-    assertEquals("Two clients expected.", 2, clients.size());
-    assertEquals("First client host name mismatch", "testc2", clients.get(0).hostName);
-    assertEquals("Second client host name mismatch", "testc1", clients.get(1).hostName);
+    assertEquals("Three clients expected.", 3, clients.size());
+    assertEquals("First client host name mismatch", "testc2", clients.get(1).hostName);
+    assertEquals("Second client host name mismatch", "testc1", clients.get(2).hostName);
   }
   
 }

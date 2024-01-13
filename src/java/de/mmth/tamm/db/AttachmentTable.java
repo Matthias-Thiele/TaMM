@@ -29,13 +29,19 @@ public class AttachmentTable extends DBTable {
     guid V 40
     """;
   
+  protected static final String INDEX_CONFIG = 
+    """
+    create index if not exists ixattachtaskids on {[tablename]} (lid);
+    create index if not exists ixattguid on {[tablename]} (guid);
+    """;
+  
   /**
    *
    * @param conn
    * @param tableName
    */
   public AttachmentTable(DBConnect conn, String tableName) {
-    super(conn, tableName, TABLE_CONFIG);
+    super(conn, tableName, TABLE_CONFIG, INDEX_CONFIG);
   }
   
   /**

@@ -28,8 +28,14 @@ public class RoleTable extends DBTable {
     owner I
     """;
   
+  protected static final String INDEX_CONFIG = 
+    """
+    create unique index if not exists ixroleids on {[tablename]} (clientid, id);
+    create index if not exists ixattguid on {[tablename]} (guid);
+    """;
+
   public RoleTable(DBConnect conn, String tableName) {
-    super(conn, tableName, TABLE_CONFIG);
+    super(conn, tableName, TABLE_CONFIG, INDEX_CONFIG);
   }
   
   /**

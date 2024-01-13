@@ -28,13 +28,18 @@ public class LockTable extends DBTable {
     lockcounter I
     """;
   
+  protected static final String INDEX_CONFIG = 
+    """
+    create index if not exists ixlockmail on {[tablename]} (mailaddress);
+    """;
+  
   /**
    *
    * @param conn
    * @param tableName
    */
   public LockTable(DBConnect conn, String tableName) {
-    super(conn, tableName, TABLE_CONFIG);
+    super(conn, tableName, TABLE_CONFIG, INDEX_CONFIG);
   }
   
   /**

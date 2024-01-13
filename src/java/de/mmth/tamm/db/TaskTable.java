@@ -35,8 +35,14 @@ public class TaskTable extends DBTable {
     interval V 2000
     """;
   
+  protected static final String INDEX_CONFIG = 
+    """
+    create unique index if not exists ixtaskids on tasklist (lid);
+    create index if not exists ixduedate on tasklist (nextduedate);
+    """;
+  
   public TaskTable(DBConnect conn, String tableName) {
-    super(conn, tableName, TABLE_CONFIG);
+    super(conn, tableName, TABLE_CONFIG, INDEX_CONFIG);
   }
   
   /**

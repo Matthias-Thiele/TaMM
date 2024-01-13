@@ -26,8 +26,13 @@ public class RoleAssignmentTable extends DBTable {
     roleid I
     """;
   
+  protected static final String INDEX_CONFIG = 
+    """
+    create index if not exists ixroleuserids on {[tablename]} (userid);
+    """;
+  
   public RoleAssignmentTable(DBConnect conn, String tableName) {
-    super(conn, tableName, TABLE_CONFIG);
+    super(conn, tableName, TABLE_CONFIG, INDEX_CONFIG);
   }
   
   /**
