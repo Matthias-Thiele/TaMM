@@ -86,6 +86,7 @@ GNU General Public License v3.0
                     setValue("name", data.name);
                     setValue("password", data.password);
                     setValue("uploadbase", data.uploadbase);
+                    setValue("logger", data.loggerbase);
                     setValue("mailadminname", data.mailadminname);
                     setValue("mailadminpwd", data.mailadminpwd);
                     setValue("mailhost", data.mailhost);
@@ -111,6 +112,7 @@ GNU General Public License v3.0
                 data.name = getValue("name");
                 data.password = getValue("password");
                 data.uploadbase = getValue("uploadbase");
+                data.loggerbase = getValue("logger");
                 data.mailadminname = getValue("mailadminname");
                 data.mailadminpwd = getValue("mailadminpwd");
                 data.mailhost = getValue("mailhost");
@@ -121,7 +123,13 @@ GNU General Public License v3.0
                 
                 const initdata = await fetch("system/initdata" + permanent, {'method': 'POST', 'body': JSON.stringify(data)});
                 const response = await initdata.json();
-                if (response.result !== "ok") {
+                if (response.result === "ok") {
+                    if (permanent === "") {
+                        statusMsg(Txt.notpersisted);
+                    } else {
+                        statusMsg(Txt.syssaved);
+                    }
+                } else {
                   statusMsg(Txt.erroronsave);
                 }
             }
@@ -275,6 +283,7 @@ GNU General Public License v3.0
                     <div><label data-key="dbadminpwd">DB Password</label><input type="password" id="password"></div>
                     <h4 data-key="files">Dateisystem</h4>
                     <div><label data-key="storage">Dokumentenspeicher</label><input type="text" id="uploadbase"></div>
+                    <div><label data-key="logger">Logger Verzeichnis</label><input type="text" id="logger"></div>
                 </div>
                 <div>
                     <h4 data-key="mailserver">Mailserver</h4>

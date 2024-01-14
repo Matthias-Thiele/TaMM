@@ -20,7 +20,9 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.prefs.Preferences;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -180,5 +182,23 @@ public class ServletUtils {
     
     File destinationFile = new File(scatterDir, data.guid);
     return destinationFile;
+  }
+  
+  public static Logger prepareLogger(ApplicationData application, String logDirName) {
+    String tmpdir = java.lang.System.getProperty("java.io.tmpdir") + "/logs";
+    java.lang.System.out.println("Tmp dir is " + tmpdir);
+    var prefs = Preferences.userRoot().node("Tamm");
+    var loggerDir = prefs.get(logDirName, tmpdir);
+    java.lang.System.out.println("Dir from prefs is " + loggerDir);
+    File dir = new File(loggerDir);
+    dir.mkdirs();
+    
+    java.lang.System.setProperty(logDirName, loggerDir);
+    Logger syslogger = LogManager.getLogger(de.mmth.tamm.System.class);
+    syslogger.info("Logger started.");
+    java.lang.System.out.println("Logger started at " + loggerDir);
+    application.adminData.loggerbase = loggerDir;
+    
+    return syslogger;
   }
 }

@@ -17,6 +17,7 @@ public class AdminData {
   
   // Filesystem storage
   public String uploadbase;
+  public String loggerbase;
   
   // Mail access
   public String mailadminname;

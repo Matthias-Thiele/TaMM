@@ -28,7 +28,8 @@ import org.apache.logging.log4j.Logger;
  */
 public class System extends HttpServlet {
   
-  private static final Logger logger = LogManager.getLogger(System.class);
+  private static Logger logger = null;
+
   private final ApplicationData application = new ApplicationData();
   private final PostProcessor postProcessor = new PostProcessor(application);
   private final GetProcessor getProcessor = new GetProcessor(application);
@@ -41,6 +42,8 @@ public class System extends HttpServlet {
    */
   @Override
   public void init() {
+    logger = ServletUtils.prepareLogger(application, ApplicationData.LOG_DIR);
+    
     application.setSchema("tamm");
     var sc = this.getServletContext();
     sc.setAttribute("application", application);

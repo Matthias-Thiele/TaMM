@@ -39,10 +39,11 @@ import org.apache.logging.log4j.LogManager;
  */
 public class ApplicationData {
   private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(ApplicationData.class);
+  protected static final String FILE_UPLOAD_BASE = "uploadbase";
+  protected static final String LOG_DIR = "loggerdirectory";
   private static final String DB_URL = "dburl";
   private static final String DB_NAME = "dbname";
   private static final String DB_PASSWORD = "dbpassword";
-  public static final String FILE_UPLOAD_BASE = "uploadbase";
   private static final String MAIL_HOST = "mailhost";
   private static final String MAIL_ADMIN = "mailadmin";
   private static final String MAIL_PWD = "mailpwd";
@@ -99,6 +100,7 @@ public class ApplicationData {
     adminData.name = prefs.get(DB_NAME, "");
     adminData.password = prefs.get(DB_PASSWORD, "");
     adminData.uploadbase = prefs.get(FILE_UPLOAD_BASE, "/var/TaMM/files");
+    adminData.loggerbase = prefs.get(LOG_DIR, "/var/TaMM/logs");
     adminData.mailadminname = prefs.get(MAIL_ADMIN, "");
     adminData.mailadminpwd = prefs.get(MAIL_PWD, "");
     adminData.mailhost = prefs.get(MAIL_HOST, "");
@@ -247,6 +249,7 @@ public class ApplicationData {
     prefs.put(DB_NAME, data.name);
     prefs.put(DB_PASSWORD, data.password);
     prefs.put(FILE_UPLOAD_BASE, data.uploadbase);
+    prefs.put(LOG_DIR, data.loggerbase);
     prefs.put(MAIL_ADMIN, data.mailadminname);
     prefs.put(MAIL_PWD, data.mailadminpwd);
     prefs.put(MAIL_HOST, data.mailhost);

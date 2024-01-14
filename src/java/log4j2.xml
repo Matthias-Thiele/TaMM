@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="debug">
   <Appenders>
-    <File name="file" fileName="${sys:catalina.home}/logs/tamm.log">
+    <File name="file" fileName="${sys:loggerdirectory}/tamm.log">
       <PatternLayout>
         <Pattern>%d %p %c{1} %L [%t] %m %ex%n</Pattern>
       </PatternLayout>

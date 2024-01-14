@@ -126,6 +126,8 @@ TxtDe.loadparams = "Parameterliste laden";
 TxtDe.savepermanently = "Parameter dauerhaft speichern";
 TxtDe.cleaniplocks = "IP Anmeldesperren löschen";
 TxtDe.cleanmaillocks = "Mail Versendezähler löschen";
+TxtDe.notpersisted = "Daten nicht dauerhaft gespeichert, nur für diesen Lauf";
+TxtDe.syssaved = "Systemdaten gespeichert.";
 
 var TxtFr = {};
 TxtFr.home = "Liste des tâches" ;
@@ -249,6 +251,8 @@ TxtFr.loadparams = "Charger la liste des paramètres";
 TxtFr.savepermanently = "Enregistrer les paramètres de manière permanente";
 TxtFr.cleaniplocks = "Supprimer les verrous de connexion IP";
 TxtFr.cleanmaillocks = "Effacer le compteur de distribution du courrier";
+TxtFr.notpersisted = "Données non conservées, uniquement pour cette exécution";
+TxtFr.syssaved = "Données système enregistrées.";
 
 var TxtEn = {};
 TxtEn.home = "Task List";
@@ -372,6 +376,8 @@ TxtEn.loadparams = "Load parameter list";
 TxtEn.savepermanently = "Save parameters permanently";
 TxtEn.cleaniplocks = "Delete IP login locks";
 TxtEn.cleanmaillocks = "Clear mail delivery counter";
+TxtEn.notpersisted = "Data not persisted, changed only for this run";
+TxtEn.syssaved = "System data saved.";
 
 var Txt;
 
