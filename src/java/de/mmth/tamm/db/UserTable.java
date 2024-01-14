@@ -143,7 +143,7 @@ public final class UserTable extends DBTable {
       try (var stmt = conn.getConnection().prepareStatement(cmd)) {
         var col = 1;
         stmt.setInt(col++, user.clientId);
-        stmt.setString(col++, user.name);
+        stmt.setString(col++, user.name.trim());
         stmt.setString(col++, user.pwd);
         stmt.setString(col++, user.mail);
         stmt.setInt(col++, user.getFlags());

@@ -65,7 +65,7 @@ public class ServletUtils {
     boolean result;
     
     var client = application.getClient(hostName);
-    logger.debug("Servlet request from " + session.clientName + " as " + hostName + ((client == null) ? " not found" : client.name));
+    logger.debug("Servlet request from " + session.clientName + " as " + hostName + ((client == null) ? " not found " : client.name));
 
     if ((session.client == null) && (client != null)) {
       // init client on first access

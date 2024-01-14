@@ -188,9 +188,15 @@ public class ApplicationData {
    * @return 
    */
   public ClientData getClient(String hostName) {
+    logger.debug("GetClient for host " + hostName);
     ClientData client = clientNames.get(hostName);
     if (client == null) {
       client = defaultClient;
+      if (client == null) {
+        logger.debug("No default client available.");
+      } else {
+        logger.debug("No host found, use default client " + client.name);
+      }
     }
     
     return client;
@@ -225,6 +231,15 @@ public class ApplicationData {
       }
 
       clientNames = localClientNames;
+      for (var lcn: localClientNames.entrySet()) {
+        logger.info("Client " + lcn.getValue().name + " as host " + lcn.getKey());
+      }
+      
+      if (defaultClient == null) {
+        logger.warn("No default client defined.");
+      } else {
+        logger.info("Default client: " + defaultClient.name);
+      }
     } catch(TammError ex) {
       logger.warn("Cannot read client list.");
     }

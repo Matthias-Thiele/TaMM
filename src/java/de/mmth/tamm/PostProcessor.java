@@ -184,7 +184,7 @@ public class PostProcessor {
    */
   private void processLogin(Reader reader, OutputStream resultData, SessionData session) throws IOException, TammError {
     LoginData loginData = new Gson().fromJson(reader, LoginData.class);
-    logger.debug("Process login request for user" + loginData.name);
+    logger.debug("Process login request for user " + loginData.name);
     JsonResult result = new JsonResult();
     boolean loginValid = false;
     if (!application.accessCache.checkAccess(session.clientIp)) {
@@ -193,7 +193,7 @@ public class PostProcessor {
       result.nextPage = "";
     } else {
       try {
-        var user = application.users.readUser(session.client.id, -1, loginData.name);
+        var user = application.users.readUser(session.client.id, -1, loginData.name.trim());
         if (PasswordUtils.comparePassword(user.pwd, loginData.pwd)) {
           result.result = "ok";
           result.nextPage = "index.html";
