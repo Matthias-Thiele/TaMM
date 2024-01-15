@@ -21,7 +21,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -29,7 +28,7 @@ import org.apache.logging.log4j.Logger;
  * @author matthias
  */
 public class TaskProcessor {
-  private static final Logger logger = LogManager.getLogger(TaskProcessor.class);
+  private static final Logger logger = TammLogger.prepareLogger(TaskProcessor.class);
 
   private final ApplicationData application;
   private final Gson gson;

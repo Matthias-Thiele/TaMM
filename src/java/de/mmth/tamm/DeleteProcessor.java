@@ -14,7 +14,6 @@ import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -22,7 +21,7 @@ import org.apache.logging.log4j.Logger;
  * @author matthias
  */
 public class DeleteProcessor {
-  private static final Logger logger = LogManager.getLogger(DeleteProcessor.class);
+  private static final Logger logger = TammLogger.prepareLogger(DeleteProcessor.class);
   
   private final ApplicationData application;
   

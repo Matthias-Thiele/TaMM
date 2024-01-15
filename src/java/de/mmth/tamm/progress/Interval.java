@@ -4,11 +4,11 @@
  */
 package de.mmth.tamm.progress;
 
+import de.mmth.tamm.TammLogger;
 import de.mmth.tamm.utils.DateUtils;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
  * @author matthias
  */
 public class Interval {
-  private static final Logger logger = LogManager.getLogger(Interval.class);
+  private static final Logger logger = TammLogger.prepareLogger(Interval.class);
   
   private Repeat repeat = Repeat.SINGLE;
   private int divider = 1;

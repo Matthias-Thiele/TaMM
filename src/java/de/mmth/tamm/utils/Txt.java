@@ -5,6 +5,7 @@
 package de.mmth.tamm.utils;
 
 import de.mmth.tamm.TammError;
+import de.mmth.tamm.TammLogger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +17,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
  * @author matthias
  */
 public class Txt {
-  private static final Logger logger = LogManager.getLogger(Txt.class);
+  private static final Logger logger = TammLogger.prepareLogger(Txt.class);
   private static final Txt instance = new Txt();
   
   private final Map<String, Map<String, String>> allText = new HashMap<>();

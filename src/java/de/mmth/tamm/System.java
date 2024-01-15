@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.prefs.Preferences;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -28,7 +27,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class System extends HttpServlet {
   
-  private static Logger logger = null;
+  private static Logger logger = TammLogger.prepareLogger(System.class);
 
   private final ApplicationData application = new ApplicationData();
   private final PostProcessor postProcessor = new PostProcessor(application);
@@ -42,8 +41,6 @@ public class System extends HttpServlet {
    */
   @Override
   public void init() {
-    logger = ServletUtils.prepareLogger(application, ApplicationData.LOG_DIR);
-    
     application.setSchema("tamm");
     var sc = this.getServletContext();
     sc.setAttribute("application", application);

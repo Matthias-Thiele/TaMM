@@ -5,6 +5,7 @@
 package de.mmth.tamm.utils;
 
 import de.mmth.tamm.TammError;
+import de.mmth.tamm.TammLogger;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,14 +13,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
 
 /**
  *
  * @author matthias
  */
 public class TemplateCache {
-  private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(TemplateCache.class);
+  private static final org.apache.logging.log4j.Logger logger = TammLogger.prepareLogger(TemplateCache.class);
   private final Map<String, String> templates = new HashMap<>();
   private final String templateDirName;
   private File templateRoot = null;

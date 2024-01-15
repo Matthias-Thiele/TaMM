@@ -31,14 +31,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
-import org.apache.logging.log4j.LogManager;
 
 /**
  *
  * @author matthias
  */
 public class ApplicationData {
-  private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(ApplicationData.class);
+  private static final org.apache.logging.log4j.Logger logger = TammLogger.prepareLogger(ApplicationData.class);
   protected static final String FILE_UPLOAD_BASE = "uploadbase";
   protected static final String LOG_DIR = "loggerdirectory";
   private static final String DB_URL = "dburl";

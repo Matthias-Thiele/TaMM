@@ -14,7 +14,6 @@ import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -22,7 +21,7 @@ import org.apache.logging.log4j.Logger;
  * @author matthias
  */
 public class UserProcessor {
-  private static final Logger logger = LogManager.getLogger(UserProcessor.class);
+  private static final Logger logger = TammLogger.prepareLogger(UserProcessor.class);
 
   private final ApplicationData application;
   

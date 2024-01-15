@@ -4,6 +4,7 @@
  */
 package de.mmth.tamm.utils;
 
+import de.mmth.tamm.TammLogger;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -14,7 +15,6 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import org.apache.logging.log4j.LogManager;
 
 /**
  * This class is used to obfuscate locally stored password.
@@ -26,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
  * @author matthias
  */
 public class Obfuscator {
-  private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(Obfuscator.class);
+  private static final org.apache.logging.log4j.Logger logger = TammLogger.prepareLogger(Obfuscator.class);
   private static final int KEY_LENGTH = 256;
   private static final int ITERATION_COUNT = 32;
   

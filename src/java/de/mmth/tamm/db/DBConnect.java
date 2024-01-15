@@ -5,12 +5,10 @@
 
 package de.mmth.tamm.db;
 
+import de.mmth.tamm.TammLogger;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Level;
-
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -19,7 +17,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class DBConnect {
   
-  private static final Logger logger = LogManager.getLogger(DBConnect.class);
+  private static final Logger logger = TammLogger.prepareLogger(DBConnect.class);
   private Connection conn;
   private String dbName;
   private boolean isValid;

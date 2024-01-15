@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.mail.EmailException;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -40,7 +39,7 @@ import org.apache.logging.log4j.Logger;
  * @author matthias
  */
 public class PostProcessor {
-  private static final Logger logger = LogManager.getLogger(PostProcessor.class);
+  private static final Logger logger = TammLogger.prepareLogger(PostProcessor.class);
   private static final long PWD_REQUEST_VALID_MILLIS = 3600000;
   
   private final ApplicationData application;

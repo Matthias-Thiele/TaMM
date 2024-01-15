@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -38,11 +37,10 @@ import org.apache.logging.log4j.Logger;
   maxRequestSize = 1024 * 1024 * 100   // 100 MB
 )
 public class Upload extends HttpServlet {
-  private static final Logger logger = LogManager.getLogger(Upload.class);
+  private static final Logger logger = TammLogger.prepareLogger(Upload.class);
   private final Gson gson = new GsonBuilder().create();
   private FileProcessor fileProcessor = null;
   
-  // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
   /**
    * Handles the HTTP <code>GET</code> method.
    *

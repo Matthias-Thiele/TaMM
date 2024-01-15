@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.mail.EmailException;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -34,7 +33,7 @@ import org.apache.logging.log4j.Logger;
  * @author matthias
  */
 public class GetProcessor {
-  private static final Logger logger = LogManager.getLogger(GetProcessor.class);
+  private static final Logger logger = TammLogger.prepareLogger(GetProcessor.class);
   private static final long PWD_INFO_VALID_MILLIS = 3600000;
   
   private final ApplicationData application;

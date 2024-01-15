@@ -7,6 +7,7 @@ package de.mmth.tamm.utils;
 import com.google.gson.Gson;
 import de.mmth.tamm.ApplicationData;
 import de.mmth.tamm.TammError;
+import de.mmth.tamm.TammLogger;
 import de.mmth.tamm.data.AttachmentData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.KeyValue;
@@ -21,16 +22,13 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.prefs.Preferences;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author matthias
  */
 public class ServletUtils {
-  private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(ServletUtils.class);
+  private static final org.apache.logging.log4j.Logger logger = TammLogger.prepareLogger(ServletUtils.class);
   
   /**
    * Extract the client IP address.
@@ -183,24 +181,6 @@ public class ServletUtils {
     
     File destinationFile = new File(scatterDir, data.guid);
     return destinationFile;
-  }
-  
-  public static Logger prepareLogger(ApplicationData application, String logDirName) {
-    String tmpdir = java.lang.System.getProperty("java.io.tmpdir") + "/logs";
-    java.lang.System.out.println("Tmp dir is " + tmpdir);
-    var prefs = Preferences.userRoot().node("Tamm");
-    var loggerDir = prefs.get(logDirName, tmpdir);
-    java.lang.System.out.println("Dir from prefs is " + loggerDir);
-    File dir = new File(loggerDir);
-    dir.mkdirs();
-    
-    java.lang.System.setProperty(logDirName, loggerDir);
-    Logger syslogger = LogManager.getLogger(de.mmth.tamm.System.class);
-    syslogger.info("Logger started.");
-    java.lang.System.out.println("Logger started at " + loggerDir);
-    application.adminData.loggerbase = loggerDir;
-    
-    return syslogger;
   }
   
     /**

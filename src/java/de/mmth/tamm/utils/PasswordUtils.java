@@ -4,17 +4,17 @@
  */
 package de.mmth.tamm.utils;
 
+import de.mmth.tamm.TammLogger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.apache.logging.log4j.LogManager;
 
 /**
  *
  * @author matthias
  */
 public class PasswordUtils {
-  private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(PasswordUtils.class);
+  private static final org.apache.logging.log4j.Logger logger = TammLogger.prepareLogger(PasswordUtils.class);
   
   /**
    * Convert byte array into hex string.

@@ -4,7 +4,6 @@
  */
 package de.mmth.tamm;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -12,7 +11,7 @@ import org.apache.logging.log4j.Logger;
  * @author matthias
  */
 public class BackgroundWorker extends Thread {
-  private static final Logger logger = LogManager.getLogger(BackgroundWorker.class);
+  private static final Logger logger = TammLogger.prepareLogger(BackgroundWorker.class);
 
   private final ApplicationData application;
   

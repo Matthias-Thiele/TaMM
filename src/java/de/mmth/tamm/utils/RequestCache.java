@@ -4,6 +4,7 @@
  */
 package de.mmth.tamm.utils;
 
+import de.mmth.tamm.TammLogger;
 import de.mmth.tamm.data.UserData;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +15,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
  * @author matthias
  */
 public class RequestCache {
-  private static final Logger logger = LogManager.getLogger(RequestCache.class);
+  private static final Logger logger = TammLogger.prepareLogger(RequestCache.class);
   
   private final Map<String, CacheItem> cache = new HashMap<>(); 
   private Date nextCleanup = new Date();

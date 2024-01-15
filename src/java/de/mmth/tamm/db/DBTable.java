@@ -5,10 +5,10 @@
 
 package de.mmth.tamm.db;
 
+import de.mmth.tamm.TammLogger;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
  * @author matthias
  */
 public class DBTable {
-  private static final Logger logger = LogManager.getLogger(DBTable.class);
+  private static final Logger logger = TammLogger.prepareLogger(DBTable.class);
   protected boolean isNewTable = false;
   protected String tableName;
   
