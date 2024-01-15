@@ -1,0 +1,16 @@
+TaMM Task Management & Monitoring
+
+A new user has been created for you in the system.
+
+You can use the link below to open a dialog for input
+a password.
+
+{[pwdrenewal]}
+
+This email was triggered by the administrator of your account
+has created. If you do not want to receive any further emails,
+You can block your email address using the link below.
+
+{[pwdmaillock]}
+
+This link is valid until {[pwdexpired]}. 

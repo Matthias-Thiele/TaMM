@@ -1,0 +1,16 @@
+Gestion et surveillance des tâches TaMM
+
+Un nouvel utilisateur a été créé pour vous dans le système.
+
+Vous pouvez utiliser le lien ci-dessous pour ouvrir une boîte de dialogue de saisie
+Un mot de passe.
+
+{[pwrenewal]}
+
+Cet e-mail a été déclenché par l'administrateur de votre compte
+a créé. Si vous ne souhaitez plus recevoir d'e-mails,
+Vous pouvez bloquer votre adresse e-mail en utilisant le lien ci-dessous.
+
+{[pwdmaillock]}
+
+Ce lien est valide jusqu'au {[pwdexpired]}.

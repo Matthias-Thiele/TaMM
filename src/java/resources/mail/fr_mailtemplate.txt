@@ -1,0 +1,19 @@
+Gestion et surveillance des tâches TaMM
+
+Un nouveau mot de passe pour le système TaMM a été demandé.
+
+Vous pouvez utiliser le lien ci-dessous pour ouvrir un dialogue sur le renouvellement
+du mot de passe.
+
+{[pwrenewal]}
+
+Si vous n'avez pas demandé cet email, vous pouvez le faire
+Ignorer le lien. Peut-être que quelqu'un d'autre utilise le vôtre
+Adresse e-mail pour provoquer des perturbations. Dans ce cas, vous pouvez
+Vous pouvez envoyer l'e-mail à votre adresse e-mail en utilisant ce qui suit
+Désactivez le lien.
+
+{[pwdmaillock]}
+
+Ce lien est valide jusqu'au {[pwdexpired]}. Après cette date
+une nouvelle clé doit être demandée.

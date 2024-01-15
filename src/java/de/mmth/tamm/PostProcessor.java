@@ -314,10 +314,10 @@ public class PostProcessor {
     params.put("pwdexpired", linkValidUntil);
     Placeholder ph = new Placeholder();
     
-    var htmlmessage = application.templates.getTemplate("mail/mailtemplate.html");
+    var htmlmessage = application.templates.getTemplate("mail/" + lang + "_mailtemplate.html");
     htmlmessage = ph.resolve(htmlmessage, params);
     
-    var textmessage = application.templates.getTemplate("mail/mailtemplate.txt");
+    var textmessage = application.templates.getTemplate("mail/" + lang + "_mailtemplate.txt");
     textmessage = ph.resolve(textmessage, params);
     
     String msg = Txt.get(lang, "pwd_renewal");

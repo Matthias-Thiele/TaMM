@@ -330,9 +330,11 @@ public class GetProcessor {
   }
 
   private void processInvitation(OutputStream resultData, SessionData session, String cmd4) {
+    String lang = session.lang;
+    
     try {
       var checkUser = application.users.readUser(session.client.id, Integer.parseInt(cmd4), null);
-      String lockInfo = ServletUtils.checkLocked(application, checkUser.mail, session.lang);
+      String lockInfo = ServletUtils.checkLocked(application, checkUser.mail, lang);
       
       String message = "";
       if (lockInfo == null) {
@@ -350,24 +352,24 @@ public class GetProcessor {
             params.put("newusermail", checkUser.mail);
             Placeholder ph = new Placeholder();
 
-            var htmlmessage = application.templates.getTemplate("mail/invitation.html");
+            var htmlmessage = application.templates.getTemplate("mail/" + lang + "_invitation.html");
             htmlmessage = ph.resolve(htmlmessage, params);
 
-            var textmessage = application.templates.getTemplate("mail/invitation.txt");
+            var textmessage = application.templates.getTemplate("mail/" + lang + "_invitation.txt");
             textmessage = ph.resolve(textmessage, params);
 
-            String msg = Txt.get(session.lang, "subject_invitation");
+            String msg = Txt.get(lang, "subject_invitation");
             application.mailer.send(application.adminData.mailreply, checkUser.mail, msg, textmessage, htmlmessage);
 
-            message = Txt.get(session.lang, "req_sent_per_mail");
+            message = Txt.get(lang, "req_sent_per_mail");
           } catch (EmailException ex) {
             logger.warn("Error sending mail.", ex);
-            message = Txt.get(session.lang, "error_send_mail");
+            message = Txt.get(lang, "error_send_mail");
           }
           
         }
       } else {
-        message = "Die verwendete EMail Adresse ist gesperrt";
+        message = Txt.get(lang, "mail_locked");
       }
       
       ServletUtils.sendResult(resultData, true, "", "", message, null);
