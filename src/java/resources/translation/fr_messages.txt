@@ -13,6 +13,7 @@ maillocks_deleted={[count]} e-mails ont été envoyés.
 # de GetProcessor
 mail_address_locked=L'adresse e-mail a été ajoutée à la liste des personnes bloquées.
 pwd_req_expired=La clé d'accès a déjà expiré.";
+subject_invitation=S'abonner à la gestion des tâches
 
 # du postprocesseur
 account_locked=Trop de tentatives infructueuses, le système est verrouillé pendant 10 minutes.

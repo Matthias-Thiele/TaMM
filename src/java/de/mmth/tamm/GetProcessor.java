@@ -12,6 +12,7 @@ import de.mmth.tamm.data.RoleAssignmentData;
 import de.mmth.tamm.data.RoleData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.utils.DateUtils;
+import de.mmth.tamm.utils.Placeholder;
 import de.mmth.tamm.utils.RequestCache;
 import de.mmth.tamm.utils.ServletUtils;
 import de.mmth.tamm.utils.Txt;
@@ -20,7 +21,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.apache.commons.mail.EmailException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,6 +35,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class GetProcessor {
   private static final Logger logger = LogManager.getLogger(GetProcessor.class);
+  private static final long PWD_INFO_VALID_MILLIS = 3600000;
   
   private final ApplicationData application;
   
@@ -94,6 +99,10 @@ public class GetProcessor {
         
       case "assignmentslist":
         processAssignmentsList(resultData, session, cmd4);
+        break;
+        
+      case "invitation":
+        processInvitation(resultData, session, cmd4);
         break;
     }
   }
@@ -318,6 +327,53 @@ public class GetProcessor {
     }
     
     ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, result);
+  }
+
+  private void processInvitation(OutputStream resultData, SessionData session, String cmd4) {
+    try {
+      var checkUser = application.users.readUser(session.client.id, Integer.parseInt(cmd4), null);
+      String lockInfo = ServletUtils.checkLocked(application, checkUser.mail, session.lang);
+      
+      String message = "";
+      if (lockInfo == null) {
+        if (application.mailer != null) {
+          String key = application.requests.add(checkUser, PWD_INFO_VALID_MILLIS, session.clientIp);
+          String validUntil = DateUtils.formatD(application.requests.getValidDate(key));
+          var requestUrl = application.tammUrl + "pwdreq.html";
+          var lockUrl = application.tammUrl + "system/lockmail/" + key;
+          try {
+            Map<String, String> params = new HashMap<>();
+            params.put("pwdrenewal", requestUrl);
+            params.put("pwdmaillock", lockUrl);
+            params.put("pwdexpired", validUntil);
+            params.put("newusername", checkUser.name);
+            params.put("newusermail", checkUser.mail);
+            Placeholder ph = new Placeholder();
+
+            var htmlmessage = application.templates.getTemplate("mail/invitation.html");
+            htmlmessage = ph.resolve(htmlmessage, params);
+
+            var textmessage = application.templates.getTemplate("mail/invitation.txt");
+            textmessage = ph.resolve(textmessage, params);
+
+            String msg = Txt.get(session.lang, "subject_invitation");
+            application.mailer.send(application.adminData.mailreply, checkUser.mail, msg, textmessage, htmlmessage);
+
+            message = Txt.get(session.lang, "req_sent_per_mail");
+          } catch (EmailException ex) {
+            logger.warn("Error sending mail.", ex);
+            message = Txt.get(session.lang, "error_send_mail");
+          }
+          
+        }
+      } else {
+        message = "Die verwendete EMail Adresse ist gesperrt";
+      }
+      
+      ServletUtils.sendResult(resultData, true, "", "", message, null);
+    } catch(TammError | IOException | NumberFormatException ex) {
+      logger.debug("Invalid send invitation mail for user id: " + cmd4);
+    }
   }
   
 }

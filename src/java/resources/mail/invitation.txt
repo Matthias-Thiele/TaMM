@@ -1,0 +1,18 @@
+TaMM Task Management & Monitoring
+
+Für Sie wurde ein neuer Anwender im System angelegt.
+
+Sie können über den nachfolgenden Link ein Dialog zur Eingabe 
+eines Passworts aufrufen.
+
+{[pwdrenewal]}
+
+Diese Mail wurde durch den Administrator ausgelöst, der Ihr Konto 
+angelegt hat. Wenn Sie keine weiteren Mails erhalten wollen, 
+können Sie Ihre Mailadresse durch den unten aufgeführten Link sperren.
+
+{[pwdmaillock]}
+
+Dieser Link ist bis zum {[pwdexpired]} gültig. Nach diesem Datum 
+muss ein neuer  Schlüssel angefordert werden.
+

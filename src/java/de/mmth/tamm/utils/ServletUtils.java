@@ -6,6 +6,7 @@ package de.mmth.tamm.utils;
 
 import com.google.gson.Gson;
 import de.mmth.tamm.ApplicationData;
+import de.mmth.tamm.TammError;
 import de.mmth.tamm.data.AttachmentData;
 import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.KeyValue;
@@ -201,4 +202,38 @@ public class ServletUtils {
     
     return syslogger;
   }
+  
+    /**
+   * Checks if the mail address accepts mails.
+   * 
+   * Invalid requests will be counted in the lock list.
+   * 
+   * @param application
+   * @param mail
+   * @param lang
+   * @return null if ok, otherwiese error message
+   * @throws TammError 
+   */
+  public static String checkLocked(ApplicationData application, String mail, String lang) throws TammError {
+    String message = null;
+    if (application.locks.checkLock(mail)) {
+      message = Txt.get(lang, "mail_locked");
+      application.locks.incrementLockCount(mail);
+    } else {
+      String domain = mail;
+      int pos = domain.indexOf('@');
+      if (pos > 0) {
+        domain = domain.substring(pos);
+      }
+      if (application.locks.checkLock(domain)) {
+        message = Txt.get(lang, "mail_domain_locked");
+        application.locks.incrementLockCount(domain);
+      } else if (!application.mailCounter.checkMaySend(domain)) {
+        message = Txt.get(lang, "total_mail_limit_reached");
+      }
+    }
+    
+    return message;
+  }
+
 }

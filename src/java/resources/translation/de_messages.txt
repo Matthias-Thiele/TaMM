@@ -12,7 +12,8 @@ maillocks_deleted=Es wurden {[count]} Mails versendet.
 
 # from GetProcessor
 mail_address_locked=Die Mail Adresse wurde in die Sperrliste aufgenommen.
-pwd_req_expired=Der Zugriffsschlüssel ist bereits abgelaufen.";
+pwd_req_expired=Der Zugriffsschlüssel ist bereits abgelaufen.
+subject_invitation=Anmeldung zum Task Management
 
 # from PostProcessor
 account_locked=Zu viele Fehlversuche, das System ist für 10 Minuten gesperrt.

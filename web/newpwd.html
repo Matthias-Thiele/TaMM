@@ -21,7 +21,7 @@ GNU General Public License v3.0
                 status.innerText = Txt.wait;
                 console.log(loginData);
                 
-                const fetchupdate = await fetch("system/updatepwd", {'method': 'POST', 'body': JSON.stringify(data)});
+                const fetchupdate = await fetch("system/updatepwd", {'method': 'POST', 'body': JSON.stringify(loginData)});
                 const response = await fetchupdate.json();
                 if (response.result === "ok") {
                   window.location = response.nextPage;

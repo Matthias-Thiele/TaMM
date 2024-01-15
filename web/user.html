@@ -201,6 +201,7 @@ GNU General Public License v3.0
                 fillAssignedRoles(userData.id);
                 
                 document.getElementById("save").disabled = true;
+                changed();
             }
             
             /**
@@ -208,7 +209,8 @@ GNU General Public License v3.0
              * @returns {undefined}
              */
             function changed() {
-                document.getElementById("save").disabled = false;
+                document.getElementById("save").disabled = !selectedUser.id;
+                document.getElementById("invitation").disabled = (!selectedUser.id || (selectedUser.id === "-1"));
             }
             
             /**
@@ -316,6 +318,22 @@ GNU General Public License v3.0
                     }
                 }
             }
+            
+            /**
+             * Sends an invitation email to the current user.
+             * 
+             * @returns {undefined}
+             */
+            async function sendInvitation() {
+                if (!selectedUser || selectedUser.id === "-1") {
+                    statusMsg(Txt.errornotsaved);
+                    return;
+                }
+                
+                const send = await fetch("system/invitation/" + selectedUser.id, {'method': 'GET'});
+                const response = await send.json();
+                statusMsg(response.message);
+            }
         </script>
     </head>
     <body onload="loadSessionData();">
@@ -361,7 +379,10 @@ GNU General Public License v3.0
                     <div><label for="lastlogin" data-key="lastlogin">Letzte Anmeldung</label><input id="lastlogin" readonly></div>
                     <div><label for="administrator" data-key="admin">Administrator</label><input id="administrator" list="usernames" onchange="changed()" readonly></div>
                     <div><label for="userid" data-key="id">Id</label><input type="text" id="userid" readonly></div>
-                    <div><button id="save" disabled onclick="doSave();" data-key="save">Speichern</button></div>
+                    <div>
+                        <button id="save" disabled onclick="doSave();" data-key="save">Speichern</button>
+                        <button id="invitation" disabled onclick="sendInvitation()" data-key="invitation">Einladung senden</button>
+                    </div>
                 </div>
                 <div>
                     <div>Zugeordnete Rollen</div>

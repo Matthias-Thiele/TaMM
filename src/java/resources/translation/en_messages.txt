@@ -13,6 +13,7 @@ maillocks_deleted={[count]} emails have been sent.
 # from GetProcessor
 mail_address_locked=The email address has been added to the blocked list.
 pwd_req_expired=The access key has already expired.";
+subject_invitation=Subscribe to Task Management
 
 # from PostProcessor
 account_locked=Too many failed attempts, the system is locked for 10 minutes.
