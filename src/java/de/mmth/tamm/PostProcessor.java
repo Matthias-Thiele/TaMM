@@ -12,6 +12,7 @@ import de.mmth.tamm.data.AttachmentData;
 import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.JsonResult;
+import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.LockData;
 import de.mmth.tamm.data.RoleAssignmentData;
 import de.mmth.tamm.data.RoleData;
@@ -41,6 +42,7 @@ import org.apache.logging.log4j.Logger;
 public class PostProcessor {
   private static final Logger logger = TammLogger.prepareLogger(PostProcessor.class);
   private static final long PWD_REQUEST_VALID_MILLIS = 3600000;
+  private static final long COOKIE_VALID_MILLIS = 3600000;
   
   private final ApplicationData application;
   private final UserProcessor userProcessor;
@@ -201,6 +203,11 @@ public class PostProcessor {
           session.user.pwd = ""; // do not leak password hash to the outer world.
           application.users.updateLoginDate(session.client.id, user.id, session.loginTime);
           loginValid = true;
+          
+          if (loginData.keep) {
+            var cookie = application.keepAlive.addLogin(user.id, COOKIE_VALID_MILLIS);
+            result.data = cookie;
+          }
         }
       } catch( TammError ex) {
         // loginValid stays false

@@ -22,6 +22,8 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -125,10 +127,11 @@ public class ServletUtils {
    * object will be created and populated with
    * initial data.
    * 
+   * @param application
    * @param request
    * @return 
    */
-  public static SessionData prepareSession(HttpServletRequest request) {
+  public static SessionData prepareSession(ApplicationData application, HttpServletRequest request) {
     HttpSession session = request.getSession();
     SessionData sd = (SessionData) session.getAttribute("TAMM");
     if (sd == null) {
@@ -144,6 +147,29 @@ public class ServletUtils {
         if (Txt.hasLanguage(locale.getLanguage())) {
           sd.lang = locale.getLanguage().substring(0, 2);
           break;
+        }
+      }
+    }  
+
+    if (sd.user == null) {
+      // check keep alive status
+      var cookies = request.getCookies();
+      for (var cookie: cookies) {
+        if (cookie.getName().equals("keepalive")) {
+          var uuid = cookie.getValue();
+          var userId = application.keepAlive.getUserId(uuid);
+          if (userId > 0) {
+            try {
+              ServletUtils.checkClientId(request, sd, application);
+              sd.user = application.users.readUser(sd.client.id, userId, null);
+              sd.loginTime = DateUtils.formatZ(null); 
+              sd.user.pwd = ""; // do not leak password hash to the outer world.
+              application.users.updateLoginDate(sd.client.id, userId, sd.loginTime);
+              logger.info("Re-login via cookie of user " + userId);
+            } catch (TammError ex) {
+              logger.warn("Cannot read keep alive user " + userId, ex);
+            }
+          }
         }
       }
     }

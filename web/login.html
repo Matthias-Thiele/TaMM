@@ -20,6 +20,8 @@ Task Management and Monitoring
                 var loginData = {};
                 loginData.name = document.getElementById("name").value;
                 loginData.pwd = document.getElementById("pwd").value;
+                loginData.keep = document.getElementById("keepalive").checked;
+                
                 var status = document.getElementById("status");
                 status.innerText = Txt.wait;
                 console.log(loginData);
@@ -27,6 +29,9 @@ Task Management and Monitoring
                 const fetchlogin = await fetch("system/login", {'method': 'POST', 'body': JSON.stringify(loginData)});
                 const response = await fetchlogin.json();
                 if (response.result === "ok") {
+                    if (response.data) {
+                        document.cookie = "keepalive=" + response.data + "; expires=" + toDay(100) + "; path=/"; 
+                    }
                     var dest = getUrlParam("next");
                     if (dest) {
                         response.nextPage = dest;
@@ -45,6 +50,7 @@ Task Management and Monitoring
             <div class="header">TaMM - Task Management & Monitoring</div>
             <div><label data-key="username">Anwendername</label><input type="text" id="name"></div>
             <div><label data-key="password">Passwort</label><input type="password" id="pwd"></div>
+            <div><span data-key="keepalive" style="margin: 5pt;">Angemeldet bleiben</span><input type="checkbox" id="keepalive"></div>
             <div><button id="login" onclick="doLogin();" data-key="dologin">Anmelden</button></div>
             <div style="margin: 3pt; font-size: 10pt;"><a href="pwdreq.html" data-key="pwdreq">Passwort anfordern</a></div>
             <div class="statusbar" id="status"></div>

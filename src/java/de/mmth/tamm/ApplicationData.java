@@ -17,6 +17,7 @@ import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.progress.SendMail;
 import de.mmth.tamm.utils.InvalidAccessCache;
+import de.mmth.tamm.utils.KeepAliveCache;
 import de.mmth.tamm.utils.LimitSentMails;
 import de.mmth.tamm.utils.Obfuscator;
 import de.mmth.tamm.utils.Placeholder;
@@ -80,6 +81,8 @@ public class ApplicationData {
   public TemplateCache templates = new TemplateCache("templates");
   public InvalidAccessCache accessCache = new InvalidAccessCache(MAX_RETRIES, DECAY_INTERVAL);
   public LimitSentMails mailCounter = new LimitSentMails(MAX_MAILS_PER_PERIOD, MAX_MAILS_PER_DOMAIN_PER_PERIOD, CLEAR_MAIL_COUNTER_PERIOD);
+  public KeepAliveCache keepAlive = new KeepAliveCache();
+  
   public Placeholder placeholder = new Placeholder();
   private ClientData defaultClient = null;
   
@@ -133,10 +136,16 @@ public class ApplicationData {
         prepareUploadBase();
         
         if (rootPath != null) {
-          File destination = new File(rootPath, "requestCache.lines");
-          if (destination.exists()) {
-            requests.load(destination.toPath());
+          File requestCache = new File(rootPath, "requestCache.lines");
+          if (requestCache.exists()) {
+            requests.load(requestCache.toPath());
           }
+          
+          File keepAliveCache = new File(rootPath, "keepAliveCache.lines");
+          if (keepAliveCache.exists()) {
+            keepAlive.load(keepAliveCache.toPath());
+          }
+          
           templates.setFileRoot(rootPath);
         }
       }

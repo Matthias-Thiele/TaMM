@@ -14,6 +14,7 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URLDecoder;
@@ -65,9 +66,13 @@ public class System extends HttpServlet {
     backgroundWorker.interrupt();
     
     if (application.rootPath != null) {
-      File destination = new File(application.rootPath, "requestCache.lines");
-      destination.delete();
-      application.requests.save(destination.toPath());
+      File requestCache = new File(application.rootPath, "requestCache.lines");
+      requestCache.delete();
+      application.requests.save(requestCache.toPath());
+      
+      File keepAliveCache = new File(application.rootPath, "keepAliveCache.lines");
+      keepAliveCache.delete();
+      application.keepAlive.save(keepAliveCache.toPath());
     }
   }
   
@@ -85,7 +90,7 @@ public class System extends HttpServlet {
     try (InputStream content = request.getInputStream()) {
       ServletOutputStream out = response.getOutputStream();
       try {
-        SessionData sd = ServletUtils.prepareSession(request);
+        SessionData sd = ServletUtils.prepareSession(application, request);
 
         String requestUri = request.getRequestURI();
         String[] uriParts = requestUri.split("/");
@@ -111,6 +116,10 @@ public class System extends HttpServlet {
         }
         
         getProcessor.process(sd, cmd, content, out, cmd4);
+        if (cmd.equals("logout")) {
+          HttpSession session = request.getSession();
+          session.removeAttribute("TAMM");
+        }
         out.flush();
       } catch(TammError te) {
         ServletUtils.sendResult(out, false, "", "", te.getMessage(), null);
@@ -141,7 +150,7 @@ public class System extends HttpServlet {
     }
     
     try (InputStream content = request.getInputStream()) {
-      SessionData sd = ServletUtils.prepareSession(request);
+      SessionData sd = ServletUtils.prepareSession(application, request);
       ServletOutputStream out = response.getOutputStream();
 
       try {
@@ -185,7 +194,7 @@ public class System extends HttpServlet {
     try (InputStream content = request.getInputStream()) {
       ServletOutputStream out = response.getOutputStream();
       try {
-        SessionData sd = ServletUtils.prepareSession(request);
+        SessionData sd = ServletUtils.prepareSession(application, request);
 
         String requestUri = request.getRequestURI();
         String[] uriParts = requestUri.split("/");

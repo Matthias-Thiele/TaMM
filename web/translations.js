@@ -130,6 +130,7 @@ TxtDe.notpersisted = "Daten nicht dauerhaft gespeichert, nur für diesen Lauf";
 TxtDe.syssaved = "Systemdaten gespeichert.";
 TxtDe.errornotsaved = "Der Anwender wurde noch nicht angelegt.";
 TxtDe.invitation = "Einladung versenden";
+TxtDe.keepalive = "Angemeldet bleiben";
 
 var TxtFr = {};
 TxtFr.home = "Liste des tâches" ;
@@ -257,6 +258,7 @@ TxtFr.notpersisted = "Données non conservées, uniquement pour cette exécution
 TxtFr.syssaved = "Données système enregistrées.";
 TxtFr.errornotsaved = "L'utilisateur n'a pas encore été créé.";
 TxtFr.invitation = "Envoyer une invitation";
+TxtFr.keepalive = "Rester connecté";
 
 var TxtEn = {};
 TxtEn.home = "Task List";
@@ -384,6 +386,7 @@ TxtEn.notpersisted = "Data not persisted, changed only for this run";
 TxtEn.syssaved = "System data saved.";
 TxtEn.errornotsaved = "The user has not been created yet.";
 TxtEn.invitation = "Send invitation";
+TxtEn.keepalive = "Stay logged in";
 
 var Txt;
 

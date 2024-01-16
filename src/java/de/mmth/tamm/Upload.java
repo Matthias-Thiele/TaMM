@@ -55,7 +55,7 @@ public class Upload extends HttpServlet {
     ApplicationData application = getApplication();
     ServletOutputStream out = response.getOutputStream();
     try {
-      SessionData sd = ServletUtils.prepareSession(request);
+      SessionData sd = ServletUtils.prepareSession(application, request);
 
       String requestUri = request.getRequestURI();
       String[] uriParts = requestUri.split("/");
@@ -94,8 +94,8 @@ public class Upload extends HttpServlet {
    */
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    SessionData sd = ServletUtils.prepareSession(request);
     ApplicationData application = getApplication();
+    SessionData sd = ServletUtils.prepareSession(application, request);
     long taskId = Long.parseLong(request.getParameter("taskid"));
     logger.info("Write attachments for task " + taskId);
     
@@ -142,8 +142,8 @@ public class Upload extends HttpServlet {
    */
   @Override
   public void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    SessionData sd = ServletUtils.prepareSession(request);
     ApplicationData application = getApplication();
+    SessionData sd = ServletUtils.prepareSession(application, request);
     String requestUri = request.getRequestURI();
     String[] uriParts = requestUri.split("/");
     String guid = uriParts[3];

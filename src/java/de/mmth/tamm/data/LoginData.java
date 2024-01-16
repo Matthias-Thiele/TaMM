@@ -15,4 +15,5 @@ public class LoginData {
   public String name;
   public String pwd;
   public String key;
+  public boolean keep;
 }

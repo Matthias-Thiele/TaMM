@@ -207,8 +207,8 @@ Userlist.prototype.createPart = function(list, part) {
         option.key = idName.id;
         list.appendChild(option);
     });
-    
-}
+};
+
 /**
  * Converts an user id into an user name.
  * @param {type} userName
