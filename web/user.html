@@ -11,6 +11,22 @@ GNU General Public License v3.0
         <link rel="shortcut icon" href="favicon.ico"/> 
         <link rel="stylesheet" href="tamm.css">
         <link rel="stylesheet" href="menu.css">
+        <style>
+            .selectionText {
+                margin-top: 4pt;
+                background-color: #f8f8fc;
+                box-shadow: 2px 1px 1px gray;
+                border-radius: 3pt;
+                padding: 5pt;
+                margin: 10pt;
+                cursor: pointer;  
+            }
+            
+            .selectionText:hover {
+                background-color: #f8fcf8;
+                box-shadow: 3px 2px 2px olive;
+            }
+        </style>
         <script src="translations.js"></script> 
         <script src="common.js"></script> 
         <script>
@@ -84,8 +100,7 @@ GNU General Public License v3.0
                 if (response.result === "ok") {
                   statusMsg(Txt.usersaved + response.data);
                   checkSaveRoleAssignments(response.data);
-                  emptyUser = {};
-                  fillForm(emptyUser);
+                  filterUsers();
                 } else {
                     if (!response.message) {
                         response.message = Txt.erroronsave;
@@ -132,6 +147,8 @@ GNU General Public License v3.0
                     data.filterText = data.filterText + "%";
                 }
                 data.onlyAdmins = getValue("onlyadmins");
+                emptyUser = {};
+                fillForm(emptyUser);
                 console.log(data);
                 statusMsg("Warte auf Server...");
                 
@@ -211,6 +228,8 @@ GNU General Public License v3.0
             function changed() {
                 document.getElementById("save").disabled = !selectedUser.id;
                 document.getElementById("invitation").disabled = (!selectedUser.id || (selectedUser.id === "-1"));
+                document.getElementById("deluser").disabled = (!selectedUser.id || (selectedUser.id === "-1"));
+                hideDialog();
             }
             
             /**
@@ -334,6 +353,38 @@ GNU General Public License v3.0
                 const response = await send.json();
                 statusMsg(response.message);
             }
+            
+            function startDeleteUser() {
+                document.getElementById("querydelete").style.display = "block";
+            }
+            
+            async function doDeleteUser(event) {
+                if (event.srcElement.tagName !== "INPUT") {
+                    console.log(event);
+                    var deputy = "";
+                    if (event.currentTarget.id === "deleteusermovetasks") {
+                        deputy = getValue("substitute");
+                    }
+                    
+                    hideDialog();
+                    setValue("substitute", "");
+                    
+                    console.log(deputy);
+                    data = {};
+                    data.deleteId = selectedUser.id;
+                    data.clientId = selectedUser.clientId;
+                    data.substituteId = (deputy) ? userNames.idFromName(deputy) : -1;
+                    const send = await fetch("system/deleteuser", {'method': 'DELETE', 'body': JSON.stringify(data)});
+                    const response = await send.json();
+                    statusMsg(response.message);
+                    filterUsers();
+                }
+            }
+            
+            function hideDialog() {
+                document.getElementById("querydelete").style.display = "none";
+            }
+            
         </script>
     </head>
     <body onload="loadSessionData();">
@@ -383,6 +434,7 @@ GNU General Public License v3.0
                     <div>
                         <button id="save" disabled onclick="doSave();" data-key="save">Speichern</button>
                         <button id="invitation" disabled onclick="sendInvitation()" data-key="invitation">Einladung senden</button>
+                        <button id="deluser" disabled onclick="startDeleteUser()" data-key="deluser">Anwender löschen</button>
                     </div>
                 </div>
                 <div>
@@ -390,6 +442,25 @@ GNU General Public License v3.0
                     <div><button onclick="addRole()" data-key="addrole">Neue Rolle hinzufügen</button></div>
                     <hr>
                     <div id="roleitems"></div>
+                </div>
+            </div>
+            <div id="querydelete" class="modal-content" style="width:400pt">
+                <div class="modal-header">
+                    <h2 data-key="deluser">Anwender löschen.</h2>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size: 125%;"><span data-key="dlgdeleteuserbody1">Wollen Sie den aktuellen Anwender löschen?</span></p>
+                    <div class="selectionText" onclick="hideDialog()">
+                        <span data-key="dlgdeleteuserchoice1">Nein, den aktuellen Anwender nicht löschen.</span>
+                    </div>
+                    <div id="deleteusermovetasks" class="selectionText" onclick="doDeleteUser(event)">
+                        <span data-key="dlgdeleteuserchoice2a">Ja, den akutellen Anwender löschen und seine Aufgaben an den Anwender </span>
+                        <input id="substitute" list="usernames" style="margin: 3pt;" onchange="updateListInput(event, userNames)">
+                        <span data-key="dlgdeleteuserchoice2b"> übertragen</span>
+                    </div>
+                    <div id="deleteuserandtasks" class="selectionText" onclick="doDeleteUser(event)">
+                        <span data-key="dlgdeleteuserchoice3">Ja, den aktuellen Anwender und alle Aufgaben die ihm zugeordnet sind löschen.</span>
+                    </div>
                 </div>
             </div>
             <div class="statusbar" id="status"></div>

@@ -102,7 +102,20 @@ public class TaskTableTest {
       // as expected
     }
     
+    int newOwner = 459;
+    int count = instance.moveTasksOwner(clientId, task.owner, newOwner);
+    assertEquals("Only one task has been moved.", 1, count);
     
+    TaskData task4 = instance.readTask(clientId, task2.lId);
+    assertEquals("Task owner not changed", newOwner, task4.owner);
+    
+    instance.deleteTasksOfOwner(clientId, newOwner);
+    try {
+      instance.readTask(clientId, task2.lId);
+      fail("Reading a deleted task should have raised an exception.");
+    } catch(TammError e) {
+      // as expected
+    }
   }
 
 }

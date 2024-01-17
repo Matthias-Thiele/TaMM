@@ -70,8 +70,12 @@ label {
     box-shadow: 2px 1px 1px gray;
     border-radius: 3pt;
     padding: 3pt;
-    margin: 3pt;
+    margin: 4pt;
     cursor: pointer;
+}
+
+.listitem:hover {
+    box-shadow: 3px 2px 2px navy;
 }
 
 .roleitem {

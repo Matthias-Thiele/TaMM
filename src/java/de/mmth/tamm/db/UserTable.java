@@ -118,6 +118,7 @@ public final class UserTable extends DBTable {
       logger.warn("Error reading user data.", ex);
       throw new TammError("Error reading user data.");
     }
+    
     return result;
   }
   
@@ -196,6 +197,32 @@ public final class UserTable extends DBTable {
     } catch (SQLException ex) {
       logger.warn("Error updating login date.", ex);
       throw new TammError("Error updating login date.");
+    }
+  }
+  
+  /**
+   * Deletes the given user from the users table.
+   * 
+   * @param clientId
+   * @param userId
+   * @throws TammError 
+   */
+  public void deleteUser(int clientId, int userId) throws TammError {
+    String cmd;
+    cmd = "DELETE FROM " + tableName + " where clientid = ? and id = ? ";
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        var col = 1;
+        stmt.setInt(col++, clientId);
+        stmt.setInt(col++, userId);
+
+        stmt.execute();
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error deleting user data.", ex);
+      throw new TammError("Error deleting user data.");
     }
   }
   

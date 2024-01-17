@@ -4,16 +4,24 @@
  */
 package de.mmth.tamm;
 
+import com.google.gson.Gson;
 import de.mmth.tamm.data.ClientData;
+import de.mmth.tamm.data.DeleteData;
+import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.LockData;
+import de.mmth.tamm.data.LoginData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.data.TaskData;
+import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.CleanType;
 import de.mmth.tamm.utils.ServletUtils;
 import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.util.logging.Level;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -75,6 +83,10 @@ public class DeleteProcessor {
         
       case "cleanmaillocks":
         processCleanLocks(resultData, session, CleanType.MAIL_LOCKS);
+        break;
+        
+      case "deleteuser":
+        processDeleteUser(resultData, session, sourceData);
         break;
     }
   }
@@ -219,5 +231,75 @@ public class DeleteProcessor {
     
     ServletUtils.sendResult(resultData, isOk, "", "", message, null);
   }
+
+  // ToDo: check rights
+  private void processDeleteUser(OutputStream resultData, SessionData session, InputStream sourceData) throws IOException, TammError {
+    String message;
+    try (Reader reader = new InputStreamReader(sourceData)) {
+      DeleteData data = new Gson().fromJson(reader, DeleteData.class);
+      logger.warn("Process delete user request for " + data.deleteId);
+      var user = application.users.readUser(data.clientId, data.deleteId, null);
+      if (user == null) {
+        message = Txt.get(session.lang, "user_not_found");
+      } else {
+        if (data.substituteId > 0) {
+          boolean substExists = existsUserOrRole(user.clientId, data.substituteId);
+          if (substExists) {
+            message = doDelete(user, data.substituteId);
+          } else {
+            message = Txt.get(session.lang, "substitute_not_found");
+          }
+        } else {
+          message = doDelete(user, -1);
+        }
+      }
+      
+      ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, null);
+    }
+  }
   
+  /**
+   * Checks if the given userRoleId exists as an user or a role.
+   * 
+   * @param clientId
+   * @param userRoleId
+   * @return
+   * @throws TammError 
+   */
+  private boolean existsUserOrRole(int clientId, int userRoleId) {
+    try {
+      if (userRoleId > 1000000) {
+        var roleClientId = application.roles.getRoleClient(userRoleId);
+        return roleClientId > 0;
+      } else {
+          var user = application.users.readUser(clientId, userRoleId, null);
+          return user != null;
+      }
+    } catch (TammError ex) {
+      return false;
+    }
+  }
+  
+  /**
+   * Delete the given user.
+   * If substitute is given a valid id, then move all tasks
+   * of this user to the substitute. Otherwise delete all tasks
+   * of this user.
+   * 
+   * @param user
+   * @param substitute
+   * @return
+   * @throws TammError 
+   */
+  private String doDelete(UserData user, int substitute) throws TammError {
+    var message = "";
+    if (substitute > 0) {
+      application.tasks.moveTasksOwner(user.clientId, user.id, substitute);
+    } else {
+      application.tasks.deleteTasksOfOwner(user.clientId, user.id);
+    }
+    
+    application.users.deleteUser(user.clientId, user.id);
+    return message;
+  }
 }

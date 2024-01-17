@@ -138,6 +138,13 @@ public class UserTableTest {
     List<UserData> users5 = instance.listUsers(clientId + 99, -1, "test%", false);
     assertEquals("No users expected.", 0, users5.size());
 
+    instance.deleteUser(clientId, userid);
+    try {
+      UserData user6 = instance.readUser(clientId, userid, null);
+      fail("User has been deleted:" + user6.name);
+    } catch( TammError ex) {
+      // as expected - user not found
+    }
   }
 
 }

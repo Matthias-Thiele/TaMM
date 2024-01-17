@@ -153,6 +153,38 @@ public class RoleTable extends DBTable {
   }
   
   /**
+   * Returns the client id to the given role.
+   * 
+   * @param roleId
+   * @return
+   * @throws TammError 
+   */
+  public int getRoleClient(int roleId) throws TammError {
+    int result = -1;
+    
+    var cmd = "SELECT clientid FROM " + tableName + " WHERE id = ? ";
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        stmt.setInt(1, roleId);
+        
+        var rows = stmt.executeQuery();
+        if (rows.next()) {
+          result = rows.getInt(1);
+          logger.debug("Role found, client id: " + result);
+        }
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error finding role client.", ex);
+      throw new TammError("Error finding role client.");
+    }
+    
+    return result;
+  }
+  
+  
+  /**
    * Copies the ResultSet role data into an RoleData object.
    * 
    * @param rows

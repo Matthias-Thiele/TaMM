@@ -57,6 +57,9 @@ public class RoleTableTest {
     int result = instance.writeRole(role);
     assertEquals("Role ids start with 0x1000000", 16777216, result);
     
+    int clientId = instance.getRoleClient(result);
+    assertEquals("ClientId mismatch", role.clientId, clientId);
+    
     var roles = instance.listRoles(role.clientId, role.owner);
     assertEquals("Only one role written", 1, roles.size());
     

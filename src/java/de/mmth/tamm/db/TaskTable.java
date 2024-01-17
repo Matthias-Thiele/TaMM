@@ -295,4 +295,64 @@ public class TaskTable extends DBTable {
     }
   }
 
+  /**
+   * Move all tasks of oldOwnerId to newOwnerId.
+   * 
+   * newOwnerId can be a role id.
+   * 
+   * @param clientId
+   * @param oldOwnerId
+   * @param newOwnerId
+   * @return
+   * @throws TammError 
+   */
+  public int moveTasksOwner(int clientId, int oldOwnerId, int newOwnerId) throws TammError {
+    String cmd;
+    cmd = "UPDATE " + tableName + " set owner = ? where owner = ? and clientid = ?";
+    logger.debug("SQL: " + cmd);
+    
+    int count = 0;
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        var col = 1;
+        stmt.setInt(col++, newOwnerId);
+        stmt.setInt(col++, oldOwnerId);
+        stmt.setInt(col++, clientId);
+
+        count = stmt.executeUpdate();
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error moving tasks.", ex);
+      throw new TammError("Error moving tasks.");
+    }
+    
+    return count;
+  }
+
+  /**
+   * Delete all tasks of the given owner.
+   * 
+   * @param clientId
+   * @param id
+   * @throws TammError 
+   */
+  public void deleteTasksOfOwner(int clientId, int id) throws TammError {
+    String cmd;
+    cmd = "DELETE FROM " + tableName + " where owner = ? and clientid = ?";
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        var col = 1;
+        stmt.setInt(col++, id);
+        stmt.setInt(col++, clientId);
+
+        stmt.execute();
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error deleting tasks of owner.", ex);
+      throw new TammError("Error deleting tasks.");
+    }
+  }
+  
 }
