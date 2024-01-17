@@ -12,7 +12,6 @@ import de.mmth.tamm.data.AttachmentData;
 import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.FindData;
 import de.mmth.tamm.data.JsonResult;
-import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.data.LockData;
 import de.mmth.tamm.data.RoleAssignmentData;
 import de.mmth.tamm.data.RoleData;
@@ -41,8 +40,8 @@ import org.apache.logging.log4j.Logger;
  */
 public class PostProcessor {
   private static final Logger logger = TammLogger.prepareLogger(PostProcessor.class);
-  private static final long PWD_REQUEST_VALID_MILLIS = 3600000;
-  private static final long COOKIE_VALID_MILLIS = 3600000;
+  private static final long MILLIS_PER_HOUR = 1000 * 60 * 60;
+  private static final long MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
   
   private final ApplicationData application;
   private final UserProcessor userProcessor;
@@ -66,6 +65,7 @@ public class PostProcessor {
    * @param cmd
    * @param sourceData
    * @param resultData
+   * @param cmd4
    * @throws IOException 
    * @throws de.mmth.tamm.TammError 
    */
@@ -205,7 +205,7 @@ public class PostProcessor {
           loginValid = true;
           
           if (loginData.keep) {
-            var cookie = application.keepAlive.addLogin(user.id, COOKIE_VALID_MILLIS);
+            var cookie = application.keepAlive.addLogin(user.id, application.adminData.keepalivetime * MILLIS_PER_DAY);
             result.data = cookie;
           }
         }
@@ -273,7 +273,7 @@ public class PostProcessor {
       if (message == null) {
         var checkUser = application.users.readUser(session.client.id, -1, userData.name);
         if (checkUser.name.equalsIgnoreCase(userData.name) && (checkUser.mail.equalsIgnoreCase(userData.mail))) {
-          String key = application.requests.add(checkUser, PWD_REQUEST_VALID_MILLIS, session.clientIp);
+          String key = application.requests.add(checkUser, application.adminData.pwdreqvaildhours * MILLIS_PER_HOUR, session.clientIp);
           String validUntil = DateUtils.formatD(application.requests.getValidDate(key));
           logger.warn("Request: " + application.tammUrl + "newpwd.html?key=" + key);
           if (application.mailer != null) {

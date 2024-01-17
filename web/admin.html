@@ -12,6 +12,23 @@ GNU General Public License v3.0
         <link rel="stylesheet" href="menu.css">
         <link rel="shortcut icon" href="favicon.ico"/> 
         <style>
+            .bodybox {
+                max-width: 95%;
+            }
+            
+            .small-number {
+                width: 60pt;
+            }
+            
+            .long-label {
+                width: 180pt;
+            }
+            
+            .blockbutton {
+                width: 130pt;
+                margin-top: 5pt;
+            }
+            
             .admin-sidebar {
                 display:flex;
                 flex-wrap:wrap;
@@ -33,14 +50,20 @@ GNU General Public License v3.0
                 }
 
                 .admin-sidebar > *:nth-child(2) {
-                    width:calc(88% / 3);
+                    width:calc(88% / 4);
                     max-width: 180pt;
                     order:-1;
                     border-right: 1px solid silver
                 }
 
+                .admin-sidebar > *:nth-child(4) {
+                    width:calc(88% / 4);
+                    order:-1;
+                    border-right: 1px solid silver
+                }
+
                 .admin-sidebar > *:nth-child(3) {
-                    width:calc(88% / 3);
+                    width:calc(88% / 4);
                     order:-1;
                     border-right: 1px solid silver
                 }
@@ -91,6 +114,11 @@ GNU General Public License v3.0
                     setValue("mailadminpwd", data.mailadminpwd);
                     setValue("mailhost", data.mailhost);
                     setValue("mailreply", data.mailreply);
+                    setValue("keepalivetime", data.keepalivetime);
+                    setValue("mailsperdomainperday", data.mailsperdomainperday);
+                    setValue("mailsperday", data.mailsperday);
+                    setValue("loginretry", data.loginretry);
+                    setValue("pwdreqvaildhours", data.pwdreqvaildhours);
                 }
                 
                 const clients = await fetch("system/clientlist", {'method': 'GET'});
@@ -117,6 +145,12 @@ GNU General Public License v3.0
                 data.mailadminpwd = getValue("mailadminpwd");
                 data.mailhost = getValue("mailhost");
                 data.mailreply = getValue("mailreply");
+                data.keepalivetime = getValue("keepalivetime");
+                data.mailsperdomainperday = getValue("mailsperdomainperday");
+                data.mailsperday = getValue("mailsperday");
+                data.loginretry = getValue("loginretry");
+                data.pwdreqvaildhours = getValue("pwdreqvaildhours");
+                
                 var permanent = document.getElementById("savepermanently").checked ? "/permanent" : "";
                
                 console.log(data);
@@ -292,14 +326,30 @@ GNU General Public License v3.0
                     <div><label for="mailhost" data-key="mailhost">Hostname</label><input type="text" id="mailhost"></div>
                     <div><label for="mailreply" data-key="mailreplyto">Reply-To Name</label><input type="text" id="mailreply"></div>
                     <hr>
-                    <div><label for="savepermanently" data-key="savepermanently">Parameter dauerhaft speichern</label><input type="checkbox" id="savepermanently"></div>
+                    <div>
+                        <button id="clear" onclick="doClear()" data-key="clear">Anzeige leeren</button>
+                    </div>
+                </div>
+                <div id="params">
+                    <h4><span data-key="params">Einstellungen</span></h4>
+                    <hr>
+                    <div><label for="keepalivetime" data-key="keepalivetime" class="long-label">Cookie Lebensdauer</label><input type="number" max="1000" min="0" id="keepalivetime" class="small-number"></div>
+                    <div><label for="mailsperday" data-key="mailsperday" class="long-label">Max versendete Mails pro Tag</label><input type="number" max="100000" min="0" id="mailsperday" class="small-number"></div>
+                    <div><label for="mailsperdomainperday" data-key="mailsperdomainperday" class="long-label">Mails pro Domäne</label><input type="number" max="10000" min="0" id="mailsperdomainperday" class="small-number"></div>
+                    <div><label for="loginretry" data-key="loginretry" class="long-label">Fehlgeschlagene Loginversuche</label><input type="number" max="20" min="1" id="loginretry" class="small-number"></div>
+                    <div><label for="pwdreqvaildhours" data-key="pwdreqvaildhours" class="long-label">Passwort-Link gültig Stunden</label><input type="number" max="1000" min="1" id="pwdreqvaildhours" class="small-number"></div>
+                    <hr>
                     <div>
                         <span data-key="loadparams">Parameterliste laden</span>
                         <input type='file' accept='text/plain' onchange='openFile(event)' >
-                        <hr>
-                        <button id="save" onclick="doSave();" data-key="saveparams">Parameter speichern</button>
-                        <button id="clear" onclick="doClear()" data-key="clear">Anzeige leeren</button>
                     </div>
+                    <hr>
+                    <div><input type="checkbox" id="savepermanently"><label for="savepermanently" data-key="savepermanently" class="long-label">Parameter dauerhaft speichern</label></div>
+                    <button id="save" onclick="doSave();" data-key="saveparams">Parameter speichern</button>
+                    <hr>
+                    <div><Button onclick="cleanTemplates()" style="margin-right:10pt" data-key="reloadtempl" class="blockbutton">Vorlagenspeicher neu laden</Button></div>
+                    <div><Button onclick="cleanIPlocks()" style="margin-right:10pt" data-key="cleaniplocks" class="blockbutton">IP Anmeldesperren löschen</Button></div>
+                    <div><Button onclick="cleanMaillocks()" style="margin-right:10pt" data-key="cleanmaillocks" class="blockbutton">Mail Versendezähler löschen</Button></div>
                 </div>
                 <div id="clientcol">
                     <h4><span data-key="clients">Mandanten</span><button style="margin-left: 10pt;" onclick="createClient();" data-key="new">Neu</button></h4>
@@ -319,9 +369,6 @@ GNU General Public License v3.0
                 </div>
             </div>
             <div class="statusbar" id="statusbar">
-                <Button onclick="cleanTemplates()" style="margin-right:10pt" data-key="reloadtempl">Vorlagenspeicher neu laden</Button>
-                <Button onclick="cleanIPlocks()" style="margin-right:10pt" data-key="cleaniplocks">IP Anmeldesperren löschen</Button>
-                <Button onclick="cleanMaillocks()" style="margin-right:10pt" data-key="cleanmaillocks">Mail Versendezähler löschen</Button>
                 <span id="status"></span>
             </div>
         </div>

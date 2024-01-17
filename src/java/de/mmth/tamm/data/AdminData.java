@@ -24,4 +24,11 @@ public class AdminData {
   public String mailadminpwd;
   public String mailhost;
   public String mailreply;
+  
+  // System constants
+  public int keepalivetime;
+  public int mailsperdomainperday;
+  public int mailsperday;
+  public int loginretry;
+  public int pwdreqvaildhours; 
 }

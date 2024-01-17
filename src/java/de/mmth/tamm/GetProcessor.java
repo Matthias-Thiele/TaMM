@@ -34,7 +34,6 @@ import org.apache.logging.log4j.Logger;
  */
 public class GetProcessor {
   private static final Logger logger = TammLogger.prepareLogger(GetProcessor.class);
-  private static final long PWD_INFO_VALID_MILLIS = 3600000;
   
   private final ApplicationData application;
   
@@ -338,7 +337,7 @@ public class GetProcessor {
       String message = "";
       if (lockInfo == null) {
         if (application.mailer != null) {
-          String key = application.requests.add(checkUser, PWD_INFO_VALID_MILLIS, session.clientIp);
+          String key = application.requests.add(checkUser, application.adminData.pwdreqvaildhours * 3600000, session.clientIp);
           String validUntil = DateUtils.formatD(application.requests.getValidDate(key));
           var requestUrl = application.tammUrl + "pwdreq.html";
           var lockUrl = application.tammUrl + "system/lockmail/" + key;

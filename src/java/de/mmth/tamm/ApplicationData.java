@@ -48,12 +48,14 @@ public class ApplicationData {
   private static final String MAIL_ADMIN = "mailadmin";
   private static final String MAIL_PWD = "mailpwd";
   private static final String MAIL_REPLY = "mailreply";
+  private static final String CONST_KEEP_ALIVE = "keepalive";
+  private static final String CONST_MAILS_PER_DOMAIN = "mailsperdomain";
+  private static final String CONST_MAILS_PER_DAY = "mailsperday";
+  private static final String CONST_LOGIN_RETRY = "loginretry";
+  private static final String CONST_PWD_REQ_HOURS = "pwdreqvaildhours";
   
-  private static final int MAX_RETRIES = 3;
   private static final long DECAY_INTERVAL = 600000;
-  private static final int MAX_MAILS_PER_PERIOD = 100;
-  private static final int MAX_MAILS_PER_DOMAIN_PER_PERIOD = 20;
-  private static final int CLEAR_MAIL_COUNTER_PERIOD = 600000;
+  private static final int CLEAR_MAIL_COUNTER_PERIOD = 1000 * 60 * 60 * 24; // one day
   
   private String schemaName;
   private String hostName;
@@ -79,8 +81,8 @@ public class ApplicationData {
   public AttachmentTable attachments;
   public SendMail mailer = null;
   public TemplateCache templates = new TemplateCache("templates");
-  public InvalidAccessCache accessCache = new InvalidAccessCache(MAX_RETRIES, DECAY_INTERVAL);
-  public LimitSentMails mailCounter = new LimitSentMails(MAX_MAILS_PER_PERIOD, MAX_MAILS_PER_DOMAIN_PER_PERIOD, CLEAR_MAIL_COUNTER_PERIOD);
+  public InvalidAccessCache accessCache = new InvalidAccessCache(adminData.loginretry, DECAY_INTERVAL);
+  public LimitSentMails mailCounter = new LimitSentMails(adminData.mailsperday, adminData.mailsperdomainperday, CLEAR_MAIL_COUNTER_PERIOD);
   public KeepAliveCache keepAlive = new KeepAliveCache();
   
   public Placeholder placeholder = new Placeholder();
@@ -107,6 +109,11 @@ public class ApplicationData {
     adminData.mailadminpwd = prefs.get(MAIL_PWD, "");
     adminData.mailhost = prefs.get(MAIL_HOST, "");
     adminData.mailreply = prefs.get(MAIL_REPLY, "");
+    adminData.keepalivetime = prefs.getInt(CONST_KEEP_ALIVE, 100);
+    adminData.mailsperday = prefs.getInt(CONST_MAILS_PER_DAY, 300);
+    adminData.mailsperdomainperday = prefs.getInt(CONST_MAILS_PER_DOMAIN, 100);
+    adminData.loginretry = prefs.getInt(CONST_LOGIN_RETRY, 3);
+    adminData.pwdreqvaildhours = prefs.getInt(CONST_PWD_REQ_HOURS, 24);
     
     var obf = prepareObfuscator();
     adminData.password = obf.decrypt(obfuscatorKey, hostName, adminData.password);
@@ -277,6 +284,11 @@ public class ApplicationData {
     prefs.put(MAIL_PWD, data.mailadminpwd);
     prefs.put(MAIL_HOST, data.mailhost);
     prefs.put(MAIL_REPLY, data.mailreply);
+    prefs.putInt(CONST_KEEP_ALIVE, data.keepalivetime);
+    prefs.putInt(CONST_MAILS_PER_DAY, data.mailsperday);
+    prefs.putInt(CONST_MAILS_PER_DOMAIN, data.mailsperdomainperday);
+    prefs.putInt(CONST_LOGIN_RETRY, data.loginretry);
+    prefs.putInt(CONST_PWD_REQ_HOURS, data.pwdreqvaildhours);
   }
 
   void setSchema(String name) {
