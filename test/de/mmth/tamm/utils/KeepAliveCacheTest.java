@@ -101,4 +101,33 @@ public class KeepAliveCacheTest {
     assertEquals("User should be found.", userId, returnId);
   }
 
+  /**
+   * Test of persisting data, of class KeepAliveCache.
+   */
+  @Test
+  public void testKeepAliveMax3() throws InterruptedException {
+    System.out.println("max 3 test");
+    int userId = 23;
+    long keepAliveDuration = 10000L;
+    KeepAliveCache instance = new KeepAliveCache();
+    
+    String result1 = instance.addLogin(userId, keepAliveDuration);
+    Thread.sleep(5);
+    String result2 = instance.addLogin(userId, keepAliveDuration);
+    Thread.sleep(2);
+    String result3 = instance.addLogin(userId, keepAliveDuration);
+    Thread.sleep(2);
+    String result4 = instance.addLogin(userId, keepAliveDuration);
+    
+    int returnId = instance.getUserId(result2);
+    assertEquals("should be still alive", returnId, userId);
+    returnId = instance.getUserId(result3);
+    assertEquals("should be still alive", returnId, userId);
+    returnId = instance.getUserId(result4);
+    assertEquals("should be still alive", returnId, userId);
+    
+    returnId = instance.getUserId(result1);
+    assertEquals("should been evicted", -1, returnId);
+  }
+
 }

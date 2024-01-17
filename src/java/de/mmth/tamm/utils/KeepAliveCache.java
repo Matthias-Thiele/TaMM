@@ -43,6 +43,31 @@ public class KeepAliveCache {
     cacheItem.expirationDate = (new Date()).getTime() + keepAliveDuration;
     cacheItem.cookie = uuid;
     cacheItem.userId = userId;
+    
+    // have at most 3 keep alive cookies active
+    LoginCacheItem it1 = null, it2 = null, forDeletion = null;
+    for (var check: loginCache.values()) {
+      if (check.userId == userId) {
+        if (it1 == null) {
+          it1 = check;
+        } else if (it2 == null) {
+          it2 = check;
+        } else {
+          if (it1.expirationDate < it2.expirationDate) {
+            forDeletion = it1;
+          } else {
+            forDeletion = it2;
+          }
+          
+          break;
+        }
+      }
+    }
+    
+    if (forDeletion != null) {
+      loginCache.remove(forDeletion.cookie);
+    }
+    
     loginCache.put(uuid, cacheItem);
     
     return uuid;
