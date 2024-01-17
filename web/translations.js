@@ -131,6 +131,8 @@ TxtDe.syssaved = "Systemdaten gespeichert.";
 TxtDe.errornotsaved = "Der Anwender wurde noch nicht angelegt.";
 TxtDe.invitation = "Einladung versenden";
 TxtDe.keepalive = "Angemeldet bleiben";
+TxtDe.editclients = "Mandantenverwaltung";
+TxtDe.settings = "Einstellungen";
 
 var TxtFr = {};
 TxtFr.home = "Liste des tâches" ;
@@ -259,6 +261,8 @@ TxtFr.syssaved = "Données système enregistrées.";
 TxtFr.errornotsaved = "L'utilisateur n'a pas encore été créé.";
 TxtFr.invitation = "Envoyer une invitation";
 TxtFr.keepalive = "Rester connecté";
+TxtFr.editclients = "Gestion des clients";
+TxtFr.settings = "Paramètres" ;
 
 var TxtEn = {};
 TxtEn.home = "Task List";
@@ -387,6 +391,8 @@ TxtEn.syssaved = "System data saved.";
 TxtEn.errornotsaved = "The user has not been created yet.";
 TxtEn.invitation = "Send invitation";
 TxtEn.keepalive = "Stay logged in";
+TxtEn.editclients = "Client management";
+TxtEn.settings = "Settings";
 
 var Txt;
 

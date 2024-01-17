@@ -43,7 +43,7 @@ GNU General Public License v3.0
             /* tablet breakpoint */
             @media (min-width:768px) {
                 .admin-sidebar > *:nth-child(1) {
-                    width:calc(88% / 3);
+                    width:calc(88% / 4);
                     max-width: 180pt;
                     order:-1;
                     border-right: 1px solid silver
@@ -56,14 +56,14 @@ GNU General Public License v3.0
                     border-right: 1px solid silver
                 }
 
-                .admin-sidebar > *:nth-child(4) {
+                .admin-sidebar > *:nth-child(3) {
                     width:calc(88% / 4);
                     order:-1;
                     border-right: 1px solid silver
                 }
 
-                .admin-sidebar > *:nth-child(3) {
-                    width:calc(88% / 4);
+                .admin-sidebar > *:nth-child(4) {
+                    width:130pt;
                     order:-1;
                     border-right: 1px solid silver
                 }
@@ -74,8 +74,6 @@ GNU General Public License v3.0
         <script src="translations.js"></script> 
         <script src="common.js"></script> 
         <script>
-            var clientlist;
-            var selectedClient = {};
             var sessionData;
             
             /**
@@ -120,18 +118,6 @@ GNU General Public License v3.0
                     setValue("loginretry", data.loginretry);
                     setValue("pwdreqvaildhours", data.pwdreqvaildhours);
                 }
-                
-                const clients = await fetch("system/clientlist", {'method': 'GET'});
-                const clientData = await clients.json();
-                console.log(clientData);
-                if (clientData.result === "ok") {
-                    clientlist = clientData.data;
-                    createClientList(clientlist);
-                    statusMsg("");
-                } else {
-                    statusMsg(clientData.message);
-                    showBlockElement("clientcol", false);
-                }
             }
 
             async function doSave() {
@@ -168,70 +154,7 @@ GNU General Public License v3.0
                 }
             }
             
-            function createClientList(clientlist) {
-                var list = document.getElementById("clientlist");
-                list.innerHTML = "";
-                clientlist.forEach( (clientInfo) => {
-                    var client = document.createElement("button");
-                    var text = document.createTextNode(clientInfo.name)
-                    client.appendChild(text);
-                    client.key = clientInfo;
-                    client.onclick = function() { fillClient(window.event.srcElement.key); };
-                    client.style = "margin: 3pt;";
-                    list.appendChild(client);
-                });
-            };
-            
-            function selectClient() {
-                selectedClient = this.source.key;
-            }
-            
-            function createClient() {
-                selectedClient = {};
-                selectedClient.id = -1;
-                selectedClient.maxDocMB = 100;
-                selectedClient.maxUser = 20;
-                fillClient();
-            }
-            
-            function fillClient(client) {
-                if (client) {
-                    selectedClient = client;
-                }
-                
-                setValue("clientid", selectedClient.id);
-                setValue("clientname", selectedClient.name);
-                setValue("clienthost", selectedClient.hostName);
-                setValue("clienthost2", selectedClient.hostName2);
-                setValue("clienthost3", selectedClient.hostName3);
-                setValue("clientmaxmb", selectedClient.maxDocMB);
-                setValue("clientmaxuser", selectedClient.maxUser);
-            }
-            
-            async function saveClient() {
-                selectedClient.name = getValue("clientname");
-                selectedClient.hostName = getValue("clienthost");
-                selectedClient.hostName2 = getValue("clienthost2");
-                selectedClient.hostName3 = getValue("clienthost3");
-                selectedClient.maxDocMB = getValue("clientmaxmb");
-                selectedClient.maxUser = getValue("clientmaxuser");
-                statusMsg(Txt.wait);
-                
-                const response = await fetch("system/saveclient", {'method': 'POST', 'body': JSON.stringify(selectedClient)});
-                const responseData = await response.json();
-                if (responseData.result === "ok") {
-                  statusMsg(Txt.clientsaved);
-                  emptyUser = {};
-                  fillClient(emptyUser);
-                  loadAdminData();
-                } else {
-                    if (!responseData.message) {
-                        responseData.message = Txt.erroronsave;
-                    }
-                    statusMsg(responseData.message);
-                }
-            }
-            
+                       
             async function cleanTemplates() {
                 deleteCall("cleantemplates");
             }
@@ -300,6 +223,7 @@ GNU General Public License v3.0
                 <li id="menuuser"><a class="menu__item" href="user.html" data-key="editusers">Anwenderverwaltung</a></li>
                 <li id="menuroles"><a class="menu__item" href="role.html" data-key="editroles">Rollen verwalten</a></li>
                 <li id="menuadmin"><a class="menu__item" href="admin.html" data-key="editsystem">Systemeinstellungen</a></li>
+                <li id="menuclients"><a class="menu__item" href="clients.html" data-key="editclients">Mandantenverwaltung</a></li>
                 <li id="menulock"><a class="menu__item" href="lock.html" data-key="editlocks">Sperrliste verwalten</a></li>
                 <li id="menupwd"><a class="menu__item" href="reqlist.html" data-key="editpwreq">Passwortanfragen</a></li>
                 <li id="menuabout"><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
@@ -325,13 +249,9 @@ GNU General Public License v3.0
                     <div><label for="mailadminpwd" data-key="mailadmpwd">Passwort Mailkonto</label><input type="password" id="mailadminpwd"></div>
                     <div><label for="mailhost" data-key="mailhost">Hostname</label><input type="text" id="mailhost"></div>
                     <div><label for="mailreply" data-key="mailreplyto">Reply-To Name</label><input type="text" id="mailreply"></div>
-                    <hr>
-                    <div>
-                        <button id="clear" onclick="doClear()" data-key="clear">Anzeige leeren</button>
-                    </div>
                 </div>
                 <div id="params">
-                    <h4><span data-key="params">Einstellungen</span></h4>
+                    <h4><span data-key="settings">Einstellungen</span></h4>
                     <hr>
                     <div><label for="keepalivetime" data-key="keepalivetime" class="long-label">Cookie Lebensdauer</label><input type="number" max="1000" min="0" id="keepalivetime" class="small-number"></div>
                     <div><label for="mailsperday" data-key="mailsperday" class="long-label">Max versendete Mails pro Tag</label><input type="number" max="100000" min="0" id="mailsperday" class="small-number"></div>
@@ -346,26 +266,13 @@ GNU General Public License v3.0
                     <hr>
                     <div><input type="checkbox" id="savepermanently"><label for="savepermanently" data-key="savepermanently" class="long-label">Parameter dauerhaft speichern</label></div>
                     <button id="save" onclick="doSave();" data-key="saveparams">Parameter speichern</button>
+                </div>
+                <div>
+                    <div><button id="clear" onclick="doClear()" data-key="clear" class="blockbutton">Anzeige leeren</button></div>
                     <hr>
                     <div><Button onclick="cleanTemplates()" style="margin-right:10pt" data-key="reloadtempl" class="blockbutton">Vorlagenspeicher neu laden</Button></div>
                     <div><Button onclick="cleanIPlocks()" style="margin-right:10pt" data-key="cleaniplocks" class="blockbutton">IP Anmeldesperren löschen</Button></div>
-                    <div><Button onclick="cleanMaillocks()" style="margin-right:10pt" data-key="cleanmaillocks" class="blockbutton">Mail Versendezähler löschen</Button></div>
-                </div>
-                <div id="clientcol">
-                    <h4><span data-key="clients">Mandanten</span><button style="margin-left: 10pt;" onclick="createClient();" data-key="new">Neu</button></h4>
-                    <div>
-                        <hr>
-                        <div id="clientlist"></div>
-                        <hr>
-                            <div><label for="clientid" data-key="id">Id</label><input type="text" id="clientid" readonly></div>
-                            <div><label for="clientname" data-key="clientname">Mandantenname</label><input type="text" id="clientname"></div>
-                            <div><label for="clienthost" data-key="hostname">Hostname</label><input type="text" id="clienthost"></div>
-                            <div><label for="clienthost2" data-key="alias">Alias</label><input type="text" id="clienthost2"></div>
-                            <div><label for="clienthost3" data-key="alias">Alias</label><input type="text" id="clienthost3"></div>
-                            <div><label for="clientmaxmb" data-key="docsmb">Dokumente MB</label><input type="number" id="clientmaxmb"></div>
-                            <div><label for="clientmaxuser" data-key="usercount">Anzahl Anwender</label><input type="number" id="clientmaxuser"></div>
-                            <button onclick="saveClient();" data-key="saveclient">Mandant speichern</button>
-                    </div>
+                    <div><Button onclick="cleanMaillocks()" style="margin-right:10pt" data-key="cleanmaillocks" class="blockbutton">Mail Versendezähler löschen</Button></div>        
                 </div>
             </div>
             <div class="statusbar" id="statusbar">

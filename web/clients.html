@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<!--
+(c) 2024 by Matthias Thiele
+GNU General Public License v3.0
+-->
+<html>
+    <head>
+        <title>TaMM</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="tamm.css">
+        <link rel="stylesheet" href="menu.css">
+        <link rel="shortcut icon" href="favicon.ico"/> 
+        <style>
+            .bodybox {
+                max-width: 600pt;
+            }
+            
+            .small-number {
+                width: 60pt;
+            }
+            
+            .long-label {
+                width: 180pt;
+            }
+            
+            .blockbutton {
+                width: 130pt;
+                margin-top: 5pt;
+            }
+            
+            .admin-sidebar {
+                display:flex;
+                flex-wrap:wrap;
+            }
+
+            /* columns */
+            .admin-sidebar > * {
+                width:100%;
+                padding:1rem;
+            }
+
+            /* tablet breakpoint */
+            @media (min-width:768px) {
+                .admin-sidebar > *:nth-child(1) {
+                    width:calc(88% / 3);
+                    max-width: 180pt;
+                    order:-1;
+                    border-right: 1px solid silver
+                }
+
+                .admin-sidebar > *:nth-child(2) {
+                    width:calc(88% / 3 * 2);
+                    order:-1;
+                }
+            }
+            
+        </style>
+        
+        <script src="translations.js"></script> 
+        <script src="common.js"></script> 
+        <script>
+            var clientlist;
+            var selectedClient = {};
+            var sessionData;
+            
+            /**
+             * Load user information and other session data.
+             * @returns {undefined}
+             */
+            async function loadAdminData() {
+                statusMsg("Wait for server...");
+                
+                const session = await fetch("system/session", {'method': 'GET'});
+                const sessionObj = await session.json();
+                if (sessionObj.result === "ok") {
+                    sessionData = sessionObj.data;
+                    if (!sessionData.user.mainAdmin) {
+                        showBlockElement("menuadmin", false);
+                        showBlockElement("menulock", false);
+                    }
+                } else {
+                    showBlockElement("menuhome", false);
+                    showBlockElement("menuuser", false);
+                    showBlockElement("menuadmin", false);
+                    showBlockElement("menulock", false);
+                }
+                
+                const clients = await fetch("system/clientlist", {'method': 'GET'});
+                const clientData = await clients.json();
+                console.log(clientData);
+                if (clientData.result === "ok") {
+                    clientlist = clientData.data;
+                    createClientList(clientlist);
+                    statusMsg("");
+                } else {
+                    statusMsg(clientData.message);
+                    showBlockElement("clientcol", false);
+                }
+            }
+
+            function createClientList(clientlist) {
+                var list = document.getElementById("clientlist");
+                list.innerHTML = "";
+                clientlist.forEach( (clientInfo) => {
+                    var client = document.createElement("div");
+                    client.className = "listitem";
+                    var text = document.createTextNode(clientInfo.name);
+                    client.appendChild(text);
+                    client.key = clientInfo;
+                    client.onclick = function() { fillClient(window.event.srcElement.key); };
+                    list.appendChild(client);
+                });
+            };
+            
+            function selectClient() {
+                selectedClient = this.source.key;
+            }
+            
+            function createClient() {
+                selectedClient = {};
+                selectedClient.id = -1;
+                selectedClient.maxDocMB = 100;
+                selectedClient.maxUser = 20;
+                fillClient();
+            }
+            
+            function fillClient(client) {
+                if (client) {
+                    selectedClient = client;
+                }
+                
+                setValue("clientid", selectedClient.id);
+                setValue("clientname", selectedClient.name);
+                setValue("clienthost", selectedClient.hostName);
+                setValue("clienthost2", selectedClient.hostName2);
+                setValue("clienthost3", selectedClient.hostName3);
+                setValue("clientmaxmb", selectedClient.maxDocMB);
+                setValue("clientmaxuser", selectedClient.maxUser);
+            }
+            
+            async function saveClient() {
+                selectedClient.name = getValue("clientname");
+                selectedClient.hostName = getValue("clienthost");
+                selectedClient.hostName2 = getValue("clienthost2");
+                selectedClient.hostName3 = getValue("clienthost3");
+                selectedClient.maxDocMB = getValue("clientmaxmb");
+                selectedClient.maxUser = getValue("clientmaxuser");
+                statusMsg(Txt.wait);
+                
+                const response = await fetch("system/saveclient", {'method': 'POST', 'body': JSON.stringify(selectedClient)});
+                const responseData = await response.json();
+                if (responseData.result === "ok") {
+                  statusMsg(Txt.clientsaved);
+                  emptyUser = {};
+                  fillClient(emptyUser);
+                  loadAdminData();
+                } else {
+                    if (!responseData.message) {
+                        responseData.message = Txt.erroronsave;
+                    }
+                    statusMsg(responseData.message);
+                }
+            }
+            
+    </script>
+    </head>
+    <body onload="loadAdminData()">
+        <div class="hamburger-menu">
+            <input class="checkbox" type="checkbox" id="menu_toggle"/>
+            <div class="hamburger-lines">
+              <span class="line line1"></span>
+              <span class="line line2"></span>
+              <span class="line line3"></span>
+            </div>  
+
+            <ul class="menu__box">
+                <li id="menuhome"><a class="menu__item" href="index.html" data-key="home">Home</a></li>
+                <li id="menuuser"><a class="menu__item" href="user.html" data-key="editusers">Anwenderverwaltung</a></li>
+                <li id="menuroles"><a class="menu__item" href="role.html" data-key="editroles">Rollen verwalten</a></li>
+                <li id="menuadmin"><a class="menu__item" href="admin.html" data-key="editsystem">Systemeinstellungen</a></li>
+                <li id="menuclients"><a class="menu__item" href="clients.html" data-key="editclients">Mandantenverwaltung</a></li>
+                <li id="menulock"><a class="menu__item" href="lock.html" data-key="editlocks">Sperrliste verwalten</a></li>
+                <li id="menupwd"><a class="menu__item" href="reqlist.html" data-key="editpwreq">Passwortanfragen</a></li>
+                <li id="menuabout"><a class="menu__item" href="about.html" data-key="about">Über das Programm</a></li>
+                <li id="menulogout"><a class="menu__item" onclick="logout();" data-key="logout">Abmelden</a></li>
+            </ul>
+        </div>
+        
+        <div class="bodybox">
+            <div class="header" data-key="clients">Mandanten</div>
+            <div class="admin-sidebar">
+                <div id="clientlist"></div>
+                <div id="clientcol">
+                    <h4><span data-key="clients">Mandanten</span><button style="margin-left: 10pt;" onclick="createClient();" data-key="new">Neu</button></h4>
+                    <hr>
+                    <div>
+                            <div><label for="clientid" data-key="id">Id</label><input type="text" id="clientid" readonly></div>
+                            <div><label for="clientname" data-key="clientname">Mandantenname</label><input type="text" id="clientname"></div>
+                            <div><label for="clienthost" data-key="hostname">Hostname</label><input type="text" id="clienthost"></div>
+                            <div><label for="clienthost2" data-key="alias">Alias</label><input type="text" id="clienthost2"></div>
+                            <div><label for="clienthost3" data-key="alias">Alias</label><input type="text" id="clienthost3"></div>
+                            <div><label for="clientmaxmb" data-key="docsmb">Dokumente MB</label><input type="number" id="clientmaxmb"></div>
+                            <div><label for="clientmaxuser" data-key="usercount">Anzahl Anwender</label><input type="number" id="clientmaxuser"></div>
+                            <button onclick="saveClient();" data-key="saveclient">Mandant speichern</button>
+                    </div>
+                </div>
+            </div>
+            <div class="statusbar" id="statusbar">
+                <span id="status"></span>
+            </div>
+        </div>
+        <datalist id="clientnames"></datalist>
+        <script>
+            translateForm();
+        </script>
+    </body>
+</html>
