@@ -28,6 +28,7 @@ req_sent_per_mail=Anforderung per Mail verschickt.
 invalid_key=Ungültiger oder abgelaufener Schlüssel
 role_created=Rolle erstellt mit id:
 total_mail_limit_reached=Das EMail Limit wurde erreicht, das System ist für 10 Minuten gesperrt.
+user_count_exceeded=Die maximale Anzahl von Anwendern für diesen Mandant wurde überschritten.
 
 # from UserProcessor
 wrong_administrator=Es können nur eigene Anwender bearbeitet werden.

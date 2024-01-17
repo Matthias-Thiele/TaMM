@@ -172,6 +172,9 @@ public class PostProcessor {
       logger.debug("Process login request for user" + clientData.name);
       application.clients.writeClient(clientData);
       application.refreshClientNames();
+      if (session.client.id == clientData.id) {
+        session.client = clientData;
+      }
     }
     ServletUtils.sendResult(resultData, message.isEmpty(), "", "", message, null);
   }
@@ -407,6 +410,8 @@ public class PostProcessor {
       data.owner = session.user.id;
       id = application.roles.writeRole(data);
       message = Txt.get(session.lang, "role_created");
+      
+      application.roleNamesMap.remove(session.client.name);
     }
     
     ServletUtils.sendResult(resultData, true, "", "", message, id);

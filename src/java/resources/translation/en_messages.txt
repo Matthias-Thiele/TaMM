@@ -28,6 +28,7 @@ req_sent_per_mail=Request sent by email.
 invalid_key=Invalid or expired key
 role_created=Role created with id:
 total_mail_limit_reached=The email limit has been reached and the system is blocked for 10 minutes.
+user_count_exceeded=The maximum number of users for this client has been exceeded.
 
 # from UserProcessor
 wrong_administrator=Only your own users can be edited.

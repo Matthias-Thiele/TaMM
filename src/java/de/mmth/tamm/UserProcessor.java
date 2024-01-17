@@ -95,10 +95,15 @@ public class UserProcessor {
     String errorMsg = "";
     Integer userId = -1;
     if (userData.id == -1) {
-      // new user
-      logger.info("Insert user data for user" + userData.name);
-      userData.pwd = PasswordUtils.encodePassword(Long.toHexString((long)(Math.random() * Long.MAX_VALUE)));
-      userId = application.users.writeUser(userData);
+      int userCount = application.users.getUserCount(session.client.id);
+      if (userCount < session.client.maxUser) {
+        // new user
+        logger.info("Insert user data for user" + userData.name);
+        userData.pwd = PasswordUtils.encodePassword(Long.toHexString((long)(Math.random() * Long.MAX_VALUE)));
+        userId = application.users.writeUser(userData);
+      } else {
+        errorMsg = Txt.get(session.lang, "user_count_exceeded");
+      }
     } else {
       // update existing user
       logger.info("Update user data for user" + userData.name);
@@ -122,7 +127,8 @@ public class UserProcessor {
         userId = checkUser.id;
       }
     }
-    
+      
+    application.userNamesMap.remove(session.client.name);
     ServletUtils.sendResult(resultData, errorMsg.isBlank(), "", "", errorMsg, userId);
   }  
   

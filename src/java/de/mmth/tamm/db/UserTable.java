@@ -314,6 +314,36 @@ public final class UserTable extends DBTable {
   }
   
   /**
+   * Returns the number of users of the given client.
+   * 
+   * @param clientId
+   * @return
+   * @throws TammError 
+   */
+  public int getUserCount(int clientId) throws TammError {
+    int result = 0;
+    
+    var cmd = "SELECT count(*) FROM " + tableName + " WHERE clientid = ?";
+    logger.debug("SQL: " + cmd);
+    
+    try {
+      try (var stmt = conn.getConnection().prepareStatement(cmd)) {
+        stmt.setInt(1, clientId);
+        
+        var userRows = stmt.executeQuery();
+        if (userRows.next()) {
+          result = userRows.getInt(1);
+          logger.debug("Number of users: " + result);
+        }
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error reading user count.", ex);
+      throw new TammError("Error reading user count.");
+    }
+    return result;
+  }
+  
+  /**
    * Copies the ResultSet user data into an UserData object.
    * 
    * @param userRows

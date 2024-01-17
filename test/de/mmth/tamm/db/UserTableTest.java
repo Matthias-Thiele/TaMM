@@ -56,6 +56,9 @@ public class UserTableTest {
     UserTable instance = new UserTable(con, "testusers");
     
     // admin user with id=1 automatically created
+    int userCount = instance.getUserCount(clientId);
+    assertEquals("Just the default admin user expected.", 1, userCount);
+    
     List<UserData> users0after = instance.listUsers(clientId, -1, null, false);
     assertEquals("Just the default admin user expected.", 1, users0after.size());
     
@@ -115,7 +118,9 @@ public class UserTableTest {
     instance.writeUser(user5);
     
     List<UserData> users1 = instance.listUsers(clientId, -1, null, false);
-    assertEquals("Three users expected.", 3, users1.size());
+    assertEquals("Three users have been created.", 3, users1.size());
+    userCount = instance.getUserCount(clientId);
+    assertEquals("Three users have been created.", 3, userCount);
     
     List<UserData> users6 = instance.listUsers(clientId, -1, null, true);
     assertEquals("Three users expected.", 2, users6.size());

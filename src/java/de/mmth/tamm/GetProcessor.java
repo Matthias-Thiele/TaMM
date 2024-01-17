@@ -141,12 +141,12 @@ public class GetProcessor {
     boolean isOk = session.user != null;
     if (isOk) {
       ClientData client = session.client;
-      List<KeyValue> clientNames = application.userNamesMap.get(client.name);
-      if (clientNames == null) {
-        clientNames = application.users.listUserNames(client.id);
-        application.userNamesMap.put(client.name, clientNames);
+      List<KeyValue> userNames = application.userNamesMap.get(client.name);
+      if (userNames == null) {
+        userNames = application.users.listUserNames(client.id);
+        application.userNamesMap.put(client.name, userNames);
       }
-      session.userNames = clientNames;
+      session.userNames = userNames;
       
       List<KeyValue> roleNames = application.roleNamesMap.get(client.name);
       if (roleNames == null) {

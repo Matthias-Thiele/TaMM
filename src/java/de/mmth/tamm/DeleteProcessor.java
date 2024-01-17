@@ -185,7 +185,8 @@ public class DeleteProcessor {
     } else {
       message = Txt.get(session.lang, "access_denied");
     }
-    
+      
+    application.roleNamesMap.remove(session.client.name);
     ServletUtils.sendResult(resultData, isOk, "", "", message, null);
   }
 

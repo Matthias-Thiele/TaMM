@@ -28,6 +28,7 @@ req_sent_per_mail=Demande envoyée par email.
 invalid_key=Clé invalide ou expirée
 role_created=Rôle créé avec l'identifiant :
 total_mail_limit_reached=La limite d'e-mails a été atteinte et le système est bloqué pendant 10 minutes.
+user_count_exceeded=Le nombre maximum d'utilisateurs pour ce locataire a été dépassé.
 
 # depuis le processeur utilisateur
 wrong_administrator=Seuls vos propres utilisateurs peuvent être modifiés.
