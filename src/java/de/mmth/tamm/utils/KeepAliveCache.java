@@ -114,6 +114,8 @@ public class KeepAliveCache {
         for (var key: forRemoval) {
           loginCache.remove(key);
         }
+        
+        logger.info("Cookies removed: " + forRemoval.size());
       }
     }
   }
@@ -125,16 +127,25 @@ public class KeepAliveCache {
    */
   public void save(Path destination) {
     logger.info("Save keep alive cache.");
-
+    var now = (new Date()).getTime();
+    var count = 0;
+    
     for (var item: loginCache.values()) {
+      if (item.expirationDate < now) {
+        continue; // do not persist expired cookies
+      }
+      
       var line = item.expirationDate + "|" + item.userId + "|" + item.cookie + "\r\n"; 
       try {
         Files.writeString(destination, line, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+        count++;
       } catch (IOException ex) {
         logger.warn("Cannot persist keep alive cache.", ex);
         break;
       }
     }
+    
+    logger.info("Active cookies written: " + count);
   }
   
   /**
@@ -145,6 +156,9 @@ public class KeepAliveCache {
   public void load(Path source) {
     logger.info("Load keep alive cache.");
     List<String> lines;
+    var now = (new Date()).getTime();
+    var count = 0;
+    
     try {
       lines = Files.readAllLines(source);
       for (var line: lines) {
@@ -155,10 +169,13 @@ public class KeepAliveCache {
           newEntry.cookie = uuid;
           newEntry.userId = Integer.parseInt(parts[1]);
           newEntry.expirationDate = Long.parseLong(parts[0]);
-
-          loginCache.put(uuid, newEntry);
+          if (newEntry.expirationDate > now) {
+            loginCache.put(uuid, newEntry);
+          }
         }
       }
+      
+      logger.info("Cookies read: " + count);
     } catch (IOException ex) {
       logger.warn("Cannot read keep alive cache.", ex);
     }
