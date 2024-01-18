@@ -30,7 +30,7 @@ Task Management and Monitoring
                 const response = await fetchlogin.json();
                 if (response.result === "ok") {
                     if (response.data) {
-                        document.cookie = "keepalive=" + response.data + "; expires=" + toDay(100) + "; path=/"; 
+                        document.cookie = "keepalive=" + response.data + "; expires=" + toDay(100) + "; path=/; SameSite=Strict"; 
                     }
                     var dest = getUrlParam("next");
                     if (dest) {

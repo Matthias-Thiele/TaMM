@@ -116,10 +116,8 @@ public class System extends HttpServlet {
         }
         
         getProcessor.process(sd, cmd, content, out, cmd4);
-        if (cmd.equals("logout")) {
-          HttpSession session = request.getSession();
-          session.removeAttribute("TAMM");
-        }
+        ServletUtils.checkLogout(request, cmd, application.keepAlive);
+        
         out.flush();
       } catch(TammError te) {
         ServletUtils.sendResult(out, false, "", "", te.getMessage(), null);

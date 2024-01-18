@@ -241,4 +241,25 @@ public class ServletUtils {
     return message;
   }
 
+  public static void checkLogout(HttpServletRequest request, String cmd, KeepAliveCache keepAlive) {
+    if (cmd.equals("logout")) {
+      HttpSession session = request.getSession();
+      SessionData sd = (SessionData) session.getAttribute("TAMM");
+      sd.user = null;
+      sd.client = null;
+      sd.myRoles = null;
+      sd.userNames.clear();
+      sd.roleNames.clear();
+      session.removeAttribute("TAMM");
+      
+      var cookies = request.getCookies();
+      for (var cookie: cookies) {
+        if (cookie.getName().equals("keepalive")) {
+          var uuid = cookie.getValue();
+          keepAlive.remove(uuid);
+        }
+      }
+    }
+    
+  }
 }

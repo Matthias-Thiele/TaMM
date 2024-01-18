@@ -180,6 +180,15 @@ public class KeepAliveCache {
       logger.warn("Cannot read keep alive cache.", ex);
     }
   }
+
+  /**
+   * Remove keep alive entry after explicit logout.
+   * 
+   * @param uuid 
+   */
+  public void remove(String uuid) {
+    loginCache.remove(uuid);
+  }
 }
 
 class LoginCacheItem {

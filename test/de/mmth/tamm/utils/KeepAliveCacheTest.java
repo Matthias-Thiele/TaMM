@@ -54,6 +54,14 @@ public class KeepAliveCacheTest {
     
     returnId = instance.getUserId(result);
     assertEquals("Cache has been cleared, no user should be found.", -1, returnId);
+    
+    String result2 = instance.addLogin(userId, keepAliveDuration);
+    int returnId2 = instance.getUserId(result2);
+    assertEquals("New user has been created", userId, returnId2);
+    
+    instance.remove(result2);
+    int returnId3 = instance.getUserId(result2);
+    assertEquals("User logout has been done, no user should be found.", -1, returnId3);
   }
 
   /**
