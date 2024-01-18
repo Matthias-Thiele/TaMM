@@ -140,7 +140,7 @@ public class TaskProcessor {
     
     TaskData advanceTask = gson.fromJson(reader, TaskData.class);
     TaskData taskData = application.tasks.readTask(session.client.id, advanceTask.lId);
-    if ((taskData.owner != session.user.id) && !session.user.mainAdmin) {
+    if (!isMyTask(session, taskData.owner)) {
       throw new TammError("Not your task.");
     }
     
@@ -172,4 +172,34 @@ public class TaskProcessor {
     return (result == null) ? "" : result;
   }
   
+  /**
+   * Checks if the session user is allowed to process the task
+   * with the given owner.
+   * 
+   * A main administrator is allowed to process all tasks.
+   * If the current user is the owner then he is allowed to process it.
+   * If the owner is a role and the current user is member then
+   * he is allowed to process it.
+   * 
+   * @param session
+   * @param owner
+   * @return 
+   */
+  private boolean isMyTask(SessionData session, int owner) {
+    if ((owner == session.user.id) || session.user.mainAdmin) {
+      return true;
+    }
+    
+    if ((session.myRoles != null) && (session.myRoles.roles != null)) {
+      for (int roleId: session.myRoles.roles) {
+        if (roleId == owner) {
+          return true;
+        }
+      }
+    } else {
+      logger.info("User has no roles information: " + session.user.name);
+    }
+    
+    return false;
+  }
 }

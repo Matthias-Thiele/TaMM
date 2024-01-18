@@ -23,5 +23,5 @@ public class SessionData {
 
   // only for system admins, null otherwise  
   public List<KeyValue> clientList;
-
+  public RoleAssignmentData myRoles;
 }

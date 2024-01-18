@@ -81,8 +81,8 @@ public class ApplicationData {
   public AttachmentTable attachments;
   public SendMail mailer = null;
   public TemplateCache templates = new TemplateCache("templates");
-  public InvalidAccessCache accessCache = new InvalidAccessCache(adminData.loginretry, DECAY_INTERVAL);
-  public LimitSentMails mailCounter = new LimitSentMails(adminData.mailsperday, adminData.mailsperdomainperday, CLEAR_MAIL_COUNTER_PERIOD);
+  public InvalidAccessCache accessCache = null;
+  public LimitSentMails mailCounter = null;
   public KeepAliveCache keepAlive = new KeepAliveCache();
   
   public Placeholder placeholder = new Placeholder();
@@ -133,6 +133,8 @@ public class ApplicationData {
         attachments = new AttachmentTable(db, "attachments");
         roles = new RoleTable(db, "roleslist");
         assignments = new RoleAssignmentTable(db, "roleassignments");
+        mailCounter = new LimitSentMails(adminData.mailsperday, adminData.mailsperdomainperday, CLEAR_MAIL_COUNTER_PERIOD);
+        accessCache = new InvalidAccessCache(adminData.loginretry, DECAY_INTERVAL);
         
         if (!adminData.mailadminname.isBlank() && !adminData.mailadminpwd.isBlank() && !adminData.mailhost.isBlank()) {
           mailer = new SendMail(adminData.mailhost, adminData.mailadminname, adminData.mailadminpwd);

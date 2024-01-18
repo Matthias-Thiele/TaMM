@@ -107,7 +107,7 @@ public class UserProcessor {
     } else {
       // update existing user
       logger.info("Update user data for user" + userData.name);
-      var checkUser = application.users.readUser(session.client.id, userData.id, null);
+      var checkUser = application.users.readUser(userData.clientId, userData.id, null);
       if (checkUser.administratorId == 0) {
         checkUser.administratorId = checkUser.id;
       }

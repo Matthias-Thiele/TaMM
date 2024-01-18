@@ -207,6 +207,8 @@ public class PostProcessor {
           application.users.updateLoginDate(session.client.id, user.id, session.loginTime);
           loginValid = true;
           
+          session.myRoles = application.assignments.listRoleAssignments(user.id);
+          
           if (loginData.keep) {
             var cookie = application.keepAlive.addLogin(user.id, application.adminData.keepalivetime * MILLIS_PER_DAY);
             result.data = cookie;
