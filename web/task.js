@@ -142,6 +142,9 @@ async function removeTask(taskId) {
  * @returns {undefined}
  */
 async function loadAttachments() {
+    let filelist = document.getElementById("filelist");
+    filelist.innerHTML = "";
+    
     if ((selectedTask.lId === "-1") || !selectedTask.lId) {
         // new task, has not been stored before.
         return;
@@ -151,9 +154,6 @@ async function loadAttachments() {
     const responseData = await response.json();
     console.log(responseData);
 
-    let filelist = document.getElementById("filelist");
-    filelist.innerHTML = "";
-    
     var attachments = responseData.data;
     attachments.forEach((a) => {
         filelist.appendChild(makeAttachmentLink(a));

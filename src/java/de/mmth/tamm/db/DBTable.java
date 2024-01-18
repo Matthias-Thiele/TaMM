@@ -69,7 +69,6 @@ public class DBTable {
     } catch (SQLException ex) {
       logger.warn("Error opening table.", ex);
     }
-    
   }
   
   /**
@@ -84,6 +83,14 @@ public class DBTable {
     return isNewTable;
   }
 
+  /**
+   * Returns the database table name.
+   * @return 
+   */
+  public String getTableName() {
+    return tableName;
+  }
+  
   /**
    * Compares the existing columns with the table definition.
    * 

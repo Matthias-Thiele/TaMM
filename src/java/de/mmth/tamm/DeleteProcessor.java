@@ -7,13 +7,12 @@ package de.mmth.tamm;
 import com.google.gson.Gson;
 import de.mmth.tamm.data.ClientData;
 import de.mmth.tamm.data.DeleteData;
-import de.mmth.tamm.data.JsonResult;
 import de.mmth.tamm.data.LockData;
-import de.mmth.tamm.data.LoginData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.data.TaskData;
 import de.mmth.tamm.data.UserData;
 import de.mmth.tamm.utils.CleanType;
+import de.mmth.tamm.utils.DBUtils;
 import de.mmth.tamm.utils.ServletUtils;
 import de.mmth.tamm.utils.Txt;
 import java.io.IOException;
@@ -21,7 +20,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.util.logging.Level;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -296,6 +294,9 @@ public class DeleteProcessor {
     if (substitute > 0) {
       application.tasks.moveTasksOwner(user.clientId, user.id, substitute);
     } else {
+      int count = DBUtils.deleteAttachmentsOfUser(application.db, user.id, application.tasks.getTableName(), application.attachments.getTableName());
+      logger.info("Result of delete attachments: " + count);
+      
       application.tasks.deleteTasksOfOwner(user.clientId, user.id);
     }
     
