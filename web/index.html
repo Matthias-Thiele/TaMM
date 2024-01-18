@@ -64,16 +64,7 @@
                     window.location = response.nextPage + "?next=index.html";
                 } else {
                     sessionData = response.data;
-                    var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
-
-                    if (!someKindOfAdmin) {
-                        showBlockElement("menuuser", false);
-                        if (!sessionData.user.mainAdmin) {
-                            showBlockElement("menuadmin", false);
-                            showBlockElement("menulock", false);
-                            showBlockElement("menupwd", false);
-                        }
-                    }
+                    adjustMenu(sessionData);
 
                     userlist = new Userlist(sessionData.roleNames, sessionData.userNames);
                     userlist.createOptionList("userlist");
@@ -322,8 +313,8 @@
                 </div>
                 <div class="">
                     <div class="subheader" data-key="taskinfo">Aufgabenbeschreibung</div>
-                    <div><label for="name" data-key="taskname">Bezeichnung</label><input onchange="changed()" size="50" type="text" id="name"><input type="text" id="tasklid" readonly hidden></div>
-                    <div><label for="description" data-key="taskdesc">Beschreibung</label><textarea onchange="changed()" rows="12" cols="60" id="description" style="resize:both"></textarea></div>
+                    <div><label for="name" data-key="taskname">Bezeichnung</label><input onchange="changed()" size="44" type="text" id="name"><input type="text" id="tasklid" readonly hidden></div>
+                    <div><label for="description" data-key="taskdesc">Beschreibung</label><textarea onchange="changed()" rows="12" cols="50" id="description" style="resize:both"></textarea></div>
                     <div><label for="createdate" data-key="created">Erzeugt am</label><input id="createdate" readonly></div>
                     <div><label for="lastchanged" data-key="changed">Geändert am</label><input id="lastchanged" readonly></div>
                     <div><label for="owner" data-key="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed(); updateListInput(event, userlist)"></div>

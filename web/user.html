@@ -47,9 +47,14 @@ GNU General Public License v3.0
                 const session = await fetch("system/session", {'method': 'GET'});
                 const response = await session.json();
                 if (response.result === "error") {
-                    window.location = response.nextPage + "?next=user.html";
+                    window.location = "login.html";
                 } else {
                     sessionData = response.data;
+                    adjustMenu(sessionData);
+                    if (!sessionData.user.subAdmin && !sessionData.user.mainAdmin) {
+                        window.location = "index.html";
+                    }
+                    
                     userNames = new Userlist(sessionData.roleNames, sessionData.userNames);
                     userNames.createOptionList("usernames");
                     clientNames = new KeyValueList(sessionData.clientList);
@@ -411,7 +416,7 @@ GNU General Public License v3.0
             </ul>
         </div>
         
-        <div class="bodybox">
+        <div class="bodybox" style="max-width: 780pt;">
             <div class="header" data-key="editusers">Anwenderverwaltung</div>
             <div class="triple-cols">
                 <div class="">

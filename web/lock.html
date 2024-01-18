@@ -39,12 +39,10 @@ GNU General Public License v3.0
                 const responseData = await response.json();
                 console.log(responseData);
                 if (responseData.result === "error") {
-                    showBlockElement("menuuser", false);
-                    showBlockElement("menuadmin", false);
-                    showBlockElement("menulock", false);
-                    statusMsg(responseData.message);
+                    window.location = "login.html";
                 } else {
                     sessionData = responseData.data;
+                    adjustMenu(sessionData);
                     if (!sessionData.user.mainAdmin) {
                         window.location = "index.html";
                     }

@@ -75,15 +75,12 @@ GNU General Public License v3.0
                 const sessionObj = await session.json();
                 if (sessionObj.result === "ok") {
                     sessionData = sessionObj.data;
+                    adjustMenu(sessionData);
                     if (!sessionData.user.mainAdmin) {
-                        showBlockElement("menuadmin", false);
-                        showBlockElement("menulock", false);
+                        window.location = "index.html";
                     }
                 } else {
-                    showBlockElement("menuhome", false);
-                    showBlockElement("menuuser", false);
-                    showBlockElement("menuadmin", false);
-                    showBlockElement("menulock", false);
+                    window.location = "login.html";
                 }
                 
                 const clients = await fetch("system/clientlist", {'method': 'GET'});

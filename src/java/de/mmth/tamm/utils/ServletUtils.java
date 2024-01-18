@@ -163,6 +163,7 @@ public class ServletUtils {
               sd.loginTime = DateUtils.formatZ(null); 
               sd.user.pwd = ""; // do not leak password hash to the outer world.
               application.users.updateLoginDate(sd.client.id, userId, sd.loginTime);
+              sd.myRoles = application.assignments.listRoleAssignments(userId);
               logger.info("Re-login via cookie of user " + userId);
             } catch (TammError ex) {
               logger.warn("Cannot read keep alive user " + userId, ex);

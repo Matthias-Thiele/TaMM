@@ -137,6 +137,7 @@ input[type="radio"]:checked + label {
 .bodybox {
     margin-left: 20pt;
     margin-top: 3pt;
+    margin-right: 20pt;
     border: 1px silver solid;
     max-width: 1000pt;
     border-radius: 5pt;
@@ -156,7 +157,7 @@ input[type="radio"]:checked + label {
 }
 
 /* tablet breakpoint */
-@media (min-width:768px) {
+@media (min-width:600px) {
     .left-sidebar > *:nth-child(1) {
         max-width: 180pt;
         min-height:0;
@@ -186,12 +187,16 @@ input[type="radio"]:checked + label {
     order:-1;
 }
 
-.triple-cols > *:nth-child(2), 
-.triple-cols > *:nth-child(3) {
+.triple-cols > *:nth-child(2) {
     border-left: 1px solid silver;
-    width:calc(98% / 3);
     max-width: 300pt;
     min-width: 200pt;
+    
+}
+.triple-cols > *:nth-child(3) {
+    border-left: 1px solid silver;
+    max-width: 180pt;
+    min-width: 100pt;
 }
 
 /* modal dialog box */

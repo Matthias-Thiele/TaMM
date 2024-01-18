@@ -19,6 +19,26 @@ function getUrlParam(name) {
     return c;
 }
 
+/**
+ * Hides the non functional pages when missing rights.
+ * 
+ * @param {type} sessionData
+ * @returns {undefined}
+ */
+function adjustMenu(sessionData) {
+    if (!sessionData.user.mainAdmin) {
+        showBlockElement("menuadmin", false);
+        showBlockElement("menulock", false);
+        showBlockElement("menupwd", false);
+        showBlockElement("menuclients", false);
+    }
+
+    if (!sessionData.user.subAdmin) {
+        showBlockElement("menuroles", false);
+        showBlockElement("menuuser", false);
+    }
+}
+
 /*
  * Send the logout command to the server and switch to the login page.
  */

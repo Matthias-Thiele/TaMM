@@ -52,11 +52,7 @@ GNU General Public License v3.0
                     window.location = response.nextPage + "?next=index.html";
                 } else {
                     sessionData = response.data;
-                    var someKindOfAdmin = sessionData.user.mainAdmin || sessionData.user.subAdmin;
-
-                    if (!someKindOfAdmin) {
-                        showBlockElement("menuuser", false);
-                    }
+                    adjustMenu(sessionData);
 
                     setTimeout(listRoles, 200);
                 }

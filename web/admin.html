@@ -58,6 +58,7 @@ GNU General Public License v3.0
 
                 .admin-sidebar > *:nth-child(3) {
                     width:calc(88% / 4);
+                    min-width: 180pt;
                     order:-1;
                     border-right: 1px solid silver
                 }
@@ -87,15 +88,12 @@ GNU General Public License v3.0
                 const sessionObj = await session.json();
                 if (sessionObj.result === "ok") {
                     sessionData = sessionObj.data;
+                    adjustMenu(sessionData);
                     if (!sessionData.user.mainAdmin) {
-                        showBlockElement("menuadmin", false);
-                        showBlockElement("menulock", false);
+                        window.location = "index.html";
                     }
                 } else {
-                    showBlockElement("menuhome", false);
-                    showBlockElement("menuuser", false);
-                    showBlockElement("menuadmin", false);
-                    showBlockElement("menulock", false);
+                    window.location = "login.html";
                 }
                 
                 const initdata = await fetch("system/initdata", {'method': 'GET'});
@@ -233,7 +231,7 @@ GNU General Public License v3.0
             </ul>
         </div>
         
-        <div class="bodybox">
+        <div class="bodybox" style="max-width:900pt;">
             <div class="header" data-key="systemadministration">System Administration</div>
             <div class="admin-sidebar">
                 <div>
