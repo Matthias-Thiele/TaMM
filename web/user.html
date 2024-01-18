@@ -212,6 +212,8 @@ GNU General Public License v3.0
                 } else {
                     setValue("client", sessionData.client.name);
                 }
+                
+                document.getElementById("client").disabled = userData.id > 0;
                 document.getElementById("sysadmin").checked = userData.mainAdmin;
                 document.getElementById("subadmin").checked = userData.subAdmin;
                 setValue("lastlogin", userData.lastLogin);
