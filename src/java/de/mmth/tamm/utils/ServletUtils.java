@@ -248,8 +248,8 @@ public class ServletUtils {
       sd.user = null;
       sd.client = null;
       sd.myRoles = null;
-      sd.userNames.clear();
-      sd.roleNames.clear();
+      sd.userNames = null;
+      sd.roleNames = null;
       session.removeAttribute("TAMM");
       
       var cookies = request.getCookies();

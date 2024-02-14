@@ -53,7 +53,7 @@ public class DeleteProcessor {
    * @throws de.mmth.tamm.TammError 
    */
   public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData, String cmd4, String cmd5) throws IOException, TammError {
-    logger.info("Process " + cmd);
+    logger.info("Delete " + cmd);
     switch (cmd) {
       case "removetask":
         processRemoveTask(resultData, session, cmd4);

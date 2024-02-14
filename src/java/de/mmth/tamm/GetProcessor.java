@@ -58,6 +58,7 @@ public class GetProcessor {
    * @throws de.mmth.tamm.TammError 
    */
   public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData, String cmd4) throws IOException, TammError {
+    logger.info("Get " + cmd);
     switch (cmd) {
       case "session":
         processSession(resultData, session);
@@ -140,26 +141,38 @@ public class GetProcessor {
     String message = "";
     boolean isOk = session.user != null;
     if (isOk) {
+      logger.info("Process session info.");
       ClientData client = session.client;
       List<KeyValue> userNames = application.userNamesMap.get(client.name);
       if (userNames == null) {
+        logger.info("Add user names for client " + client.name);
         userNames = application.users.listUserNames(client.id);
+        for (KeyValue user: userNames) {
+          logger.debug("User added: " + user.name);
+        }
         application.userNamesMap.put(client.name, userNames);
+      } else {
+        logger.debug("Number of users: " + userNames.size()); 
       }
       session.userNames = userNames;
       
       List<KeyValue> roleNames = application.roleNamesMap.get(client.name);
       if (roleNames == null) {
+        logger.info("Add role names for client " + client.name);
         roleNames = new ArrayList<>();
         var roles = application.roles.listRoles(client.id, -1);
         for (var role: roles) {
           var kv = new KeyValue(role.id, role.name);
           roleNames.add(kv);
+          logger.debug("Role added: " + role.name);
         }
         application.roleNamesMap.put(client.name, roleNames);
+      } else {
+        logger.debug("Number of roles: " + roleNames.size());
       }
       session.roleNames = roleNames;
     } else {
+      logger.info("No login, no session info prepared.");
       message = Txt.get(session.lang, "missing_login");
     }
     

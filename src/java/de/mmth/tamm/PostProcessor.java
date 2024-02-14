@@ -70,6 +70,7 @@ public class PostProcessor {
    * @throws de.mmth.tamm.TammError 
    */
   public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData, String cmd4) throws IOException, TammError {
+    logger.info("Post " + cmd);
     try (Reader reader = new InputStreamReader(sourceData)) {
       switch (cmd) {
         case "login":
