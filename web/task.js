@@ -288,9 +288,11 @@ function fillInterval(intervalData) {
  * Populates the tasklist with the selection of the
  * returned task items.
  * @param {type} tasklist
+ * @param {bool} isHistoryList 
+ * @param {Map} visibleRoles 
  * @returns {undefined}
  */
-function listTasks(tasklist, isHistoryList) {
+function listTasks(tasklist, isHistoryList, visibleRoles) {
     var list = document.getElementById("tasklist");
     list.innerHTML = "";
     var td = toDay();
@@ -299,41 +301,45 @@ function listTasks(tasklist, isHistoryList) {
     var insertEscalationBar = false;
     
     tasklist.forEach((task) => {
-        var newItem = document.createElement("div");
-        newItem.className = "listitem";
-        var taskName = document.createElement("div");
-        taskName.className = "taskname";
-        taskName.innerText = task.name;
-        var dueDate = document.createElement("div");
-        dueDate.innerText = task.nextDueDate;
-        dueDate.className = "duedate";
-        if (!isHistoryList) {
-            if (task.nextDueDate < td) {
-                dueDate.classList.add("escalated");
-                insertEscalationBar = true;
-            } else if (insertEscalationBar) {
-                insertEscalationBar = false;
-                bar = document.createElement("div");
-                bar.style = "height: 10pt;";
-                list.appendChild(bar);
-            }
-            if (task.nextDueDate > nextWeek) {
-                newItem.classList.add("futuretask");
-                dueDate.classList.add("futuretask");
-                if (!futureBarInserted) {
-                    futureBarInserted = true;
+        if (visibleRoles[task.owner] === false) {
+            // filter from list
+        } else {
+            var newItem = document.createElement("div");
+            newItem.className = "listitem";
+            var taskName = document.createElement("div");
+            taskName.className = "taskname";
+            taskName.innerText = task.name;
+            var dueDate = document.createElement("div");
+            dueDate.innerText = task.nextDueDate;
+            dueDate.className = "duedate";
+            if (!isHistoryList) {
+                if (task.nextDueDate < td) {
+                    dueDate.classList.add("escalated");
+                    insertEscalationBar = true;
+                } else if (insertEscalationBar) {
+                    insertEscalationBar = false;
                     bar = document.createElement("div");
                     bar.style = "height: 10pt;";
                     list.appendChild(bar);
                 }
+                if (task.nextDueDate > nextWeek) {
+                    newItem.classList.add("futuretask");
+                    dueDate.classList.add("futuretask");
+                    if (!futureBarInserted) {
+                        futureBarInserted = true;
+                        bar = document.createElement("div");
+                        bar.style = "height: 10pt;";
+                        list.appendChild(bar);
+                    }
+                }
             }
-        }
         
-        newItem.appendChild(taskName);
-        newItem.appendChild(dueDate);
-        newItem.userData = task;
-        newItem.onclick = function() {fillForm(task);};
-        list.appendChild(newItem);
+            newItem.appendChild(taskName);
+            newItem.appendChild(dueDate);
+            newItem.userData = task;
+            newItem.onclick = function() {fillForm(task);};
+            list.appendChild(newItem);
+        }
     });
 }
 

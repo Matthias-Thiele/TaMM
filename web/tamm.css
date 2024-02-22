@@ -259,3 +259,40 @@ input[type="radio"]:checked + label {
     font-size: 12pt;
     border-radius: 3px;
 }
+
+.filterlink {
+    padding: 3pt;
+    margin: 3pt;
+    font-size: 9pt;
+    cursor: pointer;
+}
+
+.roleslist {
+    display: none;
+    position: fixed;
+    width: 100pt;
+    background-color: white;
+    border: 1px silver solid;
+    border-radius: 5px;
+    box-shadow: 5px 3px 3px gray; 
+    padding: 5pt;
+}
+
+.showroleslist {
+     display: block;
+     animation: fade_in_show 0.5s
+}
+
+@keyframes fade_in_show {
+     0% {
+          opacity: 0;
+          transform: scale(0);
+          max-height: 0%;
+     }
+
+     100% {
+          opacity: 1;
+          transform: scale(1);
+          max-height: 100%;
+     }
+}
