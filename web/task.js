@@ -346,7 +346,7 @@ function addDateField(initialValue) {
     var root = document.getElementById("datelist");
     var dateField = document.createElement("input");
     dateField.type = "date";
-    dateField.style = "margin-right: 5pt;";
+    dateField.style = "margin: 5pt;";
     dateField.name = "startdate";
     dateField.onchange = function() {changed();};
     if (initialValue) {

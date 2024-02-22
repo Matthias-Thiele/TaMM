@@ -51,7 +51,7 @@
         <script src="task.js"></script> 
         <script>
             var sessionData;
-            var selectedTask;
+            var selectedTask = {lId: "-1"};
             var userlist;
             /**
              * Load user information and other session data.
@@ -166,7 +166,7 @@
                     if (deferredAdvance) {
                         advanceNow();
                     } else {
-                        emptyTask = {};
+                        emptyTask = {lId: "-1"};
                         fillForm(emptyTask);
                         setTimeout(filterTasks, 200);
                     }
@@ -312,12 +312,23 @@
                     <div id="tasklist" class="selectlist" style="margin-top:5pt;"></div>
                 </div>
                 <div class="">
+                    <div class="floatingpanel">
+                        <button id="save" disabled onclick="doSave();" class="floatingbutton" style="background-color: #d0fff0;" data-key="save">Speichern</button>
+                        <button id="advance" disabled onclick="doAdvance();" class="floatingbutton" data-key="done">Erledigt</button>
+                        <button id="history" onclick="doHistory();" class="floatingbutton" disabled data-key="history">History</button>
+                        <button id="remove" onclick="doRemove();" class="floatingbutton" disabled data-key="delete">Löschen</button>
+                    </div>
                     <div class="subheader" data-key="taskinfo">Aufgabenbeschreibung</div>
                     <div><label for="name" data-key="taskname">Bezeichnung</label><input onchange="changed()" size="44" type="text" id="name"><input type="text" id="tasklid" readonly hidden></div>
                     <div><label for="description" data-key="taskdesc">Beschreibung</label><textarea onchange="changed()" rows="12" cols="50" id="description" style="resize:both"></textarea></div>
-                    <div><label for="createdate" data-key="created">Erzeugt am</label><input id="createdate" readonly></div>
-                    <div><label for="lastchanged" data-key="changed">Geändert am</label><input id="lastchanged" readonly></div>
                     <div><label for="owner" data-key="owner">Eigentümer</label><input id="owner" list="userlist" onchange="changed(); updateListInput(event, userlist)"></div>
+                    <div>
+                        <div class="subheader" data-key="startdate">Startdatum</div>
+                        <div>
+                            <span id="datelist" class="datelist"><input name="startdate" type="date" style="margin: 5pt" onchange="changed()"></span>
+                            <button id="dateadd" onclick="addDateField();" data-key="adddate">+ Datum hinzufügen</button>
+                        </div>
+                    </div>
                     <div><label for="duedate" data-key="nextdue">Nächster Start</label><input id="duedate" type="date" onchange="changed()"></div>
                     <hr>
                     <div class="flex-container">
@@ -328,12 +339,7 @@
                             <input type="radio" name="interval" id="weekly" value="weekly" onchange="changed()"> <label for="weekly" data-key="intweekly">Wöchentlich</label><br>
                             <input type="radio" name="interval" id="monthly" value="monthly" onchange="changed()"> <label for="monthly" data-key="intmonthly">Monatlich</label><br>
                             <input type="radio" name="interval" id="yearly" value="yearly" onchange="changed()"> <label for="yearly" data-key="intyearly">Jährlich</label><br>
-                        </div>
-                        <div>
-                            <div class="subheader" data-key="startdate">Startdatum</div>
-                            <div><span data-key="divider">Teiler</span> <input type="number" id="divider" style="width: 40pt; margin-bottom: 6pt;" value="1" min="1" max="9999" onchange="changed()"></div>
-                            <div><button id="dateadd" onclick="addDateField();" data-key="adddate">+ Datum hinzufügen</button></div>
-                            <div id="datelist" class="datelist"><input name="startdate" type="date" style="margin-right: 5pt" onchange="changed()"></div>
+                            <div style="margin: 5pt;"><span data-key="divider">Teiler</span> <input type="number" id="divider" style="width: 40pt;" value="1" min="1" max="9999" onchange="changed()"></div>
                         </div>
                         <div>
                             <div class="subheader" data-key="attachments">Dateianbindungen</div>
@@ -342,12 +348,8 @@
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <button id="save" disabled onclick="doSave();" style="margin-right: 5pt;" data-key="save">Speichern</button>
-                        <button id="advance" disabled onclick="doAdvance();" style="margin-right: 5pt;" data-key="done">Erledigt</button>
-                        <button id="history" onclick="doHistory();" style="margin-right: 5pt;" disabled data-key="history">History</button>
-                        <button id="remove" onclick="doRemove();" style="margin-right: 5pt;" disabled data-key="delete">Löschen</button>
-                    </div>
+                    <div><label for="createdate" data-key="created">Erzeugt am</label><input id="createdate" readonly></div>
+                    <div><label for="lastchanged" data-key="changed">Geändert am</label><input id="lastchanged" readonly></div>
                 </div>
             </div>
             <div class="statusbar" id="status"></div>

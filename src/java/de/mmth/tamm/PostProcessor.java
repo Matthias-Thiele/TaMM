@@ -297,6 +297,7 @@ public class PostProcessor {
           }
         } else {
           logger.debug("Name or Mail mismatch for " + userData.name + " and " + userData.mail);
+          message = Txt.get(session.lang, "unknown_user_or_mail");
         }
       }
     } catch(TammError ex) {
