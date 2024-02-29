@@ -21,7 +21,7 @@ function addTask() {
  * @param {type} taskId
  * @returns {undefined}
  */
-function disableButton(buttonName, taskId) {
+function disableElement(buttonName, taskId) {
     var bt = document.getElementById(buttonName);
     if (bt) {
         bt.disabled = (taskId === "-1") || !taskId;
@@ -36,9 +36,10 @@ function disableButton(buttonName, taskId) {
 function fillForm(taskData) {
     hideDialog();
     selectedTask = taskData;
-    disableButton("advance", taskData.lId);
-    disableButton("remove", taskData.lId);
-    disableButton("history", taskData.lId);
+    disableElement("advance", taskData.lId);
+    disableElement("remove", taskData.lId);
+    disableElement("history", taskData.lId);
+    disableElement("duedate", taskData.lId);
     
     var status = document.getElementById("status");
     status.innerText = "";
