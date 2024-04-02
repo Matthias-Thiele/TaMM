@@ -139,6 +139,7 @@ TxtDe.dlgdeleteuserchoice1 = "Nein, den aktuellen Anwender nicht löschen.";
 TxtDe.dlgdeleteuserchoice2a = "Ja, den akutellen Anwender löschen und seine Aufgaben an den Anwender ";
 TxtDe.dlgdeleteuserchoice2b = " übertragen";
 TxtDe.dlgdeleteuserchoice3 = "Ja, den aktuellen Anwender und alle Aufgaben die ihm zugeordnet sind löschen.";
+TxtDe.dobackup = "Datensicherung";
 
 var TxtFr = {};
 TxtFr.home = "Liste des tâches" ;
@@ -275,6 +276,7 @@ TxtFr.dlgdeleteuserchoice1 = "Non, ne supprimez pas l'utilisateur actuel.";
 TxtFr.dlgdeleteuserchoice2a = "Oui, supprimer l'utilisateur actuel et attribuer ses tâches à l'utilisateur ";
 TxtFr.dlgdeleteuserchoice2b = "transfert" ;
 TxtFr.dlgdeleteuserchoice3 = "Oui, supprime l'utilisateur actuel et toutes les tâches qui lui sont assignées.";
+TxtFr.dobackup = "Backup";
 
 
 var TxtEn = {};
@@ -412,6 +414,7 @@ TxtEn.dlgdeleteuserchoice1 = "No, do not delete the current user.";
 TxtEn.dlgdeleteuserchoice2a = "Yes, delete the current user and assign his tasks to the user ";
 TxtEn.dlgdeleteuserchoice2b = "";
 TxtEn.dlgdeleteuserchoice3 = "Yes, delete the current user and all tasks assigned to him.";
+TxtEn.dobackup = "Backup";
 
 var Txt;
 
