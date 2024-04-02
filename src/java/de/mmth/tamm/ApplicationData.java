@@ -60,6 +60,8 @@ public class ApplicationData {
   private String schemaName;
   private String hostName;
   private String obfuscatorKey;
+  private ClientData defaultClient = null;
+  
   public AdminData adminData = new AdminData();
   
   public DBConnect db;
@@ -86,7 +88,7 @@ public class ApplicationData {
   public KeepAliveCache keepAlive = new KeepAliveCache();
   
   public Placeholder placeholder = new Placeholder();
-  private ClientData defaultClient = null;
+  public TaskReport taskReport;
   
   /**
    * Reads the database access information from the registry
@@ -135,6 +137,7 @@ public class ApplicationData {
         assignments = new RoleAssignmentTable(db, "roleassignments");
         mailCounter = new LimitSentMails(adminData.mailsperday, adminData.mailsperdomainperday, CLEAR_MAIL_COUNTER_PERIOD);
         accessCache = new InvalidAccessCache(adminData.loginretry, DECAY_INTERVAL);
+        taskReport = new TaskReport(adminData.uploadbase);
         
         if (!adminData.mailadminname.isBlank() && !adminData.mailadminpwd.isBlank() && !adminData.mailhost.isBlank()) {
           mailer = new SendMail(adminData.mailhost, adminData.mailadminname, adminData.mailadminpwd);

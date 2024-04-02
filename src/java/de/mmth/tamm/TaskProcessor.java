@@ -75,8 +75,10 @@ public class TaskProcessor {
     if (taskData.nextDueDate.isBlank()) {
       taskData.nextDueDate = nextDueDate(taskData);
     }
+    
     taskData.clientId = session.client.id;
     long lid = application.tasks.writeTask(taskData, false);
+    application.taskReport.log(taskData);
     logger.debug("Task written: " + lid + " : " + taskData.name);
     ServletUtils.sendResult(resultData, true, "", "", "", Long.toString(lid));
   }
