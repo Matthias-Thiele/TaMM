@@ -17,6 +17,7 @@ import java.util.Date;
  */
 public class DateUtils {
   private static final DateTimeFormatter timeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+  private static final DateTimeFormatter systemformatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
   private static final DateTimeFormatter dateformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final SimpleDateFormat isoDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   
@@ -34,6 +35,23 @@ public class DateUtils {
     }
     
     return date.format(timeformatter);
+  }
+  
+  /**
+   * Format a  zoned date time object into an ISO date string.
+   * 
+   * A null date will be replaced by 'now'. Returns a string
+   * without formatting characters.
+   * 
+   * @param date
+   * @return 
+   */
+  public static String formatS(ZonedDateTime date) {
+    if (date == null) {
+      date = ZonedDateTime.now();
+    }
+    
+    return date.format(systemformatter);
   }
   
   /**

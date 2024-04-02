@@ -14,6 +14,7 @@ import de.mmth.tamm.progress.Interval;
 import de.mmth.tamm.utils.DateUtils;
 import de.mmth.tamm.utils.ServletUtils;
 import de.mmth.tamm.utils.Txt;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;

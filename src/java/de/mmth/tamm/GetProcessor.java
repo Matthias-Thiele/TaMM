@@ -12,18 +12,22 @@ import de.mmth.tamm.data.RoleAssignmentData;
 import de.mmth.tamm.data.RoleData;
 import de.mmth.tamm.data.SessionData;
 import de.mmth.tamm.utils.DateUtils;
+import de.mmth.tamm.utils.FileUtils;
 import de.mmth.tamm.utils.Placeholder;
 import de.mmth.tamm.utils.RequestCache;
 import de.mmth.tamm.utils.ServletUtils;
 import de.mmth.tamm.utils.Txt;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.apache.commons.mail.EmailException;
 import org.apache.logging.log4j.Logger;
 
@@ -60,6 +64,10 @@ public class GetProcessor {
   public void process(SessionData session, String cmd, InputStream sourceData, OutputStream resultData, String cmd4) throws IOException, TammError {
     logger.info("Get " + cmd);
     switch (cmd) {
+      case "backup":
+        processBackup(resultData, session, cmd4);
+        break;
+        
       case "session":
         processSession(resultData, session);
         break;
@@ -105,6 +113,52 @@ public class GetProcessor {
         break;
     }
   }
+  
+  /**
+   * Create database backup and prepare ZIP file for download.
+   * 
+   * Uses a directory named "backup" side by side with the
+   * files upload directory. 
+   * 
+   * @param resultData
+   * @param session
+   * @param cmd
+   * @throws TammError
+   * @throws IOException 
+   */
+  private void processBackup(OutputStream resultData, SessionData session, String cmd) throws TammError, IOException {
+    if (session.user.mainAdmin) {
+      if ((cmd == null) || cmd.isBlank()) {
+        var destinationDir = new File(application.backupbase, "Backup." + DateUtils.formatS(null));
+        destinationDir.mkdir();
+        List<File> files = new ArrayList<>();
+        files.add(application.tasks.backup(application.copyManager, destinationDir));
+        files.add(application.clients.backup(application.copyManager, destinationDir));
+        files.add(application.assignments.backup(application.copyManager, destinationDir));
+        files.add(application.attachments.backup(application.copyManager, destinationDir));
+        files.add(application.history.backup(application.copyManager, destinationDir));
+        files.add(application.locks.backup(application.copyManager, destinationDir));
+        files.add(application.roles.backup(application.copyManager, destinationDir));
+        var guid = "Backup." + DateUtils.formatS(null) + "-" + UUID.randomUUID().toString();
+        FileUtils.zipDirectory(destinationDir, guid);
+        
+        // remove temp files
+        for (var file: files) {
+          file.delete();
+        }
+        destinationDir.delete();
+        
+        ServletUtils.sendResult(resultData, true, "", "", guid, session);
+      } else {
+        // upload zip File
+        var zipFile = new File(application.backupbase, cmd + ".zip");
+        if (zipFile.exists()) {
+          Files.copy(zipFile.toPath(), resultData);
+        }
+      }
+    }
+  }
+  
   
   /**
    * User request to add his mail address to the lock list.

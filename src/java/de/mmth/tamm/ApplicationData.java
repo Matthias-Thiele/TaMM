@@ -28,10 +28,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
+import org.postgresql.copy.CopyManager;
+import org.postgresql.core.BaseConnection;
 
 /**
  *
@@ -80,6 +83,8 @@ public class ApplicationData {
   public List<ClientData> clientList;
   public Map<String, ClientData> clientNames;
   public File rootPath;
+  public File backupbase;
+
   public AttachmentTable attachments;
   public SendMail mailer = null;
   public TemplateCache templates = new TemplateCache("templates");
@@ -89,6 +94,7 @@ public class ApplicationData {
   
   public Placeholder placeholder = new Placeholder();
   public TaskReport taskReport;
+  public CopyManager copyManager;
   
   /**
    * Reads the database access information from the registry
@@ -138,6 +144,7 @@ public class ApplicationData {
         mailCounter = new LimitSentMails(adminData.mailsperday, adminData.mailsperdomainperday, CLEAR_MAIL_COUNTER_PERIOD);
         accessCache = new InvalidAccessCache(adminData.loginretry, DECAY_INTERVAL);
         taskReport = new TaskReport(adminData.uploadbase);
+        prepareCopyManager();
         
         if (!adminData.mailadminname.isBlank() && !adminData.mailadminpwd.isBlank() && !adminData.mailhost.isBlank()) {
           mailer = new SendMail(adminData.mailhost, adminData.mailadminname, adminData.mailadminpwd);
@@ -167,6 +174,20 @@ public class ApplicationData {
   }
   
   /**
+   * Prepares the CopyManager for the backup function.
+   * If this fails, only a warning in the log will be seen,
+   * the application will not be stopped. Up to discussion...
+   */
+  private void prepareCopyManager() {
+    try {
+      copyManager = new CopyManager((BaseConnection)db.getConnection());
+    } catch (SQLException ex) {
+      logger.warn("Cannot prepare CopyManager, no backup available.", ex);
+    }
+    
+  }
+  
+  /**
    * Creates all directories for the root path of the upload base.
    */
   private void prepareUploadBase() {
@@ -179,6 +200,9 @@ public class ApplicationData {
     try {
       Files.createDirectories(rootFile.toPath());
       rootPath = rootFile;
+      
+      backupbase = new File(rootFile.getParentFile(), "backup");
+      backupbase.mkdir();
     } catch (IOException ex) {
       logger.warn("Cannot create upload base directory. No file upload available.", ex);
       rootPath = null;

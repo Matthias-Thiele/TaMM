@@ -6,10 +6,15 @@
 package de.mmth.tamm.db;
 
 import de.mmth.tamm.TammLogger;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.logging.log4j.Logger;
+import org.postgresql.copy.CopyManager;
 
 /**
  * Base class for all postgres tables.
@@ -89,6 +94,28 @@ public class DBTable {
    */
   public String getTableName() {
     return tableName;
+  }
+  
+  /**
+   * Writes the table content into the given directory.
+   * 
+   * @param manager
+   * @param destinationDir 
+   * @return  
+   */
+  public File backup(CopyManager manager, File destinationDir) {
+    File destFile = new File(destinationDir, tableName + ".sql");
+    try {
+      try (OutputStream os = new FileOutputStream(destFile)) {
+        var cmd = "COPY " + tableName + " TO STDOUT";
+        logger.debug("SQL: " + cmd);
+        manager.copyOut(cmd, os);
+        return destFile;
+      }
+    } catch (IOException | SQLException ex) {
+      logger.warn("Error writing table backup file.", ex);
+      return null;
+    }
   }
   
   /**
@@ -229,6 +256,11 @@ public class DBTable {
     return result;
   }
 
+  /**
+   * Create indexes from the given index information.
+   * 
+   * @param postprocessing 
+   */
   private void buildIndexes(String postprocessing) {
     if (postprocessing.isEmpty()) {
       logger.debug("No index information supplied, nothing to do.");

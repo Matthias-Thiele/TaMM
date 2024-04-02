@@ -25,6 +25,8 @@ public class DateUtilsTest {
     ZonedDateTime date = ZonedDateTime.now();
     String result = DateUtils.formatZ(date);
     assertEquals(19, result.length());
+    String result2 = DateUtils.formatS(date);
+    assertEquals(14, result2.length());
     
     LocalDate ldate = LocalDate.now();
     result = DateUtils.formatL(ldate);
