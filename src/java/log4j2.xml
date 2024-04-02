@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="debug">
   <Appenders>
-    <File name="file" fileName="${sys:loggerdirectory}/tamm.log" filePattern="${sys:loggerdirectory}/tamm-%d{yyyy-MM-dd}-%i.log">
+    <RollingFile  name="file" fileName="${sys:loggerdirectory}/tamm.log" filePattern="${sys:loggerdirectory}/tamm-%d{yyyy-MM-dd}-%i.log">
       <PatternLayout>
         <Pattern>%d %p %c{1} %L [%t] %m %ex%n</Pattern>
       </PatternLayout>
-    </File>  
+      <Policies>
+        <TimeBasedTriggeringPolicy />
+        <SizeBasedTriggeringPolicy size="250 MB"/>
+      </Policies>
+    </RollingFile>
   </Appenders>
   <Loggers>
     <Root level="debug">

@@ -129,7 +129,6 @@ public class RequestCache {
       return;
     }
     
-    logger.debug("Check cleanup.");
     nextCleanup = new Date((new Date()).getTime() + 60000);
     List<String> forRemoval = new ArrayList<>();
     for (var item: cache.entrySet()) {
