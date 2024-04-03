@@ -7,8 +7,10 @@ package de.mmth.tamm.db;
 
 import de.mmth.tamm.TammLogger;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -107,15 +109,74 @@ public class DBTable {
     File destFile = new File(destinationDir, tableName + ".sql");
     try {
       try (OutputStream os = new FileOutputStream(destFile)) {
-        var cmd = "COPY " + tableName + " TO STDOUT";
+        var cmd = "COPY " + tableName + " TO STDOUT CSV";
         logger.debug("SQL: " + cmd);
         manager.copyOut(cmd, os);
         return destFile;
       }
     } catch (IOException | SQLException ex) {
-      logger.warn("Error writing table backup file.", ex);
+      logger.warn("Error writing table backup file: " + destFile.getPath(), ex);
       return null;
     }
+  }
+  
+  /**
+   * Returns the number of rows.
+   * @return 
+   */
+  public long getRowCount() {
+    try {
+      var cmd = "SELECT COUNT(*) FROM " + tableName;
+      try (java.sql.PreparedStatement tableInfo = conn.getConnection().prepareStatement(cmd)) {
+        var result = tableInfo.executeQuery();
+        if (result.next()) {
+          long count = result.getLong(1);
+          logger.debug("Table " + tableName + " has " + count + " rows.");
+          return count;
+        }
+      }
+    } catch (SQLException ex) {
+      logger.warn("Error reading row count.", ex);
+    }
+    
+    return -1;
+  }
+  
+  /**
+   * Restores the table from the given directory.
+   * 
+   * If the directory contains a file with the table
+   * name then perform the copyIn operation.
+   * 
+   * @param manager
+   * @param sourceDir
+   * @return 
+   */
+  public File restore(CopyManager manager, File sourceDir) {
+    long rowCount = getRowCount();
+    if (tableName.equals("clientlist") && rowCount == 1) {
+      rowCount = 0;
+    }
+    
+    if (rowCount != 0) {
+      logger.warn("Can only restore into an empty table.");
+      return null;
+    }
+    
+    File sourceFile = new File(sourceDir, tableName + ".sql");
+    if (sourceFile.exists()) {
+      try {
+        try (InputStream is = new FileInputStream(sourceFile)) {
+          var cmd = "COPY " + tableName + " FROM STDIN CSV";
+          logger.debug("SQL: " + cmd);
+          manager.copyIn(cmd, is);
+        }
+        return sourceFile;
+      } catch(IOException | SQLException ex) {
+        logger.warn("Error reading table backup file: " + sourceFile.getPath(), ex);
+      }
+    } 
+    return null;
   }
   
   /**

@@ -21,6 +21,7 @@ public class BackgroundWorker extends Thread {
    */
   public BackgroundWorker(ApplicationData application) {
     this.application = application;
+    this.setName("TaMM Background Worker");
   }
   
   /**

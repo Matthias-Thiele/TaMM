@@ -51,15 +51,14 @@ public final class UserTable extends DBTable {
    */
   public UserTable(DBConnect conn, String tableName) {
     super(conn, tableName, TABLE_CONFIG, INDEX_CONFIG);
-    assureAdminUser();
   }
   
   /**
    * Make sure that a new table at least contains
    * the default admin user.
    */
-  private void assureAdminUser() {
-    if (isNewTable) {
+  public void assureAdminUser() {
+    if (getRowCount() == 0) {
       UserData admin = new UserData();
       admin.name = "admin";
       admin.pwd = PasswordUtils.encodePassword("tamm279");

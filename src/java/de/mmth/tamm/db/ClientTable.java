@@ -44,11 +44,15 @@ public final class ClientTable extends DBTable {
    */
   public ClientTable(DBConnect conn, String tableName) {
     super(conn, tableName, TABLE_CONFIG, INDEX_CONFIG);
-    assureMainClient();
   }
   
-  private void assureMainClient() {
-    if (isNewTable) {
+  /**
+   * Make sure that at least one Client is available.
+   * 
+   * The default client matches all hosts.
+   */
+  public void assureMainClient() {
+    if (getRowCount() == 0) {
       ClientData defaultClient = new ClientData();
       defaultClient.id = -1;
       defaultClient.name = "TaMM";

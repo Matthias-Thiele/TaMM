@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -46,5 +47,99 @@ public class FileUtils {
     }
     
     return zipFile;
+  }
+  
+  /**
+   * Unzips the given file into a directory with the same name.
+   * 
+   * The destination directory lies side by side to the source
+   * file and has the same name but no extension.
+   * 
+   * @param sourceFile
+   * @return 
+   */
+  public static File unzipIntoDirectory(File sourceFile) throws FileNotFoundException, IOException {
+    var dirName = removeExtension(sourceFile.getName());
+    var dir = new File(sourceFile.getParentFile(), dirName);
+    if (!dir.exists()) {
+      dir.mkdir();
+    }
+    
+    var buffer = new byte[1000];
+    try (FileInputStream zipData = new FileInputStream(sourceFile)) {
+      ZipInputStream zis = new ZipInputStream(zipData);
+      for (;;) {
+        var zipEntry = zis.getNextEntry();
+        if (zipEntry == null) {
+          break;
+        }
+        
+        var fileName = zipEntry.getName();
+        var file = new File(dir, fileName);
+        try (FileOutputStream unzippedData = new FileOutputStream(file)) {
+          for (;;) {
+            var len = zis.read(buffer);
+            if (len < 1) {
+              break;
+            }
+            
+            unzippedData.write(buffer, 0, len);
+          }
+        }
+        
+        zis.closeEntry();
+      }
+    }
+    
+    return dir;
+  }
+  
+  /**
+   * Removes the extension from the given file name.
+   * 
+   * @param fileNameWithExtension
+   * @return 
+   */
+  public static String removeExtension(String fileNameWithExtension) {
+    if (fileNameWithExtension == null) {
+      return null;
+    }
+    
+    var dotPos = fileNameWithExtension.lastIndexOf('.');
+    if (dotPos < 1) {
+      return fileNameWithExtension; // no extension found
+    } else {
+      return fileNameWithExtension.substring(0, dotPos);
+    }
+  }
+  
+  /**
+   * Returns the extension of the given file name
+   * @param fileNameWithExtension
+   * @return 
+   */
+  public static String getExtension(String fileNameWithExtension) {
+    if (fileNameWithExtension == null) {
+      return null;
+    }
+    
+    var dotPos = fileNameWithExtension.lastIndexOf('.');
+    if (dotPos < 1) {
+      return ""; // no extension found
+    } else {
+      return fileNameWithExtension.substring(dotPos + 1);
+    }
+    
+  }
+  
+  /**
+   * Checks if the given file name has the given extension (case insensitive)
+   * @param fileName
+   * @param extension
+   * @return 
+   */
+  public static boolean hasExtension(String fileName, String extension) {
+    var ext = getExtension(fileName);
+    return ext.compareToIgnoreCase(extension) == 0;
   }
 }

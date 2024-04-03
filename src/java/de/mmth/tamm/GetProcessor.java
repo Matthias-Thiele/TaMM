@@ -139,6 +139,7 @@ public class GetProcessor {
         files.add(application.history.backup(application.copyManager, destinationDir));
         files.add(application.locks.backup(application.copyManager, destinationDir));
         files.add(application.roles.backup(application.copyManager, destinationDir));
+        files.add(application.users.backup(application.copyManager, destinationDir));
         var guid = "Backup." + DateUtils.formatS(null) + "-" + UUID.randomUUID().toString();
         FileUtils.zipDirectory(destinationDir, guid);
         
@@ -148,10 +149,10 @@ public class GetProcessor {
         }
         destinationDir.delete();
         
-        ServletUtils.sendResult(resultData, true, "", "", guid, session);
+        ServletUtils.sendResult(resultData, true, "", "", guid + ".zip", session);
       } else {
         // upload zip File
-        var zipFile = new File(application.backupbase, cmd + ".zip");
+        var zipFile = new File(application.backupbase, cmd);
         if (zipFile.exists()) {
           Files.copy(zipFile.toPath(), resultData);
         }

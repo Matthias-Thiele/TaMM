@@ -10,12 +10,14 @@ import de.mmth.tamm.data.KeyValue;
 import de.mmth.tamm.db.AttachmentTable;
 import de.mmth.tamm.db.ClientTable;
 import de.mmth.tamm.db.DBConnect;
+import de.mmth.tamm.db.DBTable;
 import de.mmth.tamm.db.LockTable;
 import de.mmth.tamm.db.RoleAssignmentTable;
 import de.mmth.tamm.db.RoleTable;
 import de.mmth.tamm.db.TaskTable;
 import de.mmth.tamm.db.UserTable;
 import de.mmth.tamm.progress.SendMail;
+import de.mmth.tamm.utils.FileUtils;
 import de.mmth.tamm.utils.InvalidAccessCache;
 import de.mmth.tamm.utils.KeepAliveCache;
 import de.mmth.tamm.utils.LimitSentMails;
@@ -95,6 +97,7 @@ public class ApplicationData {
   public Placeholder placeholder = new Placeholder();
   public TaskReport taskReport;
   public CopyManager copyManager;
+  private File restorebase;
   
   /**
    * Reads the database access information from the registry
@@ -150,7 +153,6 @@ public class ApplicationData {
           mailer = new SendMail(adminData.mailhost, adminData.mailadminname, adminData.mailadminpwd);
         }
         
-        refreshClientNames();
         requests = new RequestCache();
         prepareUploadBase();
         
@@ -166,7 +168,12 @@ public class ApplicationData {
           }
           
           templates.setFileRoot(rootPath);
-        }
+          checkRestore();
+          
+          users.assureAdminUser();
+          clients.assureMainClient();
+          refreshClientNames();
+       }
       }
     }
     
@@ -203,6 +210,9 @@ public class ApplicationData {
       
       backupbase = new File(rootFile.getParentFile(), "backup");
       backupbase.mkdir();
+      
+      restorebase = new File(rootFile.getParentFile(), "restore");
+      restorebase.mkdir();
     } catch (IOException ex) {
       logger.warn("Cannot create upload base directory. No file upload available.", ex);
       rootPath = null;
@@ -322,5 +332,65 @@ public class ApplicationData {
 
   void setSchema(String name) {
     schemaName = name;
+  }
+  
+  /**
+   * Checks the restore directory for ZIP files with restore data.
+   * 
+   * After processing the file it will be renamed with the
+   * extension ".processed" - so further checks will ignore it.
+   * 
+   * After successful restore it should be removed manually.
+   * For retries just remove the additional extension.
+   */
+  public void checkRestore() {
+    if (restorebase.exists()) {
+      File[] entries = restorebase.listFiles();
+      if (entries != null) {
+        for (var file: entries) {
+          if (file.isFile() && FileUtils.hasExtension(file.getName(), "zip")) {
+            try {
+              doRestore(file);
+              
+              var renamedFile = new File(file.getParentFile(), file.getName() + ".processed");
+              file.renameTo(renamedFile);
+            } catch(IOException ex) {
+              logger.warn("Restore error.", ex);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  /**
+   * Tries to restore the given file into the database.
+   * 
+   * Each table has its own data file. On successful
+   * restore operation the file will be deleted. If
+   * all tables are restored successfully the unzip
+   * directory will be deleted. Otherwise it remains
+   * with the files of the not successfull restored
+   * tables.
+   * 
+   * @param sourceData
+   * @throws IOException 
+   */
+  private void doRestore(File sourceData) throws IOException {
+    File unzipDir = FileUtils.unzipIntoDirectory(sourceData);
+    if (unzipDir != null && unzipDir.exists()) {
+      DBTable[] tables = {users, tasks, history, clients, locks, assignments, attachments, roles};
+      for (var table: tables) {
+        var file = table.restore(copyManager, unzipDir);
+        if (file != null) {
+          logger.debug("Table " + file.getName() + " restored, delete file.");
+          file.delete();
+        } else {
+          logger.warn("Table " + table.getTableName() + " not restored, keep file.");
+        }
+      }
+      
+      unzipDir.delete();
+    }
   }
 }
